@@ -23,7 +23,9 @@ export default function App() {
   const [tab, setTab] = useState('home')
   const [loading, setLoading] = useState(false)
   const [payload, setPayload] = useState<unknown>(null)
-  const [qAssist, setQAssist] = useState('Koje su teme kursa za Mašinsko učenje?')
+  const [qAssist, setQAssist] = useState(
+    'Koji predmet pokriva NoSQL baze i šta uključuje sadržaj kursa?'
+  )
 
   const logout = () => {
     setToken(null)
@@ -213,12 +215,12 @@ export default function App() {
               </section>
             ) : null}
 
-            {tab === 'assistant' ? (
+            {tab === 'assistant' && role === 'STUDENT' ? (
               <section>
                 <h2>Semantička pretraga + LLM</h2>
                 <p className="sub">
-                  Kontekst dolazi iz Qdrant vektorske baze. Opciono postavite{' '}
-                  <code>OPENAI_API_KEY</code> na backend kontejneru za pun odgovor.
+                  Pretraga je ograničena na predmete sa tvog studijskog programa (Qdrant + filter). Opciono:{' '}
+                  <code>OPENAI_API_KEY</code> na relational-database-service za odgovor LLM-a.
                 </p>
                 <textarea
                   className="q-area"

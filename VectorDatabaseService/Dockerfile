@@ -12,7 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py ingest.py ./
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Strip CRLF when the repo was checked out on Windows (fixes "no such file or directory" on exec)
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=3 \

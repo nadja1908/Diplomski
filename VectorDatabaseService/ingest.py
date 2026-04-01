@@ -52,6 +52,7 @@ def main():
     batch_texts: list[str] = []
     batch_payloads: list[dict] = []
     next_id = 0
+    rows_seen = 0
 
     def flush():
         nonlocal next_id
@@ -79,20 +80,21 @@ def main():
                 continue
             row = json.loads(line)
             batch_texts.append(row["text"])
-            batch_payloads.append(
-                {
-                    "predmet_id": row.get("predmet_id"),
-                    "predmet_sifra": row.get("predmet_sifra", ""),
-                    "predmet_naziv": row.get("predmet_naziv", ""),
-                    "tip": row.get("tip", "tekst"),
-                    "text": row["text"][:4000],
-                }
-            )
+            pl = {k: v for k, v in row.items()}
+            if "predmet_id" in pl and pl["predmet_id"] is not None:
+                pl["predmet_id"] = int(pl["predmet_id"])
+            if "espb" in pl and pl["espb"] is not None:
+                pl["espb"] = int(pl["espb"])
+            pl["text"] = str(row.get("text", ""))[:4000]
+            batch_payloads.append(pl)
             if len(batch_texts) >= BATCH:
                 flush()
         flush()
 
     log.info("Ingest complete, %d points.", next_id)
+    if rows_seen > 0 and next_id == 0:
+        log.error("Chunk file had %d lines but no vectors were stored.", rows_seen)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

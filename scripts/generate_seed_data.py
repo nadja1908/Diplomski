@@ -225,6 +225,7 @@ CREATE INDEX idx_predmet_katedra ON predmet(katedra_id);
         heads.append((uid, i + 1))
 
     prof_uids: list[tuple[int, int]] = []
+    prof_by_kat: dict[int, list[str]] = {}
     zvanja = ["docent", "vanredni profesor", "redovni profesor"]
     for j in range(16):
         uid += 1
@@ -232,6 +233,8 @@ CREATE INDEX idx_predmet_katedra ON predmet(katedra_id);
         email = f"prof{j + 1:02d}@{EMAIL_DOMAIN}"
         imena = ("Milan", "Jelena", "Stefan", "Ivana", "Nikola", "Tamara")
         prezimena = ("Ilić", "Đorđević", "Popović", "Đurić", "Kostić", "Marković")
+        full_name = f"{imena[j % 6]} {prezimena[j % 6]}"
+        prof_by_kat.setdefault(kat, []).append(full_name)
         w(
             f"INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES "
             f"({uid}, '{email}', '{hpw_prof}', '{imena[j % 6]}', '{prezimena[j % 6]}', 'PROFESOR');"
@@ -303,56 +306,38 @@ CREATE INDEX idx_predmet_katedra ON predmet(katedra_id);
         )
         teme = (
             f"Tok kursa obuhvata osnovne teme iz {nz.lower()}, uključujući pregled literature, "
-            "rad u razvojnom okruženju i vežbe iz tipskih zadataka iz_ispitne prakse."
+            "rad u razvojnom okruženju i vežbe iz tipskih zadataka iz ispitne prakse."
         )
+        if sif == "13S041":
+            teme = (
+                "Tok kursa uključuje relacioni model i SQL, normalizaciju i transakcije, zatim uvod u NoSQL "
+                "baze: dokument-model (MongoDB ili slično), ključ-vrednost i kolonsko orijentisane baze, "
+                "CAP teoremu, izbor tehnologije i optimizaciju upita u praksi."
+            )
         w(
             f"INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa) VALUES "
             f"({pid}, '{esc(cilj)}', '{esc(ishod)}', '{esc(metode)}', '{esc(teme)}');"
         )
 
-        chunks.append(
-            {
-                "predmet_id": pid,
-                "predmet_sifra": sif,
-                "predmet_naziv": nz,
-                "tip": "opis",
-                "text": f"{nz} ({sif}): {opis}",
-            }
+        prof_names = prof_by_kat.get(kat, ["Nije dodeljen"])
+        profesor = prof_names[pid % len(prof_names)]
+        embed_text = (
+            f"{nz} ({sif}), {espb} ESPB. Predavač: {profesor}. Kratak opis: {opis} "
+            f"Cilj: {cilj} Ishodi učenja: {ishod} Metode nastave: {metode} Sadržaj kursa: {teme}"
         )
         chunks.append(
             {
                 "predmet_id": pid,
                 "predmet_sifra": sif,
                 "predmet_naziv": nz,
-                "tip": "cilj",
-                "text": cilj,
-            }
-        )
-        chunks.append(
-            {
-                "predmet_id": pid,
-                "predmet_sifra": sif,
-                "predmet_naziv": nz,
-                "tip": "ishodi",
-                "text": ishod,
-            }
-        )
-        chunks.append(
-            {
-                "predmet_id": pid,
-                "predmet_sifra": sif,
-                "predmet_naziv": nz,
-                "tip": "metode",
-                "text": metode,
-            }
-        )
-        chunks.append(
-            {
-                "predmet_id": pid,
-                "predmet_sifra": sif,
-                "predmet_naziv": nz,
-                "tip": "teme",
-                "text": teme,
+                "espb": espb,
+                "profesor": profesor,
+                "cilj": cilj,
+                "ishodi_ucenja": ishod,
+                "metode_nastave": metode,
+                "teme_kursa": teme,
+                "tip": "predmet",
+                "text": embed_text,
             }
         )
 

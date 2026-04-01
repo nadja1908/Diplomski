@@ -1,0 +1,143 @@
+services:
+  eureka-server:
+    build: ./EurekaService
+    ports:
+      - "8761:8761"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nais
+      POSTGRES_PASSWORD: nais
+      POSTGRES_DB: nais
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nais -d nais"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  cassandra:
+    image: cassandra:4.1
+    environment:
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 128M
+      CASSANDRA_CLUSTER_NAME: nais
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status | grep -E '^UN'"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 90s
+
+  cassandra-init:
+    image: cassandra:4.1
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./scripts/cassandra:/scripts:ro
+    entrypoint: ["/bin/bash", "-lc"]
+    command:
+      - |
+        set -e
+        for i in $$(seq 1 50); do
+          if /opt/cassandra/bin/cqlsh cassandra -f /scripts/00-keyspace.cql; then
+            echo 'Keyspace ready.'
+            exit 0
+          fi
+          echo "Attempt $$i: waiting for CQL..."
+          sleep 3
+        done
+        exit 1
+    restart: "no"
+
+  qdrant:
+    image: qdrant/qdrant:v1.11.0
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  vector-database-service:
+    build: ./VectorDatabaseService
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      INGEST_PATH: /data/chunks.jsonl
+    volumes:
+      - ./scripts/vector:/data:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+
+  relational-database-service:
+    build: ./RelationalDatabaseService
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: nais
+      DB_USER: nais
+      DB_PASSWORD: nais
+      VECTOR_SERVICE_URL: http://vector-database-service:8000
+      JWT_SECRET: nais-demo-secret-change-me-for-demo-32b
+      INTERNAL_API_SECRET: nais-internal-shared-secret
+    ports:
+      - "9030:9030"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      vector-database-service:
+        condition: service_started
+
+  columnar-database-service:
+    build: ./ColumnarDatabaseService
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      CASSANDRA_HOST: cassandra
+      CASSANDRA_DATACENTER: datacenter1
+      RELATIONAL_SERVICE_URL: http://relational-database-service:9030
+      INTERNAL_API_SECRET: nais-internal-shared-secret
+      JWT_SECRET: nais-demo-secret-change-me-for-demo-32b
+    ports:
+      - "9050:9050"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      cassandra:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+      relational-database-service:
+        condition: service_started
+
+  gateway-api:
+    build: ./GatewayService
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    ports:
+      - "9000:9000"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      relational-database-service:
+        condition: service_started
+      columnar-database-service:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  cassandra_data:
+  qdrant_data:

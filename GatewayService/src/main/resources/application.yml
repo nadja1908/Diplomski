@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: gateway-api
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - 'http://localhost:5173'
+              - 'http://127.0.0.1:5173'
+              - 'http://localhost:*'
+              - 'http://127.0.0.1:*'
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: '*'
+            allowCredentials: true
+      routes:
+        - id: relational-auth-student-head-assistant
+          uri: lb://relational-database-service
+          predicates:
+            - Path=/api/auth/**,/api/student/me/profile,/api/student/me/subjects-grades,/api/student/me/gpa,/api/head/students,/api/assistant/**
+        - id: columnar-statistics
+          uri: lb://columnar-database-service
+          predicates:
+            - Path=/api/student/me/statistics,/api/head/subjects/analytics,/api/head/trends/pass-fail,/api/head/performance-overview,/api/stats/**
+
+server:
+  port: 9000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

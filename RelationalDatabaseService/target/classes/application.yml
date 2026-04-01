@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: relational-database-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:nais}
+    username: ${DB_USER:nais}
+    password: ${DB_PASSWORD:nais}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+        jdbc:
+          time_zone: UTC
+
+server:
+  port: ${SERVER_PORT:9030}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+nais:
+  jwt:
+    secret: ${JWT_SECRET:nais-demo-secret-key-change-in-prod-min-32-chars!!}
+    expiration-ms: 86400000
+  vector-service:
+    base-url: ${VECTOR_SERVICE_URL:http://vector-database-service:8000}
+  llm:
+    openai-api-key: ${OPENAI_API_KEY:}
+    openai-model: ${OPENAI_MODEL:gpt-4o-mini}
+  internal-api-secret: ${INTERNAL_API_SECRET:nais-internal-shared-secret}
+
+logging:
+  level:
+    rs.ac.uns.acs.nais: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

@@ -28,4 +28,12 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             ORDER BY s.brojIndeksa
             """)
     List<Student> findByKatedraId(@Param("katedraId") Long katedraId);
+
+    @Query("""
+            SELECT s FROM Student s
+            JOIN FETCH s.korisnik
+            WHERE s.studijskiProgram.id = :programId
+            ORDER BY s.brojIndeksa
+            """)
+    List<Student> findByStudijskiProgramIdWithKorisnik(@Param("programId") long programId);
 }

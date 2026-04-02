@@ -10,7 +10,7 @@ import rs.ac.uns.acs.nais.service.AcademicQueryService;
 
 @RestController
 @RequestMapping("/api/student/me")
-@PreAuthorize("hasAuthority('ROLE_STUDENT')")
+@PreAuthorize("hasRole('STUDENT')")
 @RequiredArgsConstructor
 public class StudentController {
 
@@ -29,5 +29,10 @@ public class StudentController {
     @GetMapping("/gpa")
     public AcademicQueryService.GpaDto gpa(@AuthenticationPrincipal Long korisnikId) {
         return academicQueryService.gpa(korisnikId);
+    }
+
+    @GetMapping("/curriculum-progress")
+    public AcademicQueryService.CurriculumProgressDto curriculumProgress(@AuthenticationPrincipal Long korisnikId) {
+        return academicQueryService.curriculumProgress(korisnikId);
     }
 }

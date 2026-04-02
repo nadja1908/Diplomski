@@ -1,8 +1,14 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import './App.css'
 import { naisApi, setToken } from './api'
+import { HeadPortal } from './HeadPortal'
+import { StudentPortal } from './StudentPortal'
 
 type Role = string | null
+
+type ChatMessage =
+  | { id: string; role: 'user'; text: string }
+  | { id: string; role: 'assistant'; text: string; sources: string[] }
 
 function JsonBlock({ data }: { data: unknown }) {
   return (
@@ -14,18 +20,208 @@ function JsonBlock({ data }: { data: unknown }) {
   )
 }
 
+const WELCOME_TEXT =
+  'Zdravo! Pitaj me o predmetima, ocenama, proseku ili sadržaju kurseva — odgovaram iz tvog studijskog programa.'
+
+const CHAT_STARTERS = [
+  'Šta znaš o meni?',
+  'Koje predmete još nisam položio/la?',
+  'Koji predmet pokriva NoSQL?',
+  'Gde na programu ima programiranja?',
+  'Moj prosek i ocene',
+  'Spisak svih predmeta na mom programu',
+]
+
+function newId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+function ChatBotAvatar({
+  size = 40,
+  className,
+  fabStyle,
+}: {
+  size?: number
+  className?: string
+  /** Za plutajuće dugme: krug i senka umesto sirove slike. */
+  fabStyle?: boolean
+}) {
+  const [broken, setBroken] = useState(false)
+  if (broken) {
+    return (
+      <span
+        className={className}
+        style={
+          fabStyle
+            ? { width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }
+            : undefined
+        }
+      >
+        <FabBotIcon />
+      </span>
+    )
+  }
+  return (
+    <img
+      src="/chatBot.png"
+      alt=""
+      width={size}
+      height={size}
+      className={`${className ?? ''}${fabStyle ? ' chat-fab-bot-img' : ' chat-bot-avatar-img'}`.trim()}
+      onError={() => setBroken(true)}
+      decoding="async"
+    />
+  )
+}
+
+function FabBotIcon() {
+  const gid = useId().replace(/:/g, '')
+  return (
+    <svg className="chat-fab-svg" viewBox="0 0 40 40" aria-hidden>
+      <defs>
+        <linearGradient id={`fabg-${gid}`} x1="10" y1="6" x2="30" y2="36">
+          <stop stopColor="#fb923c" />
+          <stop offset="1" stopColor="#d97736" />
+        </linearGradient>
+      </defs>
+      <circle cx="20" cy="20" r="19" fill={`url(#fabg-${gid})`} />
+      <rect x="11" y="14" width="18" height="14" rx="3" fill="white" fillOpacity="0.95" />
+      <circle cx="15.5" cy="20" r="2" fill="#9a3412" />
+      <circle cx="24.5" cy="20" r="2" fill="#9a3412" />
+      <path
+        d="M15 25.5c1.2 1 2.8 1.5 5 1.5s3.8-.5 5-1.5"
+        stroke="#9a3412"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <rect x="17" y="9" width="6" height="4" rx="1" fill="white" fillOpacity="0.85" />
+    </svg>
+  )
+}
+
+function sourceKindLabel(line: string): 'sql' | 'vector' | 'other' {
+  const u = line.toLowerCase()
+  if (u.includes('postgresql') || u.includes('postgres')) return 'sql'
+  if (u.includes('qdrant')) return 'vector'
+  return 'other'
+}
+
+function FormattedBubbleText({ text, className }: { text: string; className?: string }) {
+  const blocks = text.split(/\n\n+/).filter((b) => b.trim().length > 0)
+  return (
+    <div className={className ?? 'chat-formatted'}>
+      {blocks.map((block, bi) => {
+        const lines = block.split('\n').map((l) => l.trimEnd())
+        const bulletLines = lines.filter((l) => l.length > 0)
+        const allBullets = bulletLines.length > 0 && bulletLines.every((l) => /^[•\-\*]\s/.test(l))
+        if (allBullets) {
+          return (
+            <ul key={bi} className="chat-bullet-list">
+              {bulletLines.map((line, li) => (
+                <li key={li}>{line.replace(/^[•\-\*]\s*/, '')}</li>
+              ))}
+            </ul>
+          )
+        }
+        return (
+          <p key={bi} className="chat-para">
+            {block}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
+
+function ChatSources({ sources }: { sources: string[] }) {
+  if (sources.length === 0) return null
+  return (
+    <details className="chat-sources-details">
+      <summary className="chat-sources-summary">
+        <span className="chat-sources-summary-title">Izvori</span>
+        <span className="chat-sources-count">{sources.length}</span>
+      </summary>
+      <ul className="chat-sources-list">
+        {sources.map((s) => {
+          const kind = sourceKindLabel(s)
+          return (
+            <li key={s.slice(0, 120)}>
+              <span className={`chat-source-pill chat-source-pill--${kind}`} aria-hidden>
+                {kind === 'sql' ? 'SQL' : kind === 'vector' ? 'Vektor' : '·'}
+              </span>
+              <span className="chat-source-line">{s}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </details>
+  )
+}
+
+function ChatQuickStarters({
+  disabled,
+  onPick,
+}: {
+  disabled: boolean
+  onPick: (q: string) => void
+}) {
+  return (
+    <div className="chat-starters" role="group" aria-label="Brzi predlozi pitanja">
+      <span className="chat-starters-label">Brzo pitaj</span>
+      <div className="chat-starters-scroll">
+        {CHAT_STARTERS.map((q) => (
+          <button
+            key={q}
+            type="button"
+            className="chat-starter-chip"
+            disabled={disabled}
+            onClick={() => onPick(q)}
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function FabCloseIcon() {
+  return (
+    <svg className="chat-fab-svg chat-fab-svg--close" viewBox="0 0 40 40" aria-hidden>
+      <path
+        d="M12 12l16 16M28 12L12 28"
+        stroke="white"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export default function App() {
-  const [email, setEmail] = useState('student001@ftn.rs')
+  const [email, setEmail] = useState(() =>
+    typeof localStorage !== 'undefined' ? localStorage.getItem('nais_remember_email') ?? 'student001@ftn.rs' : 'student001@ftn.rs',
+  )
   const [password, setPassword] = useState('student123')
+  const [rememberMe, setRememberMe] = useState(true)
+  const [loginLogoSrc, setLoginLogoSrc] = useState('/logoFINAL.png')
   const [role, setRole] = useState<Role>(null)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [tab, setTab] = useState('home')
-  const [loading, setLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
+  const [chatPending, setChatPending] = useState(false)
+  const [chatError, setChatError] = useState('')
   const [payload, setPayload] = useState<unknown>(null)
-  const [qAssist, setQAssist] = useState(
-    'Koji predmet pokriva NoSQL baze i šta uključuje sadržaj kursa?'
-  )
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: 'welcome', role: 'assistant', text: WELCOME_TEXT, sources: [] },
+  ])
+  const [chatInput, setChatInput] = useState('')
+  const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   const logout = () => {
     setToken(null)
@@ -33,234 +229,413 @@ export default function App() {
     setName('')
     setPayload(null)
     setTab('home')
+    setChatOpen(false)
+    setChatMessages([
+      { id: newId(), role: 'assistant', text: WELCOME_TEXT, sources: [] },
+    ])
+    setChatInput('')
+    setChatError('')
   }
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+    setAuthLoading(true)
     try {
       const r = await naisApi.login(email.trim(), password)
       setToken(r.token)
       setRole(r.role)
       setName(`${r.ime} ${r.prezime}`)
-      setTab(r.role === 'SEF_KATEDRE' ? 'head' : 'student')
+      setTab(r.role === 'SEF_KATEDRE' ? 'head' : r.role === 'STUDENT' ? 'home' : 'stats')
+      if (rememberMe) {
+        localStorage.setItem('nais_remember_email', email.trim())
+      } else {
+        localStorage.removeItem('nais_remember_email')
+      }
     } catch {
       setError('Prijava nije uspela.')
     } finally {
-      setLoading(false)
+      setAuthLoading(false)
     }
   }
 
-  const load = useCallback(
-    async (fn: () => Promise<unknown>) => {
-      setLoading(true)
-      setError('')
-      try {
-        setPayload(await fn())
-      } catch {
-        setError('Zahtev nije uspeo (proverite ulogu ili token).')
-        setPayload(null)
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
+  const load = useCallback(async (fn: () => Promise<unknown>) => {
+    setPageLoading(true)
+    setError('')
+    try {
+      setPayload(await fn())
+    } catch {
+      setError('Zahtev nije uspeo (proverite ulogu ili token).')
+      setPayload(null)
+    } finally {
+      setPageLoading(false)
+    }
+  }, [])
+
+  const sendAssistantMessage = async (presetText?: string) => {
+    const text = (presetText ?? chatInput).trim()
+    if (!text || chatPending) return
+    if (presetText === undefined) {
+      setChatInput('')
+    }
+    const userMsg: ChatMessage = { id: newId(), role: 'user', text }
+    setChatMessages((m) => [...m, userMsg])
+    setChatPending(true)
+    setChatError('')
+    try {
+      const r = await naisApi.assistant(text)
+      setChatMessages((m) => [
+        ...m,
+        {
+          id: newId(),
+          role: 'assistant',
+          text: r.answer,
+          sources: r.sources ?? [],
+        },
+      ])
+    } catch {
+      setChatError('Nije moguće dohvatiti odgovor. Proveri mrežu ili da li si ulogovan kao student.')
+      setChatMessages((m) => [
+        ...m,
+        {
+          id: newId(),
+          role: 'assistant',
+          text: 'Servis trenutno nije dostupan. Pokušaj ponovo za trenutak.',
+          sources: [],
+        },
+      ])
+    } finally {
+      setChatPending(false)
+    }
+  }
+
+  const resetChat = () => {
+    setChatMessages([
+      { id: newId(), role: 'assistant', text: WELCOME_TEXT, sources: [] },
+    ])
+    setChatInput('')
+    setChatError('')
+  }
+
+  useEffect(() => {
+    if (chatOpen) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [chatMessages, chatPending, chatOpen])
+
+  useEffect(() => {
+    if (chatOpen) {
+      const t = window.setTimeout(() => chatInputRef.current?.focus(), 200)
+      return () => window.clearTimeout(t)
+    }
+  }, [chatOpen])
+
+  useEffect(() => {
+    if (!chatOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setChatOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [chatOpen])
 
   const authenticated = role !== null
 
-  return (
-    <div className="app">
-      <header className="top">
-        <div className="brand">NAIS · akademski informacioni sistem</div>
-        {authenticated ? (
-          <div className="user-bar">
-            <span>
-              {name} · <em>{role}</em>
-            </span>
-            <button type="button" className="ghost" onClick={logout}>
-              Odjava
-            </button>
+  const chatPanel = (
+    <div
+      className="chat-popup"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-dock-title"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="chat-card chat-card--popup">
+        <div className="chat-card-header">
+          <div className="chat-bot-icon" aria-hidden>
+            <ChatBotAvatar size={44} className="chat-header-bot" />
           </div>
-        ) : null}
-      </header>
+          <div className="chat-card-title" id="chat-dock-title">
+            <strong>NAIS asistent</strong>
+            <span>Predmeti, ocene i kurikulum · samo za tvoj smer</span>
+          </div>
+          <button type="button" className="chat-new" onClick={resetChat}>
+            Novi razgovor
+          </button>
+          <button
+            type="button"
+            className="chat-popup-x"
+            onClick={() => setChatOpen(false)}
+            aria-label="Zatvori prozor četa"
+          >
+            ×
+          </button>
+        </div>
 
+        {chatError ? <div className="chat-banner-err">{chatError}</div> : null}
+
+        <div className="chat-thread" role="log" aria-live="polite">
+          {chatMessages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`chat-row ${msg.role === 'user' ? 'user' : 'assistant'}`}
+            >
+              <div className="chat-avatar" aria-hidden>
+                {msg.role === 'user' ? (
+                  <span className="chat-avatar-inner">Ti</span>
+                ) : (
+                  <span className="chat-avatar-inner chat-avatar-inner--bot" title="Asistent">
+                    <ChatBotAvatar size={28} className="chat-thread-bot" />
+                  </span>
+                )}
+              </div>
+              <div className="chat-col">
+                <div className={`chat-bubble ${msg.role === 'user' ? 'chat-bubble--user' : 'chat-bubble--assistant'}`}>
+                  {msg.role === 'assistant' ? (
+                    <FormattedBubbleText text={msg.text} />
+                  ) : (
+                    <FormattedBubbleText text={msg.text} className="chat-formatted chat-formatted--user" />
+                  )}
+                </div>
+                {msg.role === 'assistant' ? <ChatSources sources={msg.sources} /> : null}
+              </div>
+            </div>
+          ))}
+          {chatPending ? (
+            <div className="chat-row assistant">
+              <div className="chat-avatar" aria-hidden>
+                <span className="chat-avatar-inner chat-avatar-inner--bot">
+                  <ChatBotAvatar size={28} className="chat-thread-bot" />
+                </span>
+              </div>
+              <div className="chat-typing-bubble" aria-label="Asistent traži odgovor">
+                <div className="chat-typing-dots" aria-hidden>
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <span className="chat-typing-text">Pretražujem bazu i kurikulum…</span>
+              </div>
+            </div>
+          ) : null}
+          <div ref={chatEndRef} />
+        </div>
+
+        <ChatQuickStarters
+          disabled={chatPending}
+          onPick={(q) => void sendAssistantMessage(q)}
+        />
+        <div className="chat-composer">
+          <textarea
+            ref={chatInputRef}
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                void sendAssistantMessage()
+              }
+            }}
+            placeholder="Napiši pitanje ili izaberi predlog iznad…"
+            rows={2}
+            disabled={chatPending}
+            aria-label="Poruka asistentu"
+          />
+          <button
+            type="button"
+            className="chat-send-btn"
+            onClick={() => void sendAssistantMessage()}
+            disabled={chatPending || !chatInput.trim()}
+            aria-label="Pošalji poruku"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="chat-hint-bar">
+          <kbd>Enter</kbd> šalje · <kbd>Shift</kbd>+<kbd>Enter</kbd> novi red · bez LLM ključa
+          odgovor je iz baze i vektorske pretrage
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className={`app${!authenticated ? ' app--login' : ''}`}>
       {!authenticated ? (
-        <main className="panel login-panel">
-          <h1>Prijava</h1>
-          <form onSubmit={login} className="login-form">
-            <label>
-              Email
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="username"
+        <div className="login-page-dj">
+          <main className="login-card-dj">
+            <div className="login-brand-dj">
+              <img
+                className="login-brand-logo-dj"
+                src={loginLogoSrc}
+                width={64}
+                height={72}
+                alt=""
+                decoding="async"
+                onError={() => setLoginLogoSrc('/brand-logo.svg')}
               />
-            </label>
-            <label>
-              Lozinka
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-              />
-            </label>
-            {error ? <p className="err">{error}</p> : null}
-            <button type="submit" disabled={loading}>
-              {loading ? '…' : 'Prijavi se'}
-            </button>
-          </form>
-          <p className="hint">
-            Demo: student <code>student001@ftn.rs</code> /{' '}
-            <code>student123</code>
-            <br />
-            Šef katedre: <code>sef.kii@ftn.rs</code> / <code>sef123</code>
-          </p>
-        </main>
+              <div className="login-brand-titles-dj">
+                <span className="login-brand-name-dj">DjordUNI</span>
+                <span className="login-brand-sub-dj">Fakultet tehničkih nauka</span>
+              </div>
+            </div>
+            <h1 className="login-heading-dj">Prijava</h1>
+            <p className="login-lead-dj">Unesi podatke za nastavak</p>
+            <form onSubmit={login} className="login-form-dj">
+              <label className="login-label-dj">
+                Email
+                <input
+                  className="login-input-dj"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="username"
+                  placeholder="ime.prezime@djorduni.edu"
+                />
+              </label>
+              <label className="login-label-dj">
+                Lozinka
+                <input
+                  className="login-input-dj"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                />
+              </label>
+              <div className="login-extras-dj">
+                <label className="login-remember-dj">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  Zapamti me
+                </label>
+               
+              </div>
+              {error ? <p className="err login-err-dj">{error}</p> : null}
+              <button type="submit" className="login-submit-dj" disabled={authLoading}>
+                {authLoading ? '…' : 'Prijavi se'}
+              </button>
+            </form>
+         
+           
+          </main>
+        </div>
       ) : (
         <>
-          <nav className="tabs">
-            {role === 'STUDENT' ? (
-              <button
-                type="button"
-                className={tab === 'student' ? 'on' : ''}
-                onClick={() => setTab('student')}
-              >
-                Student
-              </button>
-            ) : null}
-            {role === 'SEF_KATEDRE' ? (
-              <button
-                type="button"
-                className={tab === 'head' ? 'on' : ''}
-                onClick={() => setTab('head')}
-              >
-                Šef katedre
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className={tab === 'stats' ? 'on' : ''}
-              onClick={() => setTab('stats')}
-            >
-              Statistika (Cassandra)
-            </button>
-            <button
-              type="button"
-              className={tab === 'assistant' ? 'on' : ''}
-              onClick={() => setTab('assistant')}
-            >
-              LLM asistent
-            </button>
-          </nav>
-
-          <main className="panel">
-            {tab === 'student' && role === 'STUDENT' ? (
-              <section>
-                <h2>Moj dashboard</h2>
-                <div className="actions">
-                  <button type="button" onClick={() => load(naisApi.studentProfile)}>
-                    Profil
+          {role === 'STUDENT' ? (
+            <main className="panel panel--fab panel--student-portal">
+              <StudentPortal displayName={name || 'Student'} onLogout={logout} />
+            </main>
+          ) : (
+            <div className="sp-layout dj-shell head-portal-wrap">
+              <header className="dj-topnav" role="banner">
+                <div className="dj-brand">
+                  <img
+                    className="dj-brand-logo"
+                    src={loginLogoSrc}
+                    width={56}
+                    height={64}
+                    alt=""
+                    decoding="async"
+                    onError={() => setLoginLogoSrc('/brand-logo.svg')}
+                  />
+                  <div className="dj-brand-text">
+                    <span className="dj-brand-name">DjordUNI</span>
+                    <span className="dj-brand-tag">šef katedre</span>
+                  </div>
+                </div>
+                <nav className="dj-nav" aria-label="Navigacija šefa katedre">
+                  {role === 'SEF_KATEDRE' ? (
+                    <button
+                      type="button"
+                      className={`dj-nav-item${tab === 'head' ? ' dj-nav-item--active' : ''}`}
+                      onClick={() => setTab('head')}
+                    >
+                      Pregled katedre
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={`dj-nav-item${tab === 'stats' ? ' dj-nav-item--active' : ''}`}
+                    onClick={() => setTab('stats')}
+                  >
+                    Statistika
                   </button>
-                  <button type="button" onClick={() => load(naisApi.studentGrades)}>
-                    Predmeti i ocene
-                  </button>
-                  <button type="button" onClick={() => load(naisApi.studentGpa)}>
-                    Prosek (ESPB)
-                  </button>
-                  <button type="button" onClick={() => load(naisApi.studentStats)}>
-                    Statistika iz Cassandre
+                </nav>
+                <div className="dj-top-right">
+                  <span className="dj-student-name">{name}</span>
+                  <button type="button" className="dj-logout-link" onClick={logout}>
+                    Odjava
                   </button>
                 </div>
-                <JsonBlock data={payload} />
-              </section>
-            ) : null}
+              </header>
 
-            {tab === 'head' && role === 'SEF_KATEDRE' ? (
-              <section>
-                <h2>Šef katedre</h2>
-                <div className="actions">
-                  <button type="button" onClick={() => load(naisApi.headStudents)}>
-                    Studenti
-                  </button>
-                  <button type="button" onClick={() => load(naisApi.headAnalytics)}>
-                    Analitika predmeta
-                  </button>
-                  <button type="button" onClick={() => load(naisApi.headTrends)}>
-                    Trendovi položeno/palo
-                  </button>
-                  <button type="button" onClick={() => load(naisApi.headPerf)}>
-                    Pregled performansi
-                  </button>
-                </div>
-                <JsonBlock data={payload} />
-              </section>
-            ) : null}
+              <div className="sp-main dj-main head-portal-main">
+                {tab === 'head' && role === 'SEF_KATEDRE' ? <HeadPortal /> : null}
 
-            {tab === 'stats' ? (
-              <section>
-                <h2>Globalni rang predmeta</h2>
-                <p className="sub">
-                  Agregati čuvani u Apache Cassandri (sinhronizacija sa PostgreSQL pri
-                  pokretanju backend-a).
-                </p>
-                <div className="actions">
-                  <button type="button" onClick={() => load(naisApi.rankings)}>
-                    Učitaj rang listu
-                  </button>
-                </div>
-                <JsonBlock data={payload} />
-              </section>
-            ) : null}
+                {tab === 'stats' ? (
+                  <article className="dj-card head-work-card">
+                    <h2 className="dj-card-title">Globalni rang predmeta</h2>
+                    <p className="dj-card-hint">
+                      Agregati u Apache Cassandri (sinhronizacija sa PostgreSQL pri pokretanju backend-a).
+                    </p>
+                    <div className="dj-head-actions">
+                      <button type="button" onClick={() => load(naisApi.rankings)}>
+                        Učitaj rang listu
+                      </button>
+                    </div>
+                    <div className="dj-json-wrap">
+                      <JsonBlock data={payload} />
+                    </div>
+                  </article>
+                ) : null}
 
-            {tab === 'assistant' && role === 'STUDENT' ? (
-              <section>
-                <h2>Semantička pretraga + LLM</h2>
-                <p className="sub">
-                  Pretraga je ograničena na predmete sa tvog studijskog programa (Qdrant + filter). Opciono:{' '}
-                  <code>OPENAI_API_KEY</code> na relational-database-service za odgovor LLM-a.
-                </p>
-                <textarea
-                  className="q-area"
-                  value={qAssist}
-                  onChange={(e) => setQAssist(e.target.value)}
-                  rows={3}
-                />
+                {error ? <p className="err head-portal-err">{error}</p> : null}
+                {pageLoading ? <p className="loading head-portal-loading">Učitavanje…</p> : null}
+              </div>
+            </div>
+          )}
+
+          {role === 'STUDENT' ? (
+            <div className="chat-dock-root">
+              {chatOpen ? (
                 <button
                   type="button"
-                  onClick={() => load(() => naisApi.assistant(qAssist))}
+                  className="chat-backdrop"
+                  aria-label="Zatvori asistenta"
+                  onClick={() => setChatOpen(false)}
+                />
+              ) : null}
+              <div className="chat-dock">
+                {chatOpen ? chatPanel : null}
+                <button
+                  type="button"
+                  className={`chat-fab ${chatOpen ? 'chat-fab--open' : ''}`}
+                  onClick={() => setChatOpen((o) => !o)}
+                  aria-expanded={chatOpen}
+                  title={chatOpen ? 'Zatvori asistenta' : 'Otvori asistenta'}
                 >
-                  Pošalji
+                  <span className="chat-fab-glow" aria-hidden />
+                  {chatOpen ? (
+                    <FabCloseIcon />
+                  ) : (
+                    <ChatBotAvatar size={36} fabStyle />
+                  )}
                 </button>
-                {payload &&
-                typeof payload === 'object' &&
-                payload !== null &&
-                'answer' in payload ? (
-                  <div className="answer">
-                    <h3>Odgovor</h3>
-                    <p>{String((payload as { answer: string }).answer)}</p>
-                    <h4>Izvori</h4>
-                    <ul>
-                      {(
-                        payload as unknown as {
-                          sources: string[]
-                        }
-                      ).sources.map((s) => (
-                        <li key={s.slice(0, 80)}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <JsonBlock data={payload} />
-                )}
-              </section>
-            ) : null}
-
-            {error ? <p className="err">{error}</p> : null}
-            {loading ? <p className="loading">Učitavanje…</p> : null}
-          </main>
+              </div>
+            </div>
+          ) : null}
         </>
       )}
     </div>

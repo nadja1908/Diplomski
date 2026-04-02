@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" fill="none" aria-hidden="true">
+  <path fill="#292524" d="M60 4l8 6v14l-8-5-8 5V10l8-6z"/>
+  <rect x="24" y="32" width="72" height="76" rx="8" stroke="#57534e" stroke-width="2" fill="#fafaf9"/>
+  <path stroke="#78716c" stroke-width="2" d="M38 52h44M38 66h36M38 80h40"/>
+  <path stroke="#a8a29e" stroke-width="1.5" fill="none" d="M12 108c12-18 24-22 48-22s36 4 48 22"/>
+  <path stroke="#a8a29e" stroke-width="1.5" fill="none" d="M108 108c-12-18-24-22-48-22s-36 4-48 22"/>
+  <rect x="28" y="118" width="64" height="10" rx="2" fill="#44403c"/>
+  <text x="60" y="125.5" text-anchor="middle" fill="#fafaf9" font-size="7" font-family="Segoe UI,sans-serif" font-weight="700">FTN</text>
+</svg>

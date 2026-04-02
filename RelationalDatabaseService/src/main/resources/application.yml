@@ -30,7 +30,8 @@ eureka:
 
 nais:
   jwt:
-    secret: ${JWT_SECRET:nais-demo-secret-key-change-in-prod-min-32-chars!!}
+    # Isti default kao docker-compose (JWT_SECRET) da IDE i kontejner ne potpisuju različite tokene.
+    secret: ${JWT_SECRET:nais-demo-secret-change-me-for-demo-32b}
     expiration-ms: 86400000
   vector-service:
     base-url: ${VECTOR_SERVICE_URL:http://vector-database-service:8000}

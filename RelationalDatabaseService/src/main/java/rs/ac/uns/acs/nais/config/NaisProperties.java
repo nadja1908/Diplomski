@@ -14,7 +14,7 @@ public class NaisProperties {
 
     @Data
     public static class Jwt {
-        private String secret = "change-me";
+        private String secret = "nais-demo-secret-change-me-for-demo-32b";
         private long expirationMs = 86400000L;
     }
 

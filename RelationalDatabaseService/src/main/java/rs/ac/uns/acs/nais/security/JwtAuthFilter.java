@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,8 +28,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.startsWith("/api/auth/");
+        if (!HttpMethod.POST.matches(request.getMethod())) {
+            return false;
+        }
+        return "/api/auth/login".equals(request.getServletPath());
     }
 
     @Override
@@ -46,16 +49,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             var claims = jwtService.parseClaims(token);
             String sub = claims.getSubject();
-            String role = String.valueOf(claims.get("role"));
-            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                var auth = new UsernamePasswordAuthenticationToken(
-                        Long.parseLong(sub),
-                        null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                );
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            Object roleClaim = claims.get("role");
+            String role = null;
+            if (roleClaim instanceof String s && !s.isBlank()) {
+                role = s.trim();
+            } else if (roleClaim != null) {
+                role = String.valueOf(roleClaim).trim();
             }
+            if (role == null || role.isBlank()) {
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (role.startsWith("ROLE_")) {
+                role = role.substring(5);
+            }
+            long korisnikId = Long.parseLong(sub);
+            var auth = new UsernamePasswordAuthenticationToken(
+                    korisnikId,
+                    null,
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
+            );
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (Exception ignored) {
             SecurityContextHolder.clearContext();
         }

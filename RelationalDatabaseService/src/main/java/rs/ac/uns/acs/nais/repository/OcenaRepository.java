@@ -35,4 +35,13 @@ public interface OcenaRepository extends JpaRepository<Ocena, Long> {
             WHERE s.korisnik.id = :korisnikId
             """)
     List<Long> findDistinctPredmetIdsByStudentKorisnikId(@Param("korisnikId") Long korisnikId);
+
+    @Query("""
+            SELECT o FROM Ocena o
+            JOIN FETCH o.student s
+            JOIN FETCH o.ispitniTermin t
+            JOIN FETCH t.predmet p
+            WHERE s.studijskiProgram.id = :programId
+            """)
+    List<Ocena> findAllByStudijskiProgramId(@Param("programId") long programId);
 }

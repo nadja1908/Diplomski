@@ -30,7 +30,7 @@ nais:
   relational-base-url: ${RELATIONAL_SERVICE_URL:http://relational-database-service:9030}
   internal-api-key: ${INTERNAL_API_SECRET:nais-internal-shared-secret}
   jwt:
-    secret: ${JWT_SECRET:nais-demo-secret-key-change-in-prod-min-32-chars!!}
+    secret: ${JWT_SECRET:nais-demo-secret-change-me-for-demo-32b}
 
 logging:
   level:

@@ -21,10 +21,15 @@ spring:
             allowedHeaders: '*'
             allowCredentials: true
       routes:
+        # Eksplicitno (radi i sa starijim slikama gde duža lista Path predikata zna da zakaže).
+        - id: relational-student-curriculum
+          uri: lb://relational-database-service
+          predicates:
+            - Path=/api/student/me/curriculum-progress
         - id: relational-auth-student-head-assistant
           uri: lb://relational-database-service
           predicates:
-            - Path=/api/auth/**,/api/student/me/profile,/api/student/me/subjects-grades,/api/student/me/gpa,/api/head/students,/api/assistant/**
+            - Path=/api/auth/**,/api/student/me/profile,/api/student/me/subjects-grades,/api/student/me/gpa,/api/head/students,/api/head/programs,/api/head/program/**,/api/assistant/**
         - id: columnar-statistics
           uri: lb://columnar-database-service
           predicates:

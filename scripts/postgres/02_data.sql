@@ -35,245 +35,270 @@ INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (18, 
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (19, 'prof15@ftn.rs', '$2b$10$WE1hz8pmOEpgyyrL46VUjusxg6KdhaCOCl36s/96llBdhrah1XNoC', 'Stefan', 'Popović', 'PROFESOR');
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (20, 'prof16@ftn.rs', '$2b$10$WE1hz8pmOEpgyyrL46VUjusxg6KdhaCOCl36s/96llBdhrah1XNoC', 'Ivana', 'Đurić', 'PROFESOR');
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (21, 'student001@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (1, 21, 'RA 001/19', 1, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (1, 21, 'RI 001/21', 1, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (22, 'student002@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (2, 22, 'RA 002/20', 2, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (2, 22, 'SI 002/22', 2, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (23, 'student003@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (3, 23, 'RA 003/21', 3, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (3, 23, 'AUT 003/25', 3, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (24, 'student004@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (4, 24, 'RA 004/22', 4, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (4, 24, 'EE 004/24', 4, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (25, 'student005@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (5, 25, 'RA 005/23', 5, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (5, 25, 'RT 005/25', 5, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (26, 'student006@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (6, 26, 'RA 006/19', 6, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (6, 26, 'TK 006/21', 6, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (27, 'student007@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (7, 27, 'RA 007/20', 1, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (7, 27, 'RI 007/22', 1, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (28, 'student008@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (8, 28, 'RA 008/21', 2, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (8, 28, 'SI 008/23', 2, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (29, 'student009@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (9, 29, 'RA 009/22', 3, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (9, 29, 'AUT 009/24', 3, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (30, 'student010@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (10, 30, 'RA 010/23', 4, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (10, 30, 'EE 010/25', 4, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (31, 'student011@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (11, 31, 'RA 011/19', 5, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (11, 31, 'RT 011/21', 5, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (32, 'student012@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (12, 32, 'RA 012/20', 6, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (12, 32, 'TK 012/22', 6, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (33, 'student013@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (13, 33, 'RA 013/21', 1, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (13, 33, 'RI 013/23', 1, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (34, 'student014@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (14, 34, 'RA 014/22', 2, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (14, 34, 'SI 014/24', 2, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (35, 'student015@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (15, 35, 'RA 015/23', 3, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (15, 35, 'AUT 015/25', 3, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (36, 'student016@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (16, 36, 'RA 016/19', 4, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (16, 36, 'EE 016/21', 4, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (37, 'student017@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (17, 37, 'RA 017/20', 5, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (17, 37, 'RT 017/22', 5, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (38, 'student018@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (18, 38, 'RA 018/21', 6, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (18, 38, 'TK 018/23', 6, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (39, 'student019@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (19, 39, 'RA 019/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (19, 39, 'RI 019/24', 1, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (40, 'student020@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (20, 40, 'RA 020/23', 2, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (20, 40, 'SI 020/25', 2, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (41, 'student021@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (21, 41, 'RA 021/19', 3, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (21, 41, 'AUT 021/21', 3, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (42, 'student022@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (22, 42, 'RA 022/20', 4, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (22, 42, 'EE 022/22', 4, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (43, 'student023@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (23, 43, 'RA 023/21', 5, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (23, 43, 'RT 023/23', 5, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (44, 'student024@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (24, 44, 'RA 024/22', 6, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (24, 44, 'TK 024/24', 6, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (45, 'student025@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (25, 45, 'RA 025/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (25, 45, 'RI 025/25', 1, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (46, 'student026@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (26, 46, 'RA 026/19', 2, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (26, 46, 'SI 026/21', 2, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (47, 'student027@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (27, 47, 'RA 027/20', 3, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (27, 47, 'AUT 027/22', 3, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (48, 'student028@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (28, 48, 'RA 028/21', 4, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (28, 48, 'EE 028/23', 4, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (49, 'student029@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (29, 49, 'RA 029/22', 5, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (29, 49, 'RT 029/24', 5, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (50, 'student030@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (30, 50, 'RA 030/23', 6, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (30, 50, 'TK 030/25', 6, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (51, 'student031@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (31, 51, 'RA 031/19', 1, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (31, 51, 'RI 031/21', 1, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (52, 'student032@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (32, 52, 'RA 032/20', 2, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (32, 52, 'SI 032/22', 2, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (53, 'student033@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (33, 53, 'RA 033/21', 3, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (33, 53, 'AUT 033/23', 3, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (54, 'student034@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (34, 54, 'RA 034/22', 4, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (34, 54, 'EE 034/24', 4, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (55, 'student035@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (35, 55, 'RA 035/23', 5, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (35, 55, 'RT 035/25', 5, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (56, 'student036@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (36, 56, 'RA 036/19', 6, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (36, 56, 'TK 036/21', 6, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (57, 'student037@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (37, 57, 'RA 037/20', 1, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (37, 57, 'RI 037/22', 1, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (58, 'student038@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (38, 58, 'RA 038/21', 2, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (38, 58, 'SI 038/23', 2, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (59, 'student039@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (39, 59, 'RA 039/22', 3, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (39, 59, 'AUT 039/24', 3, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (60, 'student040@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (40, 60, 'RA 040/23', 4, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (40, 60, 'EE 040/25', 4, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (61, 'student041@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (41, 61, 'RA 041/19', 5, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (41, 61, 'RT 041/21', 5, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (62, 'student042@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (42, 62, 'RA 042/20', 6, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (42, 62, 'TK 042/22', 6, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (63, 'student043@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (43, 63, 'RA 043/21', 1, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (43, 63, 'RI 043/23', 1, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (64, 'student044@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (44, 64, 'RA 044/22', 2, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (44, 64, 'SI 044/24', 2, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (65, 'student045@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (45, 65, 'RA 045/23', 3, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (45, 65, 'AUT 045/25', 3, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (66, 'student046@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (46, 66, 'RA 046/19', 4, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (46, 66, 'EE 046/21', 4, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (67, 'student047@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (47, 67, 'RA 047/20', 5, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (47, 67, 'RT 047/22', 5, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (68, 'student048@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (48, 68, 'RA 048/21', 6, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (48, 68, 'TK 048/23', 6, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (69, 'student049@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (49, 69, 'RA 049/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (49, 69, 'RI 049/24', 1, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (70, 'student050@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (50, 70, 'RA 050/23', 2, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (50, 70, 'SI 050/25', 2, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (71, 'student051@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (51, 71, 'RA 051/19', 3, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (51, 71, 'AUT 051/21', 3, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (72, 'student052@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (52, 72, 'RA 052/20', 4, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (52, 72, 'EE 052/22', 4, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (73, 'student053@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (53, 73, 'RA 053/21', 5, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (53, 73, 'RT 053/23', 5, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (74, 'student054@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (54, 74, 'RA 054/22', 6, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (54, 74, 'TK 054/24', 6, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (75, 'student055@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (55, 75, 'RA 055/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (55, 75, 'RI 055/25', 1, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (76, 'student056@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (56, 76, 'RA 056/19', 2, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (56, 76, 'SI 056/21', 2, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (77, 'student057@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (57, 77, 'RA 057/20', 3, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (57, 77, 'AUT 057/22', 3, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (78, 'student058@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (58, 78, 'RA 058/21', 4, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (58, 78, 'EE 058/23', 4, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (79, 'student059@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (59, 79, 'RA 059/22', 5, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (59, 79, 'RT 059/24', 5, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (80, 'student060@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (60, 80, 'RA 060/23', 6, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (60, 80, 'TK 060/25', 6, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (81, 'student061@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (61, 81, 'RA 061/19', 1, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (61, 81, 'RI 061/21', 1, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (82, 'student062@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (62, 82, 'RA 062/20', 2, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (62, 82, 'SI 062/22', 2, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (83, 'student063@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (63, 83, 'RA 063/21', 3, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (63, 83, 'AUT 063/23', 3, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (84, 'student064@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (64, 84, 'RA 064/22', 4, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (64, 84, 'EE 064/24', 4, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (85, 'student065@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (65, 85, 'RA 065/23', 5, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (65, 85, 'RT 065/25', 5, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (86, 'student066@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (66, 86, 'RA 066/19', 6, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (66, 86, 'TK 066/21', 6, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (87, 'student067@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (67, 87, 'RA 067/20', 1, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (67, 87, 'RI 067/22', 1, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (88, 'student068@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (68, 88, 'RA 068/21', 2, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (68, 88, 'SI 068/23', 2, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (89, 'student069@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (69, 89, 'RA 069/22', 3, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (69, 89, 'AUT 069/24', 3, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (90, 'student070@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (70, 90, 'RA 070/23', 4, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (70, 90, 'EE 070/25', 4, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (91, 'student071@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (71, 91, 'RA 071/19', 5, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (71, 91, 'RT 071/21', 5, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (92, 'student072@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (72, 92, 'RA 072/20', 6, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (72, 92, 'TK 072/22', 6, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (93, 'student073@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (73, 93, 'RA 073/21', 1, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (73, 93, 'RI 073/23', 1, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (94, 'student074@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (74, 94, 'RA 074/22', 2, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (74, 94, 'SI 074/24', 2, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (95, 'student075@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (75, 95, 'RA 075/23', 3, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (75, 95, 'AUT 075/25', 3, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (96, 'student076@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (76, 96, 'RA 076/19', 4, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (76, 96, 'EE 076/21', 4, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (97, 'student077@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (77, 97, 'RA 077/20', 5, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (77, 97, 'RT 077/22', 5, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (98, 'student078@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (78, 98, 'RA 078/21', 6, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (78, 98, 'TK 078/23', 6, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (99, 'student079@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (79, 99, 'RA 079/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (79, 99, 'RI 079/24', 1, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (100, 'student080@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (80, 100, 'RA 080/23', 2, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (80, 100, 'SI 080/25', 2, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (101, 'student081@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (81, 101, 'RA 081/19', 3, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (81, 101, 'AUT 081/21', 3, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (102, 'student082@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (82, 102, 'RA 082/20', 4, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (82, 102, 'EE 082/22', 4, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (103, 'student083@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (83, 103, 'RA 083/21', 5, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (83, 103, 'RT 083/23', 5, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (104, 'student084@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (84, 104, 'RA 084/22', 6, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (84, 104, 'TK 084/24', 6, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (105, 'student085@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (85, 105, 'RA 085/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (85, 105, 'RI 085/25', 1, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (106, 'student086@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (86, 106, 'RA 086/19', 2, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (86, 106, 'SI 086/21', 2, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (107, 'student087@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (87, 107, 'RA 087/20', 3, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (87, 107, 'AUT 087/22', 3, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (108, 'student088@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (88, 108, 'RA 088/21', 4, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (88, 108, 'EE 088/23', 4, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (109, 'student089@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (89, 109, 'RA 089/22', 5, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (89, 109, 'RT 089/24', 5, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (110, 'student090@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (90, 110, 'RA 090/23', 6, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (90, 110, 'TK 090/25', 6, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (111, 'student091@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (91, 111, 'RA 091/19', 1, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (91, 111, 'RI 091/21', 1, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (112, 'student092@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (92, 112, 'RA 092/20', 2, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (92, 112, 'SI 092/22', 2, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (113, 'student093@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Bogdanović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (93, 113, 'RA 093/21', 3, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (93, 113, 'AUT 093/23', 3, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (114, 'student094@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (94, 114, 'RA 094/22', 4, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (94, 114, 'EE 094/24', 4, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (115, 'student095@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (95, 115, 'RA 095/23', 5, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (95, 115, 'RT 095/25', 5, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (116, 'student096@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (96, 116, 'RA 096/19', 6, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (96, 116, 'TK 096/21', 6, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (117, 'student097@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (97, 117, 'RA 097/20', 1, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (97, 117, 'RI 097/22', 1, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (118, 'student098@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (98, 118, 'RA 098/21', 2, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (98, 118, 'SI 098/23', 2, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (119, 'student099@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (99, 119, 'RA 099/22', 3, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (99, 119, 'AUT 099/24', 3, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (120, 'student100@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (100, 120, 'RA 100/23', 4, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (100, 120, 'EE 100/25', 4, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (121, 'student101@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (101, 121, 'RA 101/19', 5, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (101, 121, 'RT 101/21', 5, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (122, 'student102@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (102, 122, 'RA 102/20', 6, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (102, 122, 'TK 102/22', 6, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (123, 'student103@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (103, 123, 'RA 103/21', 1, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (103, 123, 'RI 103/23', 1, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (124, 'student104@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (104, 124, 'RA 104/22', 2, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (104, 124, 'SI 104/24', 2, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (125, 'student105@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (105, 125, 'RA 105/23', 3, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (105, 125, 'AUT 105/25', 3, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (126, 'student106@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (106, 126, 'RA 106/19', 4, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (106, 126, 'EE 106/21', 4, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (127, 'student107@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (107, 127, 'RA 107/20', 5, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (107, 127, 'RT 107/22', 5, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (128, 'student108@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (108, 128, 'RA 108/21', 6, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (108, 128, 'TK 108/23', 6, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (129, 'student109@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Hana', 'Milić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (109, 129, 'RA 109/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (109, 129, 'RI 109/24', 1, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (130, 'student110@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Uroš', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (110, 130, 'RA 110/23', 2, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (110, 130, 'SI 110/25', 2, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (131, 'student111@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (111, 131, 'RA 111/19', 3, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (111, 131, 'AUT 111/21', 3, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (132, 'student112@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Vuk', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (112, 132, 'RA 112/20', 4, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (112, 132, 'EE 112/22', 4, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (133, 'student113@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (113, 133, 'RA 113/21', 5, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (113, 133, 'RT 113/23', 5, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (134, 'student114@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Maša', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (114, 134, 'RA 114/22', 6, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (114, 134, 'TK 114/24', 6, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (135, 'student115@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Luka', 'Tomić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (115, 135, 'RA 115/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (115, 135, 'RI 115/25', 1, 2025);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (136, 'student116@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Filip', 'Simić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (116, 136, 'RA 116/19', 2, 2019);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (116, 136, 'SI 116/21', 2, 2021);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (137, 'student117@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Ristić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (117, 137, 'RA 117/20', 3, 2020);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (117, 137, 'AUT 117/22', 3, 2022);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (138, 'student118@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Pavić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (118, 138, 'RA 118/21', 4, 2021);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (118, 138, 'EE 118/23', 4, 2023);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (139, 'student119@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Teodora', 'Radović', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (119, 139, 'RA 119/22', 5, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (119, 139, 'RT 119/24', 5, 2024);
 INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (140, 'student120@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Sara', 'Čukić', 'STUDENT');
-INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (120, 140, 'RA 120/23', 6, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (120, 140, 'TK 120/25', 6, 2025);
+-- Dodatni RI (program 1) za godine upisa 2022–2024 (demo statistike / kohorte)
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (141, 'student121@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Nemanja', 'Kovacevic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (142, 'student122@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Jovana', 'Milosevic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (143, 'student123@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Petar', 'Lazic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (144, 'student124@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Milena', 'Obradovic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (145, 'student125@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Andrej', 'Stojanovic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (146, 'student126@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Katarina', 'Vasic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (147, 'student127@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Bogdan', 'Mitic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (148, 'student128@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Ivana', 'Peric', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (149, 'student129@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Stefan', 'Jankovic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (150, 'student130@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Tijana', 'Dukic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (151, 'student131@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Lazar', 'Todorovic', 'STUDENT');
+INSERT INTO korisnik (id, email, lozinka_hash, ime, prezime, uloga) VALUES (152, 'student132@ftn.rs', '$2b$10$8e5XJN5da5YxOCRoJXcPGOfZLuv3/sC2gSxw3hH1DJmiOOZnZd30q', 'Ana', 'Zivanovic', 'STUDENT');
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (121, 141, 'RI 121/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (122, 142, 'RI 122/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (123, 143, 'RI 123/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (124, 144, 'RI 124/22', 1, 2022);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (125, 145, 'RI 125/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (126, 146, 'RI 126/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (127, 147, 'RI 127/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (128, 148, 'RI 128/23', 1, 2023);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (129, 149, 'RI 129/24', 1, 2024);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (130, 150, 'RI 130/24', 1, 2024);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (131, 151, 'RI 131/24', 1, 2024);
+INSERT INTO student (id, korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) VALUES (132, 152, 'RI 132/24', 1, 2024);
 SELECT setval(pg_get_serial_sequence('korisnik','id'), (SELECT MAX(id) FROM korisnik));
 SELECT setval(pg_get_serial_sequence('student','id'), (SELECT MAX(id) FROM student));
 INSERT INTO sef_katedre (korisnik_id, katedra_id) VALUES (1, 1);
@@ -345,6 +370,450 @@ INSERT INTO predmet (id, sifra, naziv, espb, studijski_program_id, katedra_id, k
 INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa) VALUES (23, 'Cilj predmeta Cloud computing je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da primeni ključne koncepte kurseva u projektnim zadacima; analizira probleme i bira odgovarajuće algoritme i alate; dokumentuje rešenja.', 'Predavanja, vežbe, individualni i timski domaći zadaci, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Tok kursa obuhvata osnovne teme iz cloud computing, uključujući pregled literature, rad u razvojnom okruženju i vežbe iz tipskih zadataka iz ispitne prakse.');
 INSERT INTO predmet (id, sifra, naziv, espb, studijski_program_id, katedra_id, kratak_opis) VALUES (24, '13S073', 'Informacioni sistemi', 6, 1, 1, 'ER modeli, integracija, BI i veliki podaci.');
 INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa) VALUES (24, 'Cilj predmeta Informacioni sistemi je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da primeni ključne koncepte kurseva u projektnim zadacima; analizira probleme i bira odgovarajuće algoritme i alate; dokumentuje rešenja.', 'Predavanja, vežbe, individualni i timski domaći zadaci, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Tok kursa obuhvata osnovne teme iz informacioni sistemi, uključujući pregled literature, rad u razvojnom okruženju i vežbe iz tipskih zadataka iz ispitne prakse.');
+INSERT INTO predmet (id, sifra, naziv, espb, studijski_program_id, katedra_id, kratak_opis) VALUES
+(25, '13R01', 'Uvod u računarsku nauku i profesiju', 6, 1, 1, 'Disciplina, istorija računarstva, uloga softverskog inženjera (2. godina RI).'),
+(26, '13R02', 'Matematička logika i dokazivanje', 7, 1, 1, 'Iskazna logika, dokaz, priprema za teoriju računarstva (2. godina RI).'),
+(27, '13R03', 'Linearna algebra za informatičare', 8, 1, 1, 'Vektorski prostori, matrice, linearni sistemi u CS primenama (2. godina RI).'),
+(28, '13R04', 'Verovatnoća i statistika', 6, 1, 1, 'Osnovni modeli, statistička inferencija i rad sa podacima (2. godina RI).'),
+(29, '13R05', 'Elektrotehničke osnove informatike', 7, 1, 1, 'Digitalna logika, signali, osnovni sklopovi i binarna aritmetika (2. godina RI).'),
+(30, '13R06', 'Rad u Unix/Linux okruženju', 8, 1, 1, 'Školjka, procesi, dozvole, skripte i alati komandne linije (2. godina RI).'),
+(31, '13R07', 'Dokumentovanje softverskih projekata', 6, 1, 1, 'Git, Markdown, dijagrami i pravilna tehnička komunikacija (2. godina RI).'),
+(32, '13R08', 'Seminarski rad iz programiranja', 7, 1, 1, 'Samostalan mali projekat, izveštaj i odbrana rezultata (2. godina RI).'),
+(33, '13R09', 'Programske paradigme i jezici', 8, 1, 1, 'Poređenje imperativnog, funkcionalnog i deklarativnog stila (2. godina RI).'),
+(34, '13R10', 'Kompjuterska arhitektura', 6, 1, 1, 'CPU, memorijska hijerarhija, pipeline i performanse (2. godina RI).'),
+(35, '13R11', 'Teorija automata i formalnih jezika', 7, 1, 1, 'Konačni automati, regularni jezici, gramatike, uvod u izračunljivost (3. godina RI).'),
+(36, '13R12', 'Numerička matematika za inženjere', 8, 1, 1, 'Mašinska aritmetika, greške, stabilne numeričke metode (3. godina RI).'),
+(37, '13R13', 'Upravljanje memorijom u jezicima niskog nivoa', 6, 1, 1, 'Stack/heap, pokazivači, alati za proveru curenja memorije (3. godina RI).'),
+(38, '13R14', 'Paralelizam na nivou instrukcija', 7, 1, 1, 'SIMD, uvod u OpenMP, zakon Amdahla (3. godina RI).'),
+(39, '13R15', 'Konkurentno programiranje', 8, 1, 1, 'Niti, sinhronizacija, deadlock i utrkivanje (3. godina RI).'),
+(40, '13R16', 'Uvod u grafičke sisteme', 6, 1, 1, 'Grafički pipeline, rasterizacija, osnovni API (3. godina RI).'),
+(41, '13R17', 'Razvoj skalabilnih veb servisa', 7, 1, 1, 'REST, autentikacija, sesije, greške i rast opterećenja (3. godina RI).'),
+(42, '13R18', 'Napredne baze podataka u praksi', 8, 1, 1, 'Indeksi, izolacija transakcija, plan izvršenja i optimizacija (3. godina RI).'),
+(43, '13R19', 'Bezbednost aplikacija i mreže', 6, 1, 1, 'OWASP, hardening, mrežni i aplikacioni sloj (3. godina RI).'),
+(44, '13R20', 'Strategije testiranja softvera', 7, 1, 1, 'Unit, integracioni testovi, mocking i TDD (3. godina RI).'),
+(45, '13R21', 'DevOps i neprekidna isporuka', 8, 1, 1, 'CI/CD, konfiguracija kao kod, kontejneri u timu (4. godina RI).'),
+(46, '13R22', 'Obrada prirodnog jezika', 6, 1, 1, 'Tokenizacija, ugrađivanja, jednostavni klasifikatori teksta (4. godina RI).'),
+(47, '13R23', 'Ugrađeni i real-time sistemi', 7, 1, 1, 'Mikrokontroleri, senzori, ograničenja u realnom vremenu (4. godina RI).'),
+(48, '13R24', 'Timski projekat – analiza i arhitektura', 8, 1, 1, 'Prikupljanje zahteva, dizajn rešenja i dokumentacija (4. godina RI).'),
+(49, '13R25', 'Produkcija i održavanje softvera', 6, 1, 1, 'Logovanje, metrike, strategije izdavanja i otklanjanja kvarova (4. godina RI).'),
+(50, '13R26', 'Pravo intelektualne svojine u IT', 7, 1, 1, 'Licence, autorsko pravo, patenti i otvoreni kod (4. godina RI).'),
+(51, '13R27', 'Etika i privatnost podataka', 8, 1, 1, 'GDPR/LPD perspektiva, pristanak i minimizacija podataka (4. godina RI).'),
+(52, '13R28', 'Upravljanje znanjem u organizacijama', 6, 1, 1, 'Baze znanja, wiki procesi i prenos ekspertize (4. godina RI).'),
+(53, '13R29', 'Raspodeljeni algoritmi i konsenzus', 7, 1, 1, 'Klasteri, pouzdanost pod podelama, uvod u konsenzus protokole (4. godina RI).'),
+(54, '13R30', 'Priprema diplomskog rada', 8, 1, 1, 'Literatura, metodologija istraživanja i plan izrade rada (4. godina RI).');
+INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa) VALUES
+(25, 'Cilj predmeta Uvod u računarsku nauku i profesiju je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da prepozna uloge u industriji, koristi osnovnu literaturu i primeni pojmove iz uvoda u projekatne i diskusione zadatke.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Istorija računarstva, reprezentacija podataka, hardver i softver, profesionalna etika, uvod u studijski program i očekivane kompetencije.'),
+(26, 'Cilj predmeta Matematička logika i dokazivanje je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da formuliše iskaze, prati dokaze i primeni pravila izvoda na jednostavne probleme relevantne za teoriju računarstva.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Iskazna logika, istinitosne tablice, prirodna dedukcija, kontradikcija, uvod u rezoluciju i vezu sa automatima i dokazivačima.'),
+(27, 'Cilj predmeta Linearna algebra za informatičare je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da rešava linearne sisteme, tumči matrice u kontekstu grafova i algoritama i primeni sopstvene vrednosti na jednostavnim modelima.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Vektorski prostori, linearna nezavisnost, determinante, sopstveni vektori; veza sa kompresijom, PageRank (uvod) i regresijom.'),
+(28, 'Cilj predmeta Verovatnoća i statistika je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da modelira slučajne veličine, tumči raspodele i interval poverenja u jednostavnim eksperimentima sa podacima.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Diskretne i kontinualne raspodele, očekivanje, nezavisnost, centralni granični teorem (ideja), osnovna statistička inferencija i vizualizacija.'),
+(29, 'Cilj predmeta Elektrotehničke osnove informatike je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da tumči jednostavne sklopove, nivoe logičkih signala i osnovnu vezu između fizičkog i digitalnog sloja računara.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Binarna aritmetika, logička kola, multipleksori, flip-flopovi, ADC/DAC na konceptualnom nivou, buka i pouzdanost (uvod).'),
+(30, 'Cilj predmeta Rad u Unix/Linux okruženju je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da koristi školjku, upravlja procesima i dozvolama te napiše jednostavne Bash skripte za automatizaciju.', 'Predavanja, vežbe, individualni i timski domaći zadaci, laboratorijske vežbe i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Fajl sistem, korisnici i grupe, pipeline, grep/sed/awk (osnove), procesi, signali, cron i servisi na konceptualnom nivou.'),
+(31, 'Cilj predmeta Dokumentovanje softverskih projekata je da student savlada teorijske i praktične osnove neophodne za dalji nastavak studija i timski rad.', 'Student je sposoban da vodi grananje u Git-u, piše README i tehničke izveštaje i pravi čitke dijagrame tokova i komponenti.', 'Predavanja, vežbe, projektni zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Semantičko verzionisanje, merge i rebase (uvod), MR/PR praksa, Markdown, UML ili Mermaid dijagrami i šabloni izveštaja kvaliteta.'),
+(32, 'Cilj predmeta Seminarski rad iz programiranja je da student savlada teorijske i praktične osnove kroz mali samostalan projekat sa odbranom.', 'Student je sposoban da prevede zahteve u dizajn, implementira rešenje, testira ga i predstavi rezultat stručnoj publici.', 'Konsultacije, samostalan rad, odbrana seminarskog rada. Akcenat na aktivnom učenju i feedback-u.', 'Formulisanje teme, izbor alata, iterativna implementacija, jednostavno testiranje, pisanje kratkog izveštaja i demonstracija rada.'),
+(33, 'Cilj predmeta Programske paradigme i jezici je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da uporedi imperativni, funkcionalni i deklarativni stil i izabere odgovarajući pristup za mali zadatak.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Nepromenljivost, funkcije višeg reda, pattern matching (uvod), lenjo računanje (ideja), primeri u bar dva jezika ili paradigme.'),
+(34, 'Cilj predmeta Kompjuterska arhitektura je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da čita dijagram blokova CPU-a, proceni uticaj keša i objasni zašto pojedini kod troši više ciklusa.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'ISA i asemblerski uvod, aritmetičko-logička jedinica, kontrola toka, hijerarhija memorije, keš, grananje uz hazard, performanse (MIPS/FLOPS ideja).'),
+(35, 'Cilj predmeta Teorija automata i formalnih jezika je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da konstruiše automate, dokazuje jednostavna svojstva jezika i razume granice izračunljivosti.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Deterministički i nedeterministički konačni automati, regularni izrazi, Pumping lemma (uvod), kontekstno slobodne gramatike, hijerarhija Čomskog, neodlučivost (motivacija).'),
+(36, 'Cilj predmeta Numerička matematika za inženjere je da student savlada teorijske i praktične osnove neophodne za dalji studij i inženjersku praksu u oblasti koju predmet pokriva.', 'Student je sposoban da proceni grešku diskretizacije, bira jednostavnu numeričku šemu i implementira je u vežbama.', 'Predavanja, vežbe, individualni i timski domaći zadaci, računski zadaci i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Greška zaokruživanja, stabilnost, LU i iterativne metode (uvod), nelinearne jednačine, numerička integracija i diferenciranje (osnove).'),
+(37, 'Cilj predmeta Upravljanje memorijom u jezicima niskog nivoa je da student savlada teorijske i praktične osnove neophodne za siguran rad sa pokazivačima i heap-om.', 'Student je sposoban da debuguje curenje memorije na malom programu i da koristi alate kao što su Valgrind ili sanitizers na osnovnom nivou.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Stack i heap, životni vek objekata, dinamička alokacija, tipične greške (use-after-free, double free), uvod u profilisanje memorije.'),
+(38, 'Cilj predmeta Paralelizam na nivou instrukcija je da student savlada teorijske i praktične osnove vektorskog ubrzavanja petlji.', 'Student je sposoban da prepozna mogućnosti za SIMD/OpenMP na jednostavnim petljama i izmeri ubrzanje.', 'Predavanja, laboratorijske vežbe, individualni zadaci i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Data parallelizam, vektorski registri, direktive OpenMP za petlje, zakon Amdahla, merenje performansi i false sharing (uvod).'),
+(39, 'Cilj predmeta Konkurentno programiranje je da student savlada teorijske i praktične osnove sinhronizacije niti i procesa.', 'Student je sposoban da implementira zaštitu deljenih resursa, izbegne tipične deadlock situacije i koristi uslovne promenljive.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Modeli memorije (intuitivno), muteksi, semafori, monitori, utrkivanje i sporije, thread pool (uvod), motivacija za async I/O.'),
+(40, 'Cilj predmeta Uvod u grafičke sisteme je da student savlada teorijske i praktične osnove prikaza 3D scena u realnom vremenu.', 'Student je sposoban da primeni matrice transformacija, projekciju i osnovni rasterizacioni tok na jednostavnoj sceni.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Koordinatni sistemi, homogene koordinate, svetlo i materijal (Phong uvod), teksture, Z-bafer, anti-aliasing (ideja).'),
+(41, 'Cilj predmeta Razvoj skalabilnih veb servisa je da student savlada teorijske i praktične osnove projektovanja HTTP API-ja otpornih na opterećenje.', 'Student je sposoban da dizajnira REST resurse, rukuje autentikacijom i greškama te predloži jednostavno keširanje ili paginaciju.', 'Predavanja, vežbe, timski projektni zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Resursi i statusni kodovi, idempotentnost, JWT/sesije, limitiranje zahteva (uvod), osnovna analiza uskog grla pod opterećenjem (alat ili skripta).'),
+(42, 'Cilj predmeta Napredne baze podataka u praksi je da student savlada teorijske i praktične osnove performansi i transakcione konzistentnosti.', 'Student je sposoban da tumči plan izvršenja upita, bira indekse i razume izolacione nivoe i rizik od mrtve blokade.', 'Predavanja, laboratorijske vežbe, individualni i timski zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Indeksi i statistika optimizatora, EXPLAIN, zaključavanje, replikacija (uvod), read/write podela (motivacija), jednostavni monitoring sporih upita.'),
+(43, 'Cilj predmeta Bezbednost aplikacija i mreže je da student savlada teorijske i praktične osnove prevencije uobičajenih napada.', 'Student je sposoban da primeni OWASP smernice na mali veb projekat i da konfiguriše osnovnu mrežnu i TLS zaštitu.', 'Predavanja, vežbe, laboratorija sa CTF zadacima lakoće osnovnog nivoa, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'SQLi, XSS, CSRF, kodiranje izlaza, kontrola pristupa modelu, TLS i cipher suite (uvod), logovanje bezbednosnih događaja.'),
+(44, 'Cilj predmeta Strategije testiranja softvera je da student savlada teorijske i praktične osnove test piramide i održivih testova.', 'Student je sposoban da piše unit i integracione testove sa mock-ovima i da ih uključi u pipeline.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Pokrivenost koda, fixture-i, property-based testiranje (uvod), flaky testovi i stabilizacija, TDD kao praksa na malom primeru.'),
+(45, 'Cilj predmeta DevOps i neprekidna isporuka je da student savlada teorijske i praktične osnove automatizacije isporuke softvera.', 'Student je sposoban da definiše korake CI/CD, upravlja tajnama na konceptualnom nivou i pokrene kontejnerizovanu uslugu u razvoju.', 'Predavanja, laboratorijske vežbe, projektni zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Build artefakti, test u pipeline-u, immutable infrastruktura (ideja), Docker Compose (uvod), monitoring i health check-ovi u razvoju.'),
+(46, 'Cilj predmeta Obrada prirodnog jezika je da student savlada teorijske i praktične osnove radnog toka obrade teksta.', 'Student je sposoban da izgradi jednostavan pipeline tokenizacije, vektorizacije i evaluacije klasifikatora na označenom skupu.', 'Predavanja, vežbe, individualni i timski domaći zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Predobrada teksta, TF-IDF, Bag-of-words, jednostavni klasifikatori, word2vec (motivacija), mere performansi (precision/recall/F1).'),
+(47, 'Cilj predmeta Ugrađeni i real-time sistemi je da student savlada teorijske i praktične osnove programiranja sa vremenskim i energetskim ograničenjima.', 'Student je sposoban da konfiguriše GPIO i prekide na jednostavnoj platformi i da objasni prioritet prekida i štednju energije.', 'Predavanja, vežbe, laboratorijske vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Mikrokontroleri, senzori, protokoli I2C/SPI (uvod), latencija i determinizam, watch-dog i štednja energije, osnovni bezbednosni aspekti IoT-a.'),
+(48, 'Cilj predmeta Timski projekat – analiza i arhitektura je da student savlada teorijske i praktične osnove prikupljanja zahteva i arhitektonskog dizajna.', 'Student je sposoban da vodi intervjue sa stejkholderima, definiše user stories i predloži arhitektonske komponente sa rizicima.', 'Predavanja, timski rad uz mentora, prezentacija dizajna, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'SRS na agilan način, NFR, C4 ili slični dijagrami, tehnički dug (uvod), plan iteracija i kriterijumi prihvatanja.'),
+(49, 'Cilj predmeta Produkcija i održavanje softvera je da student savlada teorijske i praktične osnove posmatranja sistema u produkciji.', 'Student je sposoban da poveže logove i metrike, definiše SLO i predloži rollback strategiju na nivou vežbe.', 'Predavanja, studije slučaja, laboratorijske simulacije, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Strukturirani logovi, tragovi, metrike i alarmi, kanari i blue-green (uvod), postmortem bez okrivljavanja, održavanje kao kontinuitet.'),
+(50, 'Cilj predmeta Pravo intelektualne svojine u IT je da student savlada teorijske i praktične osnove licence i zaštite intelektualne svojine.', 'Student je sposoban da izabere licencu za sopstveni projekat i da prepozna rizike NDA i kršenja licence zavisnosti.', 'Predavanja, vežbe, diskusije studija slučaja, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Autorsko pravo, AGPL/GPL/MIT/BSD (uvod), patenti na softver (ideja), otvoreni kod u korporaciji, pregled uzoraka ugovora.'),
+(51, 'Cilj predmeta Etika i privatnost podataka je da student savlada teorijske i praktične osnove etike i usklađenosti sa propisima o ličnim podacima.', 'Student je sposoban da proceni lawful basis, primeni minimizaciju i dokumentuje obradu u jednostavnom studiju slučaja.', 'Predavanja, diskusije, vežbe, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'GDPR/LPD principi, DPIA (uvod), pristanak i transparentnost, pseudonimizacija, etički review i pristrasnost modela (motivacija).'),
+(52, 'Cilj predmeta Upravljanje znanjem u organizacijama je da student savlada teorijske i praktične osnove organizacije tehničkog znanja.', 'Student je sposoban da dizajnira jednostavnu taksonomiju dokumentacije i da vodi ažuriranje runbook-ova ili wiki stranica.', 'Predavanja, vežbe, timski projektni zadaci, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Životni ciklus dokumenta, pretraga i findability, review procesi, knowledge handover u timu, incident response (uvod).'),
+(53, 'Cilj predmeta Raspodeljeni algoritmi i konsenzus je da student savlada teorijske i praktične osnove pouzdanosti pod parcijalnim kvarovima i particijama mreže.', 'Student je sposoban da objasni glasanje kvorumom, replikaciju i osnovne korake Raft/Paxos ideje bez formalnog dokaza.', 'Predavanja, vežbe, simulacije ili čitanje rada, kolokvijumi i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Model padova čvorova i poruka, osnovni problemi dogovora, linija vremena događaja, primena u etcd/Kafka (motivacija).'),
+(54, 'Cilj predmeta Priprema diplomskog rada je da student savlada teorijske i praktične osnove planiranja istraživanja i strukturisanja diplomskog rada.', 'Student je sposoban da formuliše istraživačko pitanje, napravi pregled literature i vremenski plan uz konsultacije sa mentorom.', 'Konsultacije, samostalan rad, kolokvijumi o planu rada i završni ispit. Akcenat na aktivnom učenju i feedback-u.', 'Izbor teme, relevantni izvori, metodologija (eksperimentalno, analitičko, razvoj alata), struktura rada, citiranje i etika istraživanja.');
+
+-- Demo kurikulum: ~40 predmeta po studijskom programu (SI, AUT, EE, RT, TK)
+INSERT INTO predmet (id, sifra, naziv, espb, studijski_program_id, katedra_id, kratak_opis) VALUES
+(55, '13Q01', 'SI - modul 01', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(56, '13Q02', 'SI - modul 02', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(57, '13Q03', 'SI - modul 03', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(58, '13Q04', 'SI - modul 04', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(59, '13Q05', 'SI - modul 05', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(60, '13Q06', 'SI - modul 06', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(61, '13Q07', 'SI - modul 07', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(62, '13Q08', 'SI - modul 08', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(63, '13Q09', 'SI - modul 09', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(64, '13Q10', 'SI - modul 10', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(65, '13Q11', 'SI - modul 11', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(66, '13Q12', 'SI - modul 12', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(67, '13Q13', 'SI - modul 13', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(68, '13Q14', 'SI - modul 14', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(69, '13Q15', 'SI - modul 15', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(70, '13Q16', 'SI - modul 16', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(71, '13Q17', 'SI - modul 17', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(72, '13Q18', 'SI - modul 18', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(73, '13Q19', 'SI - modul 19', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(74, '13Q20', 'SI - modul 20', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(75, '13Q21', 'SI - modul 21', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(76, '13Q22', 'SI - modul 22', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(77, '13Q23', 'SI - modul 23', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(78, '13Q24', 'SI - modul 24', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(79, '13Q25', 'SI - modul 25', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(80, '13Q26', 'SI - modul 26', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(81, '13Q27', 'SI - modul 27', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(82, '13Q28', 'SI - modul 28', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(83, '13Q29', 'SI - modul 29', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(84, '13Q30', 'SI - modul 30', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(85, '13Q31', 'SI - modul 31', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(86, '13Q32', 'SI - modul 32', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(87, '13Q33', 'SI - modul 33', 6, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(88, '13Q34', 'SI - modul 34', 7, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(89, '13Q35', 'SI - modul 35', 8, 2, 1, 'Strukturni predmet programa SI (demo baza).'),
+(90, '13U01', 'AUT - modul 01', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(91, '13U02', 'AUT - modul 02', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(92, '13U03', 'AUT - modul 03', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(93, '13U04', 'AUT - modul 04', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(94, '13U05', 'AUT - modul 05', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(95, '13U06', 'AUT - modul 06', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(96, '13U07', 'AUT - modul 07', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(97, '13U08', 'AUT - modul 08', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(98, '13U09', 'AUT - modul 09', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(99, '13U10', 'AUT - modul 10', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(100, '13U11', 'AUT - modul 11', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(101, '13U12', 'AUT - modul 12', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(102, '13U13', 'AUT - modul 13', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(103, '13U14', 'AUT - modul 14', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(104, '13U15', 'AUT - modul 15', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(105, '13U16', 'AUT - modul 16', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(106, '13U17', 'AUT - modul 17', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(107, '13U18', 'AUT - modul 18', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(108, '13U19', 'AUT - modul 19', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(109, '13U20', 'AUT - modul 20', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(110, '13U21', 'AUT - modul 21', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(111, '13U22', 'AUT - modul 22', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(112, '13U23', 'AUT - modul 23', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(113, '13U24', 'AUT - modul 24', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(114, '13U25', 'AUT - modul 25', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(115, '13U26', 'AUT - modul 26', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(116, '13U27', 'AUT - modul 27', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(117, '13U28', 'AUT - modul 28', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(118, '13U29', 'AUT - modul 29', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(119, '13U30', 'AUT - modul 30', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(120, '13U31', 'AUT - modul 31', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(121, '13U32', 'AUT - modul 32', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(122, '13U33', 'AUT - modul 33', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(123, '13U34', 'AUT - modul 34', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(124, '13U35', 'AUT - modul 35', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(125, '13U36', 'AUT - modul 36', 6, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(126, '13U37', 'AUT - modul 37', 7, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(127, '13U38', 'AUT - modul 38', 8, 3, 2, 'Strukturni predmet programa AUT (demo baza).'),
+(128, '13L01', 'EE - modul 01', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(129, '13L02', 'EE - modul 02', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(130, '13L03', 'EE - modul 03', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(131, '13L04', 'EE - modul 04', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(132, '13L05', 'EE - modul 05', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(133, '13L06', 'EE - modul 06', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(134, '13L07', 'EE - modul 07', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(135, '13L08', 'EE - modul 08', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(136, '13L09', 'EE - modul 09', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(137, '13L10', 'EE - modul 10', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(138, '13L11', 'EE - modul 11', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(139, '13L12', 'EE - modul 12', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(140, '13L13', 'EE - modul 13', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(141, '13L14', 'EE - modul 14', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(142, '13L15', 'EE - modul 15', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(143, '13L16', 'EE - modul 16', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(144, '13L17', 'EE - modul 17', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(145, '13L18', 'EE - modul 18', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(146, '13L19', 'EE - modul 19', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(147, '13L20', 'EE - modul 20', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(148, '13L21', 'EE - modul 21', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(149, '13L22', 'EE - modul 22', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(150, '13L23', 'EE - modul 23', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(151, '13L24', 'EE - modul 24', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(152, '13L25', 'EE - modul 25', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(153, '13L26', 'EE - modul 26', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(154, '13L27', 'EE - modul 27', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(155, '13L28', 'EE - modul 28', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(156, '13L29', 'EE - modul 29', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(157, '13L30', 'EE - modul 30', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(158, '13L31', 'EE - modul 31', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(159, '13L32', 'EE - modul 32', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(160, '13L33', 'EE - modul 33', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(161, '13L34', 'EE - modul 34', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(162, '13L35', 'EE - modul 35', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(163, '13L36', 'EE - modul 36', 6, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(164, '13L37', 'EE - modul 37', 7, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(165, '13L38', 'EE - modul 38', 8, 4, 3, 'Strukturni predmet programa EE (demo baza).'),
+(166, '13V01', 'RT - modul 01', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(167, '13V02', 'RT - modul 02', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(168, '13V03', 'RT - modul 03', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(169, '13V04', 'RT - modul 04', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(170, '13V05', 'RT - modul 05', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(171, '13V06', 'RT - modul 06', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(172, '13V07', 'RT - modul 07', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(173, '13V08', 'RT - modul 08', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(174, '13V09', 'RT - modul 09', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(175, '13V10', 'RT - modul 10', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(176, '13V11', 'RT - modul 11', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(177, '13V12', 'RT - modul 12', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(178, '13V13', 'RT - modul 13', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(179, '13V14', 'RT - modul 14', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(180, '13V15', 'RT - modul 15', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(181, '13V16', 'RT - modul 16', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(182, '13V17', 'RT - modul 17', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(183, '13V18', 'RT - modul 18', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(184, '13V19', 'RT - modul 19', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(185, '13V20', 'RT - modul 20', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(186, '13V21', 'RT - modul 21', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(187, '13V22', 'RT - modul 22', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(188, '13V23', 'RT - modul 23', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(189, '13V24', 'RT - modul 24', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(190, '13V25', 'RT - modul 25', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(191, '13V26', 'RT - modul 26', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(192, '13V27', 'RT - modul 27', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(193, '13V28', 'RT - modul 28', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(194, '13V29', 'RT - modul 29', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(195, '13V30', 'RT - modul 30', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(196, '13V31', 'RT - modul 31', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(197, '13V32', 'RT - modul 32', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(198, '13V33', 'RT - modul 33', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(199, '13V34', 'RT - modul 34', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(200, '13V35', 'RT - modul 35', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(201, '13V36', 'RT - modul 36', 6, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(202, '13V37', 'RT - modul 37', 7, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(203, '13V38', 'RT - modul 38', 8, 5, 4, 'Strukturni predmet programa RT (demo baza).'),
+(204, '13M01', 'TK - modul 01', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(205, '13M02', 'TK - modul 02', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(206, '13M03', 'TK - modul 03', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(207, '13M04', 'TK - modul 04', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(208, '13M05', 'TK - modul 05', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(209, '13M06', 'TK - modul 06', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(210, '13M07', 'TK - modul 07', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(211, '13M08', 'TK - modul 08', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(212, '13M09', 'TK - modul 09', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(213, '13M10', 'TK - modul 10', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(214, '13M11', 'TK - modul 11', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(215, '13M12', 'TK - modul 12', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(216, '13M13', 'TK - modul 13', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(217, '13M14', 'TK - modul 14', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(218, '13M15', 'TK - modul 15', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(219, '13M16', 'TK - modul 16', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(220, '13M17', 'TK - modul 17', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(221, '13M18', 'TK - modul 18', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(222, '13M19', 'TK - modul 19', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(223, '13M20', 'TK - modul 20', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(224, '13M21', 'TK - modul 21', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(225, '13M22', 'TK - modul 22', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(226, '13M23', 'TK - modul 23', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(227, '13M24', 'TK - modul 24', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(228, '13M25', 'TK - modul 25', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(229, '13M26', 'TK - modul 26', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(230, '13M27', 'TK - modul 27', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(231, '13M28', 'TK - modul 28', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(232, '13M29', 'TK - modul 29', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(233, '13M30', 'TK - modul 30', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(234, '13M31', 'TK - modul 31', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(235, '13M32', 'TK - modul 32', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(236, '13M33', 'TK - modul 33', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(237, '13M34', 'TK - modul 34', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(238, '13M35', 'TK - modul 35', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(239, '13M36', 'TK - modul 36', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(240, '13M37', 'TK - modul 37', 7, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(241, '13M38', 'TK - modul 38', 8, 6, 4, 'Strukturni predmet programa TK master (demo baza).'),
+(242, '13M39', 'TK - modul 39', 6, 6, 4, 'Strukturni predmet programa TK master (demo baza).');
+
+INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa) VALUES
+(55, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(56, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(57, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(58, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(59, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(60, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(61, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(62, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(63, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(64, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(65, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(66, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(67, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(68, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(69, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(70, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(71, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(72, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(73, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(74, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(75, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(76, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(77, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(78, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(79, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(80, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(81, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(82, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(83, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(84, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(85, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(86, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(87, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(88, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(89, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(90, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(91, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(92, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(93, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(94, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(95, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(96, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(97, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(98, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(99, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(100, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(101, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(102, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(103, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(104, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(105, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(106, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(107, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(108, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(109, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(110, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(111, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(112, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(113, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(114, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(115, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(116, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(117, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(118, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(119, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(120, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(121, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(122, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(123, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(124, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(125, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(126, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(127, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(128, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(129, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(130, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(131, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(132, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(133, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(134, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(135, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(136, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(137, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(138, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(139, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(140, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(141, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(142, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(143, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(144, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(145, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(146, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(147, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(148, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(149, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(150, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(151, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(152, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(153, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(154, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(155, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(156, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(157, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(158, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(159, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(160, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(161, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(162, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(163, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(164, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(165, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(166, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(167, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(168, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(169, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(170, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(171, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(172, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(173, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(174, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(175, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(176, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(177, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(178, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(179, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(180, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(181, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(182, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(183, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(184, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(185, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(186, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(187, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(188, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(189, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(190, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(191, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(192, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(193, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(194, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(195, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(196, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(197, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(198, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(199, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(200, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(201, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(202, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(203, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(204, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(205, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(206, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(207, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(208, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(209, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(210, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(211, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(212, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(213, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(214, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(215, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(216, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(217, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(218, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(219, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(220, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(221, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(222, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(223, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(224, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(225, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(226, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(227, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(228, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(229, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(230, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(231, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(232, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(233, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(234, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(235, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(236, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(237, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(238, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(239, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(240, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(241, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.'),
+(242, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.');
+
 INSERT INTO preduslov (predmet_id, preduslov_predmet_id) VALUES (2, 1);
 INSERT INTO preduslov (predmet_id, preduslov_predmet_id) VALUES (3, 2);
 INSERT INTO preduslov (predmet_id, preduslov_predmet_id) VALUES (4, 3);
@@ -975,5 +1444,149 @@ INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VAL
 INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (478, 119, 113, 24, 5);
 INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (479, 119, 15, 24, 5);
 INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (480, 120, 16, 59, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (481, 121, 45, 64, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (482, 121, 85, 34, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (483, 121, 108, 20, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (484, 121, 104, 24, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (485, 121, 9, 34, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (486, 121, 101, 36, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (487, 121, 80, 46, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (488, 121, 29, 53, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (489, 121, 25, 35, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (490, 121, 47, 66, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (491, 121, 76, 37, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (492, 121, 2, 45, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (493, 122, 45, 65, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (494, 122, 85, 35, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (495, 122, 108, 21, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (496, 122, 104, 25, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (497, 122, 9, 35, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (498, 122, 101, 37, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (499, 122, 80, 47, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (500, 122, 29, 54, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (501, 122, 25, 36, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (502, 122, 47, 67, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (503, 122, 76, 38, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (504, 122, 2, 46, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (505, 123, 45, 66, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (506, 123, 85, 36, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (507, 123, 108, 22, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (508, 123, 104, 26, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (509, 123, 9, 36, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (510, 123, 101, 38, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (511, 123, 80, 48, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (512, 123, 29, 55, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (513, 123, 25, 37, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (514, 123, 47, 68, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (515, 123, 76, 39, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (516, 123, 2, 47, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (517, 124, 45, 67, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (518, 124, 85, 37, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (519, 124, 108, 23, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (520, 124, 104, 27, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (521, 124, 9, 37, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (522, 124, 101, 39, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (523, 124, 80, 49, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (524, 124, 29, 56, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (525, 124, 25, 38, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (526, 124, 47, 69, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (527, 124, 76, 40, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (528, 124, 2, 48, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (529, 125, 45, 68, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (530, 125, 85, 38, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (531, 125, 108, 24, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (532, 125, 104, 28, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (533, 125, 9, 38, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (534, 125, 101, 40, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (535, 125, 80, 50, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (536, 125, 29, 57, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (537, 125, 25, 39, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (538, 125, 47, 70, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (539, 125, 76, 41, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (540, 125, 2, 49, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (541, 126, 45, 64, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (542, 126, 85, 34, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (543, 126, 108, 20, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (544, 126, 104, 24, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (545, 126, 9, 34, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (546, 126, 101, 36, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (547, 126, 80, 46, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (548, 126, 29, 53, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (549, 126, 25, 35, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (550, 126, 47, 66, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (551, 126, 76, 37, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (552, 126, 2, 45, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (553, 127, 45, 65, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (554, 127, 85, 35, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (555, 127, 108, 21, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (556, 127, 104, 25, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (557, 127, 9, 35, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (558, 127, 101, 37, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (559, 127, 80, 47, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (560, 127, 29, 54, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (561, 127, 25, 36, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (562, 127, 47, 67, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (563, 127, 76, 38, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (564, 127, 2, 46, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (565, 128, 45, 66, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (566, 128, 85, 36, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (567, 128, 108, 22, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (568, 128, 104, 26, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (569, 128, 9, 36, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (570, 128, 101, 38, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (571, 128, 80, 48, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (572, 128, 29, 55, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (573, 128, 25, 37, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (574, 128, 47, 68, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (575, 128, 76, 39, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (576, 128, 2, 47, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (577, 129, 45, 67, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (578, 129, 85, 37, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (579, 129, 108, 23, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (580, 129, 104, 27, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (581, 129, 9, 37, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (582, 129, 101, 39, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (583, 129, 80, 49, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (584, 129, 29, 56, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (585, 129, 25, 38, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (586, 129, 47, 69, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (587, 129, 76, 40, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (588, 129, 2, 48, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (589, 130, 45, 68, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (590, 130, 85, 38, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (591, 130, 108, 24, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (592, 130, 104, 28, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (593, 130, 9, 38, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (594, 130, 101, 40, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (595, 130, 80, 50, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (596, 130, 29, 57, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (597, 130, 25, 39, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (598, 130, 47, 70, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (599, 130, 76, 41, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (600, 130, 2, 49, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (601, 131, 45, 64, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (602, 131, 85, 34, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (603, 131, 108, 20, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (604, 131, 104, 24, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (605, 131, 9, 34, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (606, 131, 101, 36, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (607, 131, 80, 46, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (608, 131, 29, 53, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (609, 131, 25, 35, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (610, 131, 47, 66, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (611, 131, 76, 37, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (612, 131, 2, 45, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (613, 132, 45, 65, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (614, 132, 85, 35, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (615, 132, 108, 21, 5);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (616, 132, 104, 25, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (617, 132, 9, 35, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (618, 132, 101, 37, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (619, 132, 80, 47, 9);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (620, 132, 29, 54, 8);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (621, 132, 25, 36, 7);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (622, 132, 47, 67, 10);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (623, 132, 76, 38, 6);
+INSERT INTO ocena (id, student_id, ispitni_termin_id, poeni, vrednost_ocene) VALUES (624, 132, 2, 46, 8);
 SELECT setval(pg_get_serial_sequence('predmet','id'), (SELECT MAX(id) FROM predmet));
 SELECT setval(pg_get_serial_sequence('ocena','id'), (SELECT MAX(id) FROM ocena));

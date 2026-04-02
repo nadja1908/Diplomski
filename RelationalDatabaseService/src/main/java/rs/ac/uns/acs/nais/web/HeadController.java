@@ -1,24 +1,46 @@
 package rs.ac.uns.acs.nais.web;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import rs.ac.uns.acs.nais.domain.Korisnik;
 import rs.ac.uns.acs.nais.service.AcademicQueryService;
 
 @RestController
 @RequestMapping("/api/head")
-@PreAuthorize("hasAuthority('ROLE_SEF_KATEDRE')")
 @RequiredArgsConstructor
 public class HeadController {
 
     private final AcademicQueryService academicQueryService;
 
+    /**
+     * Bez parametra: lista studijskih programa katedre + studenti (radi i kroz stariji gateway koji nema /api/head/programs).
+     * Sa programPregledId: pun pregled jednog programa (isti odgovor kao /api/head/program/{id}/pregled).
+     */
     @GetMapping("/students")
-    public Object students(@AuthenticationPrincipal Korisnik korisnik) {
-        return academicQueryService.studentsForHead(korisnik);
+    public Object students(
+            @AuthenticationPrincipal Long korisnikId,
+            @RequestParam(value = "programPregledId", required = false) Long programPregledId,
+            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa) {
+        if (programPregledId != null) {
+            return academicQueryService.programPregledForHead(korisnikId, programPregledId, statistikaGodinaUpisa);
+        }
+        return academicQueryService.headStudentsBundle(korisnikId);
+    }
+
+    @GetMapping("/programs")
+    public Object studyPrograms(@AuthenticationPrincipal Long korisnikId) {
+        return academicQueryService.studyProgramsForHead(korisnikId);
+    }
+
+    @GetMapping("/program/{programId}/pregled")
+    public Object programPregled(
+            @AuthenticationPrincipal Long korisnikId,
+            @PathVariable long programId,
+            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa) {
+        return academicQueryService.programPregledForHead(korisnikId, programId, statistikaGodinaUpisa);
     }
 }

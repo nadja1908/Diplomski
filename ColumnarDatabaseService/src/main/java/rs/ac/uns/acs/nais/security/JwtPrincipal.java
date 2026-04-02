@@ -16,7 +16,11 @@ public class JwtPrincipal implements UserDetails {
 
     public JwtPrincipal(Long korisnikId, String uloga) {
         this.korisnikId = korisnikId;
-        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + uloga));
+        String u = uloga != null ? uloga.trim() : "";
+        if (u.startsWith("ROLE_")) {
+            u = u.substring(5);
+        }
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + u));
     }
 
     @Override

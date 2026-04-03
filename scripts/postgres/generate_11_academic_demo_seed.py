@@ -11,6 +11,7 @@ Zavisi od: curriculum_seed_utils.py, 02_data.sql (parsiranje predmeta).
 """
 from __future__ import annotations
 
+import calendar
 import pathlib
 import re
 from collections import defaultdict
@@ -212,6 +213,67 @@ def poeni_za_ocenu(ocena: int) -> int:
     return min(100, 30 + ocena * 7 + (ocena % 4) * 3)
 
 
+# (mesec, težina): jan/feb manje, jun/jul više, avg/okt srednje — realističnija raspodela rokova
+_ROK_WEIGHTS: list[tuple[int, int]] = [
+    (1, 5),
+    (2, 8),
+    (4, 10),
+    (6, 22),
+    (7, 22),
+    (8, 15),
+    (10, 18),
+]
+
+
+def _weighted_exam_month(rnd_val: int) -> int:
+    tot = sum(w for _, w in _ROK_WEIGHTS)
+    r = rnd_val % tot
+    acc = 0
+    for m, w in _ROK_WEIGHTS:
+        acc += w
+        if r < acc:
+            return m
+    return _ROK_WEIGHTS[-1][0]
+
+
+def first_eligible_in_range(gu: int, kg: int, ks: int, d_lo: date, d_hi: date) -> date | None:
+    d = d_lo
+    while d <= d_hi:
+        if student_moze_polagati_na_datum(gu, d, kg, ks):
+            return d
+        d += timedelta(days=1)
+    return None
+
+
+def choose_biased_exam_date(
+    gu: int,
+    kg: int,
+    ks: int,
+    student_sid: int,
+    salt: str,
+    d_lo: date,
+    d_hi: date,
+    rng_fn,
+) -> date | None:
+    if d_lo > d_hi:
+        return None
+    years = list(range(d_lo.year, d_hi.year + 1))
+    for attempt in range(56):
+        y = years[rng_fn(student_sid, f"{salt}y{attempt}") % len(years)]
+        mon = _weighted_exam_month(rng_fn(student_sid, f"{salt}m{attempt}"))
+        last_d = calendar.monthrange(y, mon)[1]
+        da = date(y, mon, 1)
+        db = date(y, mon, last_d)
+        clip_lo = max(da, d_lo)
+        clip_hi = min(db, d_hi)
+        if clip_lo > clip_hi:
+            continue
+        hit = first_eligible_in_range(gu, kg, ks, clip_lo, clip_hi)
+        if hit:
+            return hit
+    return first_eligible_date(gu, kg, ks, d_lo, d_hi)
+
+
 def main() -> None:
     text02 = DATA_02.read_text(encoding="utf-8")
     ui_students = parse_ui_students_from_02(text02)
@@ -316,12 +378,25 @@ def main() -> None:
             kg, ks = p["kurikulum_godina"], p["kurikulum_semestar"]
             d0 = date(gu, 10, 1)
             d1 = AS_OF
-            d_pass = first_eligible_date(gu, kg, ks, d0, d1)
+            d_pass = choose_biased_exam_date(gu, kg, ks, student_sid, f"pass{sifra}", d0, d1, rng)
+            if d_pass is None:
+                d_pass = first_eligible_date(gu, kg, ks, d0, d1)
             if d_pass is None:
                 raise RuntimeError(f"no eligible pass date {sifra} gu={gu}")
             want_fail = skill < 35 and (rng(student_sid, sifra + "f") % 3 == 0)
             if want_fail:
-                d_fail = first_eligible_date(gu, kg, ks, d0, d_pass - timedelta(days=14))
+                d_fail = choose_biased_exam_date(
+                    gu,
+                    kg,
+                    ks,
+                    student_sid,
+                    f"fail{sifra}",
+                    d0,
+                    d_pass - timedelta(days=14),
+                    rng,
+                )
+                if d_fail is None:
+                    d_fail = first_eligible_date(gu, kg, ks, d0, d_pass - timedelta(days=14))
                 if d_fail:
                     tid_f = alloc_termin(prog_id, sifra, d_fail)
                     planned.append((tid_f, 5, student_sid, d_fail))
@@ -339,11 +414,26 @@ def main() -> None:
             if r % 5 == 0:
                 continue
             kg, ks = p["kurikulum_godina"], p["kurikulum_semestar"]
-            d_pass = first_eligible_date(gu, kg, ks, date(gu, 10, 1), AS_OF)
+            d_pass = choose_biased_exam_date(
+                gu, kg, ks, student_sid, f"ex{p['sifra']}", date(gu, 10, 1), AS_OF, rng
+            )
+            if d_pass is None:
+                d_pass = first_eligible_date(gu, kg, ks, date(gu, 10, 1), AS_OF)
             if d_pass is None:
                 continue
             if r % 4 == 0:
-                d_fail = first_eligible_date(gu, kg, ks, date(gu, 10, 1), d_pass - timedelta(days=10))
+                d_fail = choose_biased_exam_date(
+                    gu,
+                    kg,
+                    ks,
+                    student_sid,
+                    f"exf{p['sifra']}",
+                    date(gu, 10, 1),
+                    d_pass - timedelta(days=10),
+                    rng,
+                )
+                if d_fail is None:
+                    d_fail = first_eligible_date(gu, kg, ks, date(gu, 10, 1), d_pass - timedelta(days=10))
                 if d_fail:
                     tid_f = alloc_termin(prog_id, p["sifra"], d_fail)
                     planned.append((tid_f, 5, student_sid, d_fail))
@@ -356,9 +446,12 @@ def main() -> None:
         for sifra, d_pass in must_fail_extra[:1]:
             p = next(x for x in subs if x["sifra"] == sifra)
             kg, ks = p["kurikulum_godina"], p["kurikulum_semestar"]
-            d_fail = first_eligible_date(
-                gu, kg, ks, date(gu, 10, 1), min(d_pass - timedelta(days=5), AS_OF)
+            d_hi = min(d_pass - timedelta(days=5), AS_OF)
+            d_fail = choose_biased_exam_date(
+                gu, kg, ks, student_sid, f"mfe{sifra}", date(gu, 10, 1), d_hi, rng
             )
+            if d_fail is None:
+                d_fail = first_eligible_date(gu, kg, ks, date(gu, 10, 1), d_hi)
             if d_fail:
                 tid_f = alloc_termin(prog_id, sifra, d_fail)
                 planned.append((tid_f, 5, student_sid, d_fail))
@@ -367,7 +460,11 @@ def main() -> None:
         if not has_fail and allowed:
             p = allowed[rng(student_sid, "forcefail") % len(allowed)]
             kg, ks = p["kurikulum_godina"], p["kurikulum_semestar"]
-            d_fail = first_eligible_date(gu, kg, ks, date(gu, 10, 1), AS_OF)
+            d_fail = choose_biased_exam_date(
+                gu, kg, ks, student_sid, "forcefail", date(gu, 10, 1), AS_OF, rng
+            )
+            if d_fail is None:
+                d_fail = first_eligible_date(gu, kg, ks, date(gu, 10, 1), AS_OF)
             if d_fail:
                 tid_f = alloc_termin(prog_id, p["sifra"], d_fail)
                 planned.append((tid_f, 5, student_sid, d_fail))

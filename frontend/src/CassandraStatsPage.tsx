@@ -143,14 +143,14 @@ export function CassandraStatsPage({ isHeadOfDepartment }: Props) {
           </section>
         ) : null}
 
-        {isHeadOfDepartment && trend && trend.meseci.length > 0 ? (
+        {isHeadOfDepartment && trend && (trend.meseci?.length ?? 0) > 0 ? (
           <section className="cass-stats-section" aria-labelledby="cass-trend-title">
             <h3 id="cass-trend-title" className="cass-stats-h3">
               Trend položeno / palo po ispitnim rokovima (katedra)
             </h3>
             <p className="dj-card-hint">
-              Zbir agregata po ispitnim rokovima (Januarski, Februarski, Aprilski, Junski, Avgustovski, Oktobarski) —
-              datum ispita mapiran na odgovarajući rok.
+              Prikaz za poslednju kalendarsku godinu roka sa podacima: Januar, Februar, April, Jun, Jul, Avgust, Oktobar.
+              Datum ispita mapiran je na odgovarajući rok; jun i jul su odvojeni.
             </p>
             <div className="cass-trend-list">
               {trend.meseci.map((p) => {

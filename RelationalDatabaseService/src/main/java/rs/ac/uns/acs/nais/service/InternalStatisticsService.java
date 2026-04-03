@@ -63,9 +63,9 @@ public class InternalStatisticsService {
         }
 
         /*
-         * Tačke po ispitnom roku (ne po kalendarskom mesecu): ključ mesec = YYYY-R01..R06
-         * (R01 Januarski … R06 Oktobarski). Meseci van „čistih“ rokova mapiraju se na najbliži rok
-         * (npr. mart → Aprilski, jul → Junski, decembar → Januarski sledeće godine).
+         * Tačke po ispitnom roku: ključ mesec = YYYY-R01..R07
+         * R01 Januar, R02 Februar, R03 April, R04 Jun, R05 Jul, R06 Avgust, R07 Oktobar
+         * (mart → aprilski rok; sep–nov → oktobarski; dec → januar sledeće godine).
          */
         List<Map<String, Object>> monthlyRows = jdbcTemplate.queryForList("""
                 SELECT p.id AS predmet_id,
@@ -91,11 +91,11 @@ public class InternalStatisticsService {
                             WHEN 4 THEN 3
                             WHEN 5 THEN 4
                             WHEN 6 THEN 4
-                            WHEN 7 THEN 4
-                            WHEN 8 THEN 5
-                            WHEN 9 THEN 6
-                            WHEN 10 THEN 6
-                            WHEN 11 THEN 6
+                            WHEN 7 THEN 5
+                            WHEN 8 THEN 6
+                            WHEN 9 THEN 7
+                            WHEN 10 THEN 7
+                            WHEN 11 THEN 7
                             WHEN 12 THEN 1
                             ELSE 1
                         END AS rok_indeks

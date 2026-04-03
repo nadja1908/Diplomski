@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rs.ac.uns.acs.nais.security.JwtPrincipal;
 import rs.ac.uns.acs.nais.service.ColumnarStatsService;
@@ -23,8 +24,10 @@ public class ColumnarHeadController {
     }
 
     @GetMapping("/trends/pass-fail")
-    public ColumnarStatsService.PassFailTrendDto passFailTrends(@AuthenticationPrincipal JwtPrincipal principal) {
-        return columnarStatsService.headPassFailTrends(principal.getKorisnikId());
+    public ColumnarStatsService.PassFailTrendDto passFailTrends(
+            @AuthenticationPrincipal JwtPrincipal principal,
+            @RequestParam(name = "godina", required = false) Integer godina) {
+        return columnarStatsService.headPassFailTrends(principal.getKorisnikId(), godina);
     }
 
     @GetMapping("/performance-overview")

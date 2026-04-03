@@ -17,8 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +28,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ColumnarStatsService {
 
-    private static final Pattern TREND_ROK_KEY = Pattern.compile("(\\d{4})-R(\\d{2})");
+    private static final Pattern TREND_ROK_KEY = Pattern.compile("^(\\d{4})-R(\\d{2})$");
     private static final Pattern TREND_CAL_KEY = Pattern.compile("(\\d{4})-(\\d{2})");
 
     private final SubjectStatisticsRepository subjectStatisticsRepository;
@@ -84,25 +86,45 @@ public class ColumnarStatsService {
         return out;
     }
 
-    public PassFailTrendDto headPassFailTrends(Long korisnikId) {
+    public PassFailTrendDto headPassFailTrends(Long korisnikId, Integer godina) {
         Long katedraId = relationalInternalClient.katedraForSef(korisnikId);
         if (katedraId == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Niste šef katedre");
         }
         Set<Long> ids = new HashSet<>(relationalInternalClient.predmetIdsForKatedra(katedraId));
         Map<String, MonthAgg> byMonth = new TreeMap<>();
+        TreeSet<Integer> years = new TreeSet<>(Comparator.reverseOrder());
         for (Long pid : ids) {
             for (SubjectMonthlyTrend t : subjectMonthlyTrendRepository.findByKeyPredmetId(pid)) {
                 String canonical = normalizeTrendPeriodKey(t.getKey().getMesec());
+                rokGodinaIzKljuča(canonical).ifPresent(years::add);
                 MonthAgg agg = byMonth.computeIfAbsent(canonical, x -> new MonthAgg());
                 agg.polozeno += t.getPolozeno();
                 agg.pali += t.getPali();
             }
         }
-        List<PassFailTrendDto.MonthPoint> points = byMonth.entrySet().stream()
-                .map(e -> new PassFailTrendDto.MonthPoint(e.getKey(), e.getValue().polozeno, e.getValue().pali))
-                .toList();
-        return new PassFailTrendDto(points);
+        List<Integer> dostupneGodine = new ArrayList<>(years);
+        if (years.isEmpty()) {
+            return new PassFailTrendDto(List.of(), dostupneGodine, null);
+        }
+        int izabranaGodina = godina != null ? godina : years.first();
+        List<PassFailTrendDto.MonthPoint> points = new ArrayList<>();
+        for (int rokIdx = 1; rokIdx <= 7; rokIdx++) {
+            String k = String.format("%d-R%02d", izabranaGodina, rokIdx);
+            MonthAgg a = byMonth.get(k);
+            int p = a == null ? 0 : a.polozeno;
+            int f = a == null ? 0 : a.pali;
+            points.add(new PassFailTrendDto.MonthPoint(k, p, f));
+        }
+        return new PassFailTrendDto(points, dostupneGodine, izabranaGodina);
+    }
+
+    private static OptionalInt rokGodinaIzKljuča(String canonicalKey) {
+        Matcher m = TREND_ROK_KEY.matcher(canonicalKey);
+        if (!m.matches()) {
+            return OptionalInt.empty();
+        }
+        return OptionalInt.of(Integer.parseInt(m.group(1)));
     }
 
     public PerformanceOverviewDto headPerformanceOverview(Long korisnikId) {
@@ -150,14 +172,13 @@ public class ColumnarStatsService {
     }
 
     /**
-     * Usklađuje stare ključeve {@code YYYY-MM} sa novim {@code YYYY-R01..R06} (isti rok → isti bucket pri agregaciji).
+     * Usklađuje stare ključeve {@code YYYY-MM} sa {@code YYYY-R01..R07} (isti rok → isti bucket pri agregaciji).
      */
     static String normalizeTrendPeriodKey(String mesec) {
         if (mesec == null || mesec.isBlank()) {
             return mesec;
         }
-        Matcher rok = TREND_ROK_KEY.matcher(mesec);
-        if (rok.matches()) {
+        if (TREND_ROK_KEY.matcher(mesec).matches()) {
             return mesec;
         }
         Matcher cal = TREND_CAL_KEY.matcher(mesec);
@@ -170,16 +191,17 @@ public class ColumnarStatsService {
         return mesec;
     }
 
-    /** [0] = rok godina, [1] = indeks roka 1..6 (Januarski … Oktobarski). */
+    /** [0] = rok godina, [1] = indeks roka 1..7 (Jan, Feb, Apr, Jun, Jul, Aug, Oct). */
     private static int[] calendarMonthToRokIndex(int year, int month) {
         return switch (month) {
             case 12 -> new int[] { year + 1, 1 };
             case 1 -> new int[] { year, 1 };
             case 2 -> new int[] { year, 2 };
             case 3, 4 -> new int[] { year, 3 };
-            case 5, 6, 7 -> new int[] { year, 4 };
-            case 8 -> new int[] { year, 5 };
-            case 9, 10, 11 -> new int[] { year, 6 };
+            case 5, 6 -> new int[] { year, 4 };
+            case 7 -> new int[] { year, 5 };
+            case 8 -> new int[] { year, 6 };
+            case 9, 10, 11 -> new int[] { year, 7 };
             default -> new int[] { year, 1 };
         };
     }
@@ -202,7 +224,11 @@ public class ColumnarStatsService {
     ) {
     }
 
-    public record PassFailTrendDto(List<MonthPoint> meseci) {
+    public record PassFailTrendDto(
+            List<MonthPoint> meseci,
+            List<Integer> dostupneGodine,
+            Integer izabranaGodina
+    ) {
         public record MonthPoint(String mesec, int polozeno, int pali) {
         }
     }

@@ -82,8 +82,11 @@ export const naisApi = {
   },
   /** Cassandra — predmeti katedre (samo šef). */
   headAnalytics: () => api<ColumnarSubjectStat[]>('/api/head/subjects/analytics'),
-  /** Cassandra — mesečni trend položeno / palo (samo šef). */
-  headTrends: () => api<PassFailTrend>('/api/head/trends/pass-fail'),
+  /** Cassandra — trend položeno / palo po ispitnim rokovima za jednu kalendarsku godinu roka. */
+  headTrends: (godina?: number) => {
+    const q = godina != null ? `?godina=${encodeURIComponent(String(godina))}` : ''
+    return api<PassFailTrend>(`/api/head/trends/pass-fail${q}`)
+  },
   /** Cassandra — zbirni KPI + najlakši / najteži predmet katedre (samo šef). */
   headPerf: () => api<PerformanceOverview>('/api/head/performance-overview'),
   /** Cassandra — globalni rang svih predmeta (sinhronizovano iz PostgreSQL-a). */

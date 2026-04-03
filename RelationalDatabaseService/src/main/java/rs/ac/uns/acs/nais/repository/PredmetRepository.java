@@ -25,5 +25,12 @@ public interface PredmetRepository extends JpaRepository<Predmet, Long> {
     @Query("SELECT p FROM Predmet p WHERE p.studijskiProgram.id = :programId ORDER BY p.sifra ASC")
     List<Predmet> findAllByStudijskiProgramIdOrderBySifraAsc(@Param("programId") Long programId);
 
+    @Query("""
+            SELECT p FROM Predmet p
+            WHERE p.studijskiProgram.id = :programId
+            ORDER BY p.kurikulumGodina ASC, p.kurikulumSemestar ASC, p.sifra ASC
+            """)
+    List<Predmet> findAllByStudijskiProgramIdOrderByKurikulumSifra(@Param("programId") Long programId);
+
     long countByStudijskiProgram_Id(Long programId);
 }

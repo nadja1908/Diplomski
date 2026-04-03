@@ -29,6 +29,10 @@ eureka:
     prefer-ip-address: true
 
 nais:
+  academic:
+    # Kalendarska godina u kojoj je generacija koja upisuje u tom kal. godini u 1. godini studija
+    # (2025 → 1. godina, 2024 → 2., …). Poklopiti sa frontend konstantom REFERENCE_INTAKE_YEAR.
+    reference-intake-year: ${NAIS_REFERENCE_INTAKE_YEAR:2025}
   jwt:
     # Isti default kao docker-compose (JWT_SECRET) da IDE i kontejner ne potpisuju različite tokene.
     secret: ${JWT_SECRET:nais-demo-secret-change-me-for-demo-32b}

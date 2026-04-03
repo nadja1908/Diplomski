@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import rs.ac.uns.acs.nais.config.NaisProperties;
 import rs.ac.uns.acs.nais.internal.dto.StatisticsAggregatesResponse;
+import rs.ac.uns.acs.nais.internal.dto.StudentProgramPredmetMin;
+import rs.ac.uns.acs.nais.academic.AcademicProgressionRules;
 import rs.ac.uns.acs.nais.repository.OcenaRepository;
 import rs.ac.uns.acs.nais.repository.PredmetRepository;
 import rs.ac.uns.acs.nais.repository.SefKatedreRepository;
+import rs.ac.uns.acs.nais.repository.StudentRepository;
 import rs.ac.uns.acs.nais.service.InternalStatisticsService;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class InternalApiController {
     private final OcenaRepository ocenaRepository;
     private final SefKatedreRepository sefKatedreRepository;
     private final PredmetRepository predmetRepository;
+    private final StudentRepository studentRepository;
 
     private void verifyKey(String key) {
         String expected = naisProperties.getInternalApiSecret();
@@ -43,7 +47,30 @@ public class InternalApiController {
             @RequestHeader("X-Internal-Key") String key
     ) {
         verifyKey(key);
-        return ocenaRepository.findDistinctPredmetIdsByStudentKorisnikId(korisnikId);
+        var student = studentRepository.findByKorisnikId(korisnikId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student nije pronađen"));
+        return ocenaRepository.findByStudentIdWithDetails(student.getId()).stream()
+                .filter(o -> AcademicProgressionRules.ocenaJeDozvoljenaEvidencija(student, o))
+                .map(o -> o.getIspitniTermin().getPredmet().getId())
+                .distinct()
+                .toList();
+    }
+
+    /**
+     * Svi predmeti studijskog programa studenta (isti kurikulum), za Cassandrinu statistiku položeno/palo na nivou predmeta.
+     */
+    @GetMapping("/student/korisnik/{korisnikId}/program-predmeti")
+    public List<StudentProgramPredmetMin> programPredmetiZaStudenta(
+            @PathVariable Long korisnikId,
+            @RequestHeader("X-Internal-Key") String key
+    ) {
+        verifyKey(key);
+        var student = studentRepository.findByKorisnikId(korisnikId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student nije pronađen"));
+        long programId = student.getStudijskiProgram().getId();
+        return predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId).stream()
+                .map(p -> new StudentProgramPredmetMin(p.getId(), p.getSifra(), p.getNaziv()))
+                .toList();
     }
 
     @GetMapping("/sef/korisnik/{korisnikId}/katedra-id")

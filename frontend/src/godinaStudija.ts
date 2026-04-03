@@ -1,6 +1,8 @@
 import type { CurriculumProgress, CurriculumSubject } from './studentTypes'
 
-/** Isto pravilo kao AcademicQueryService.godinaStudijaBlokKurikuluma (Java). Blok 1 i 4 po redu šifri = godine 4 i 1. */
+/**
+ * @deprecated Samo za starije odgovore API-ja bez polja godina/semestar; kurikulum sada dolazi iz baze.
+ */
 export function godinaStudijaBlokKurikuluma(redniBrojOdNule: number): number {
   if (redniBrojOdNule < 0) return 1
   const blokGodina = Math.min(4, Math.floor(redniBrojOdNule / 10) + 1)

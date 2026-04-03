@@ -3,6 +3,8 @@ package rs.ac.uns.acs.nais.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import rs.ac.uns.acs.nais.academic.AcademicProgressionRules;
+import rs.ac.uns.acs.nais.academic.LinearAcademicTimeline;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import rs.ac.uns.acs.nais.domain.Korisnik;
@@ -26,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class AcademicQueryService {
     private final StudijskiProgramRepository studijskiProgramRepository;
     private final OcenaRepository ocenaRepository;
     private final PredmetRepository predmetRepository;
+    private final LinearAcademicTimeline linearAcademicTimeline;
 
     /**
      * Autorizacija po bazi (ne {@code @PreAuthorize} na kontroleru), da radi pouzdano sa JWT principalom tipa {@link Long}.
@@ -78,6 +80,7 @@ public class AcademicQueryService {
         Student s = studentRepository.findByKorisnikId(korisnikId)
                 .orElseThrow(() -> new IllegalStateException("Student nije pronađen"));
         return ocenaRepository.findByStudentIdWithDetails(s.getId()).stream()
+                .filter(o -> AcademicProgressionRules.ocenaJeDozvoljenaEvidencija(s, o))
                 .map(this::toSubjectGrade)
                 .toList();
     }
@@ -86,7 +89,9 @@ public class AcademicQueryService {
     public GpaDto gpa(Long korisnikId) {
         Student s = studentRepository.findByKorisnikId(korisnikId)
                 .orElseThrow(() -> new IllegalStateException("Student nije pronađen"));
-        List<Ocena> ocene = ocenaRepository.findByStudentIdWithDetails(s.getId());
+        List<Ocena> ocene = ocenaRepository.findByStudentIdWithDetails(s.getId()).stream()
+                .filter(o -> AcademicProgressionRules.ocenaJeDozvoljenaEvidencija(s, o))
+                .toList();
         Map<String, Predmet> predmetPoSifri = new HashMap<>();
         Map<String, Integer> bestBySifra = new HashMap<>();
         for (Ocena o : ocene) {
@@ -99,26 +104,36 @@ public class AcademicQueryService {
         int espbSum = 0;
         double weighted = 0;
         int brojPolozenihPredmeta = 0;
+        int zbirOcenaPolozenih = 0;
         for (Map.Entry<String, Integer> e : bestBySifra.entrySet()) {
             if (e.getValue() < 6) {
                 continue;
             }
             brojPolozenihPredmeta++;
+            zbirOcenaPolozenih += e.getValue();
             Predmet p = predmetPoSifri.get(e.getKey());
             int esp = p != null && p.getEspb() != null ? p.getEspb() : 0;
             espbSum += esp;
             weighted += e.getValue() * esp;
         }
         Double prosek = espbSum == 0 ? null : Math.round((weighted / espbSum) * 100.0) / 100.0;
+        Double prosekAritmetickiPolozenih = brojPolozenihPredmeta == 0
+                ? null
+                : Math.round((zbirOcenaPolozenih * 100.0 / brojPolozenihPredmeta)) / 100.0;
         long programId = s.getStudijskiProgram().getId();
         int ukupnoPredmetaNaProgramu = (int) predmetRepository.countByStudijskiProgram_Id(programId);
-        return new GpaDto(prosek, espbSum, ocene.size(), brojPolozenihPredmeta, ukupnoPredmetaNaProgramu);
+        return new GpaDto(
+                prosek,
+                prosekAritmetickiPolozenih,
+                espbSum,
+                ocene.size(),
+                brojPolozenihPredmeta,
+                ukupnoPredmetaNaProgramu);
     }
 
     /**
      * Kurikulum studijskog programa studenta sa statusom po predmetu (najbolji pokušaj).
-     * Godina predmeta: blokovi od 10 predmeta po rastućoj šifri; prvi i poslednji blok su zamenjeni u oznakama godine (1.↔4.)
-     * da napredak po položenim predmetima bude prirodniji. Četvrti blok (u smislu šifre) nosi ostatak ako ukupno nije deljivo sa 10.
+     * Godina i semestar predmeta dolaze iz kolona {@code kurikulum_godina} i {@code kurikulum_semestar} u bazi (nastavni plan).
      * Procenjena godina studenta: akademska godina počinje oktobrom (1–6).
      */
     @Transactional(readOnly = true)
@@ -129,7 +144,10 @@ public class AcademicQueryService {
         LocalDate today = LocalDate.now();
         final int procenjenaGodina = procenjenaGodinaStudijaAkademska(godinaUpisa, today);
 
-        List<Ocena> ocene = ocenaRepository.findByStudentIdWithDetails(s.getId());
+        List<Ocena> sveOcene = ocenaRepository.findByStudentIdWithDetails(s.getId());
+        List<Ocena> ocene = sveOcene.stream()
+                .filter(o -> AcademicProgressionRules.ocenaJeDozvoljenaEvidencija(s, o))
+                .toList();
         Map<String, Integer> bestBySifra = new HashMap<>();
         Map<String, List<Ocena>> izlasciPoSifri = new HashMap<>();
         for (Ocena o : ocene) {
@@ -142,21 +160,18 @@ public class AcademicQueryService {
         }
 
         long programId = s.getStudijskiProgram().getId();
-        List<Predmet> predmeti = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
-        List<Integer> semestriPoRedu = kurikulumSemestriPoRedu(predmeti);
+        List<Predmet> predmeti = predmetRepository.findAllByStudijskiProgramIdOrderByKurikulumSifra(programId);
         List<CurriculumSubjectDto> redovi = new ArrayList<>();
-        int idx = 0;
         for (Predmet p : predmeti) {
-            int gs = godinaStudijaBlokKurikuluma(idx);
-            int sem = semestriPoRedu.get(idx);
-            idx++;
+            int gs = p.getKurikulumGodina();
+            int sem = p.getKurikulumSemestar();
             Integer najbolja = bestBySifra.get(p.getSifra());
             String status;
             if (najbolja != null && najbolja >= 6) {
                 status = "POLOZENO";
             } else if (najbolja != null) {
                 status = "PALI";
-            } else if (!studentImaZavrsenihSemestaraZaPredmet(godinaUpisa, today, gs, sem)) {
+            } else if (!predmetJeUSvojojFaziStudija(godinaUpisa, today, gs, sem)) {
                 status = "KASNIJE";
             } else {
                 status = "BEZ_IZLAZAKA";
@@ -217,23 +232,6 @@ public class AcademicQueryService {
                 o.getVrednostOcene(),
                 o.getPoeni()
         );
-    }
-
-    /**
-     * Blok kurikuluma po redu (0 = prvih 10 po šifri, …). Osnovna godina bloka je 1–4, zatim se menjaju mesta prve i četvrte godine.
-     */
-    static int godinaStudijaBlokKurikuluma(int redniBrojOdNule) {
-        if (redniBrojOdNule < 0) {
-            return 1;
-        }
-        int blokGodina = Math.min(4, redniBrojOdNule / 10 + 1);
-        if (blokGodina == 1) {
-            return 4;
-        }
-        if (blokGodina == 4) {
-            return 1;
-        }
-        return blokGodina;
     }
 
     /**
@@ -310,42 +308,6 @@ public class AcademicQueryService {
         return programSifra + " " + tail;
     }
 
-    /** Predmet (godina G, semestar S): računa se da je ispit moguć posle S-tog semestra te godine u kurikulumu. */
-    static boolean studentImaZavrsenihSemestaraZaPredmet(int godinaUpisa, LocalDate d, int kurikulumGodina, int kurikulumSemestar) {
-        int potrebno = (kurikulumGodina - 1) * 2 + kurikulumSemestar;
-        return ukupnoZavrsenihSemestara(godinaUpisa, d) >= potrebno;
-    }
-
-    /**
-     * Po svakoj godini kurikuluma: prva polovina predmeta (po šifri) = semestar 1, ostatak = semestar 2.
-     */
-    static List<Integer> kurikulumSemestriPoRedu(List<Predmet> predmetiOrdered) {
-        record Tmp(Predmet p, int gs) {}
-        List<Tmp> rows = new ArrayList<>();
-        for (int i = 0; i < predmetiOrdered.size(); i++) {
-            rows.add(new Tmp(predmetiOrdered.get(i), godinaStudijaBlokKurikuluma(i)));
-        }
-        Map<Integer, List<Tmp>> byG = new TreeMap<>();
-        for (Tmp t : rows) {
-            byG.computeIfAbsent(t.gs, k -> new ArrayList<>()).add(t);
-        }
-        Map<String, Integer> semBySifra = new HashMap<>();
-        for (List<Tmp> group : byG.values()) {
-            group.sort(Comparator.comparing(t -> t.p.getSifra()));
-            int n = group.size();
-            int firstSemCount = (n + 1) / 2;
-            for (int i = 0; i < n; i++) {
-                int sem = i < firstSemCount ? 1 : 2;
-                semBySifra.put(group.get(i).p.getSifra(), sem);
-            }
-        }
-        List<Integer> out = new ArrayList<>(predmetiOrdered.size());
-        for (Predmet p : predmetiOrdered) {
-            out.add(semBySifra.getOrDefault(p.getSifra(), 1));
-        }
-        return out;
-    }
-
     @Transactional(readOnly = true)
     public HeadStudentsBundleDto headStudentsBundle(Long korisnikId) {
         assertSefKatedre(korisnikId);
@@ -389,11 +351,17 @@ public class AcademicQueryService {
      * završili dovoljno semestara da bi mogli da polažu taj predmet (godina + semestar u kurikulumu).
      *
      * @param statistikaGodinaUpisa ako nije {@code null}, u statistiku ulaze samo studenti te kalendarske godine upisa
-     *                              (jedna generacija); inače svi studenti programa.
+     *                              (jedna generacija); inače svi studenti programa. Ignoriše se kad je {@code statistikaCeoProgram}.
+     * @param statistikaCeoProgram ako je {@code true}: za svaki predmet na programu brojači koriste <strong>sve</strong> studente
+     *                           na tom programu (bez filtra generacije i bez „dovoljno semestara“ / II sem. kalendara);
+     *                           {@code elegibilnih} = broj studenata na programu, ostalo na osnovu najboljih ocena iz evidencije.
      */
     @Transactional(readOnly = true)
     public HeadProgramPregledDto programPregledForHead(
-            Long korisnikId, long programId, Integer statistikaGodinaUpisa) {
+            Long korisnikId,
+            long programId,
+            Integer statistikaGodinaUpisa,
+            Boolean statistikaCeoProgram) {
         assertSefKatedre(korisnikId);
         var sef = sefKatedreRepository.findByKorisnikIdWithKatedra(korisnikId)
                 .orElseThrow(() -> new IllegalStateException("Niste šef katedre"));
@@ -407,7 +375,9 @@ public class AcademicQueryService {
         List<HeadStudentRowDto> studentRows = new ArrayList<>();
         for (Student s : students) {
             int gy = s.getGodinaUpisa();
-            int procenjena = procenjenaGodinaStudijaAkademska(gy, today);
+            int procenjena = linearAcademicTimeline.koristiStrogiLinearniModel(gy)
+                    ? linearAcademicTimeline.studyYearFromGodinaUpisa(gy)
+                    : procenjenaGodinaStudijaAkademska(gy, today);
             var k = s.getKorisnik();
             studentRows.add(new HeadStudentRowDto(
                     s.getId(),
@@ -420,14 +390,11 @@ public class AcademicQueryService {
             ));
         }
 
-        List<Predmet> predmeti = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
-        List<Integer> semestri = kurikulumSemestriPoRedu(predmeti);
+        List<Predmet> predmeti = predmetRepository.findAllByStudijskiProgramIdOrderByKurikulumSifra(programId);
         List<HeadPredmetRowDto> predmetRows = new ArrayList<>();
-        int idx = 0;
         for (Predmet p : predmeti) {
-            int gs = godinaStudijaBlokKurikuluma(idx);
-            int sem = semestri.get(idx);
-            idx++;
+            int gs = p.getKurikulumGodina();
+            int sem = p.getKurikulumSemestar();
             predmetRows.add(new HeadPredmetRowDto(
                     p.getId(),
                     p.getSifra(),
@@ -441,7 +408,11 @@ public class AcademicQueryService {
         List<Ocena> ocene = ocenaRepository.findAllByStudijskiProgramId(programId);
         Map<Long, Map<Long, Integer>> bestByStudentPredmet = new HashMap<>();
         for (Ocena o : ocene) {
-            long sid = o.getStudent().getId();
+            Student st = o.getStudent();
+            if (!AcademicProgressionRules.ocenaJeDozvoljenaEvidencija(st, o)) {
+                continue;
+            }
+            long sid = st.getId();
             long pid = o.getIspitniTermin().getPredmet().getId();
             int v = o.getVrednostOcene();
             bestByStudentPredmet
@@ -450,6 +421,7 @@ public class AcademicQueryService {
         }
 
         boolean iiSemKurikulumaAktivnoZaStat = statistikaPolaganjaZaDrugiSemestarKurikulumaAktivna(today);
+        boolean ceoProgram = Boolean.TRUE.equals(statistikaCeoProgram);
 
         List<HeadPredmetStatDto> stats = new ArrayList<>();
         for (HeadPredmetRowDto pr : predmetRows) {
@@ -460,16 +432,8 @@ public class AcademicQueryService {
             int saIzlaskom = 0;
             int polozili = 0;
             int pali = 0;
-            boolean predmetIIsem = sem == 2;
-            boolean racunajRed = !predmetIIsem || iiSemKurikulumaAktivnoZaStat;
-            if (racunajRed) {
+            if (ceoProgram) {
                 for (HeadStudentRowDto st : studentRows) {
-                    if (!studentUpadaUStatistikuGeneracije(st.godinaUpisa(), statistikaGodinaUpisa)) {
-                        continue;
-                    }
-                    if (!studentImaZavrsenihSemestaraZaPredmet(st.godinaUpisa(), today, g, sem)) {
-                        continue;
-                    }
                     elegibilnih++;
                     Integer best = bestByStudentPredmet.getOrDefault(st.id(), Map.of()).get(pid);
                     if (best == null) {
@@ -480,6 +444,31 @@ public class AcademicQueryService {
                         polozili++;
                     } else {
                         pali++;
+                    }
+                }
+            } else {
+                boolean predmetIIsem = sem == 2;
+                boolean racunajRed = !predmetIIsem || iiSemKurikulumaAktivnoZaStat;
+                if (racunajRed) {
+                    for (HeadStudentRowDto st : studentRows) {
+                        if (!studentUpadaUStatistikuGeneracije(st.godinaUpisa(), statistikaGodinaUpisa)) {
+                            continue;
+                        }
+                        if (!AcademicProgressionRules.studentMozePolagatiPredmetNaDatum(
+                                st.godinaUpisa(), today, g, sem)) {
+                            continue;
+                        }
+                        elegibilnih++;
+                        Integer best = bestByStudentPredmet.getOrDefault(st.id(), Map.of()).get(pid);
+                        if (best == null) {
+                            continue;
+                        }
+                        saIzlaskom++;
+                        if (best >= 6) {
+                            polozili++;
+                        } else {
+                            pali++;
+                        }
                     }
                 }
             }
@@ -501,19 +490,24 @@ public class AcademicQueryService {
         }
 
         var summary = new HeadProgramSummaryDto(prog.getId(), prog.getSifra(), prog.getNaziv());
-        String napomena =
-                "Školska godina počinje oktobrom. Procenjena godina studija i uzorak za statistiku koriste taj kalendar. "
-                        + "Predmeti u okviru iste godine kurikuluma podeljeni su na I i II semestar (prva / druga polovina "
-                        + "predmeta te godine po šifri). U statistiku ulaze samo studenti koji su do današnjeg datuma "
-                        + "završili dovoljno semestara da bi realno mogli da polažu taj predmet. "
-                        + "Za predmete II semestra u toj godini kurikuluma brojevi položenih / izlazaka prikazuju se tek "
-                        + "u letnjem periodu (jul–sep), posle završetka drugog semestra u modelu; okt–jun ti redovi su prazni. "
+        String napomena = ceoProgram
+                ? ("Režim „ceo program“: za svaki od " + predmetRows.size() + " predmeta na smeru brojači koriste sve studente "
+                        + "na programu; u agregat ulaze samo ocene čiji je datum ispita u skladu sa pravilom napredovanja "
+                        + "(završeni semestri do tog datuma vs. godina/semestar predmeta u kurikulumu). "
+                        + "% položenih = položili / sa izlaskom.")
+                : ("Za generacije 2022–2025 važi striktan linearni model (bez ponavljanja godine): uzorak i procenjena godina "
+                        + "kurikuluma odgovaraju godini upisa. Starije generacije (≤2021) koriste kalendar koji počinje oktobrom "
+                        + "i pravilo o II semestru (jul–sep). Predmeti u okviru iste godine kurikuluma podeljeni su na I i II semestar. "
                         + (statistikaGodinaUpisa != null
                         ? (statistikaGodinaUpisa == 2021
                         ? "Statistika je ograničena na generacije upisa 2021 i ranije."
                         : "Statistika je ograničena na generaciju upisa " + statistikaGodinaUpisa + ".")
-                        : "Opciono možete ograničiti statistiku na jednu godinu upisa (jednu generaciju).");
+                        : "Opciono možete ograničiti statistiku na jednu godinu upisa (jednu generaciju)."));
         return new HeadProgramPregledDto(summary, studentRows, predmetRows, stats, napomena);
+    }
+
+    private boolean predmetJeUSvojojFaziStudija(int godinaUpisa, LocalDate today, int gs, int sem) {
+        return AcademicProgressionRules.studentMozePolagatiPredmetNaDatum(godinaUpisa, today, gs, sem);
     }
 
     private SubjectGradeDto toSubjectGrade(Ocena o) {
@@ -544,7 +538,9 @@ public class AcademicQueryService {
 
     public record GpaDto(
             Double prosekNaEspb,
+            Double prosekAritmetickiPolozenihPredmeta,
             int zbirEspbPolozenih,
+            /** Ukupan broj evidentiranih izlazaka (učitavanja na ispit), posle pravila napredovanja. */
             int ukupnoIspita,
             int brojPolozenihPredmeta,
             int ukupnoPredmetaNaProgramu

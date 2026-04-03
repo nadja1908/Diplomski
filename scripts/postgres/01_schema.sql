@@ -49,7 +49,9 @@ CREATE TABLE predmet (
   espb INT NOT NULL,
   studijski_program_id BIGINT NOT NULL REFERENCES studijski_program(id),
   katedra_id BIGINT NOT NULL REFERENCES katedra(id),
-  kratak_opis TEXT
+  kratak_opis TEXT,
+  kurikulum_godina INT NOT NULL CHECK (kurikulum_godina BETWEEN 1 AND 4),
+  kurikulum_semestar INT NOT NULL CHECK (kurikulum_semestar IN (1, 2))
 );
 
 CREATE TABLE sadrzaj_predmeta (
@@ -97,3 +99,39 @@ CREATE INDEX idx_ispitni_termin_predmet ON ispitni_termin(predmet_id);
 CREATE INDEX idx_student_program ON student(studijski_program_id);
 CREATE INDEX idx_predmet_program ON predmet(studijski_program_id);
 CREATE INDEX idx_predmet_katedra ON predmet(katedra_id);
+CREATE INDEX idx_predmet_kurikulum ON predmet(studijski_program_id, kurikulum_godina, kurikulum_semestar);
+
+-- Napredovanje: da li je na datum ispita (Europe/Belgrade) student završio dovoljno semestara za predmet (kg, ks).
+CREATE OR REPLACE FUNCTION nais_datum_ispita_bg(exam_ts timestamptz) RETURNS date AS $$
+  SELECT (exam_ts AT TIME ZONE 'Europe/Belgrade')::date;
+$$ LANGUAGE SQL IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION nais_procenjena_godina_studija(gu int, d date) RETURNS int AS $$
+DECLARE
+  cy int := EXTRACT(YEAR FROM d)::int;
+  cm int := EXTRACT(MONTH FROM d)::int;
+  pocetak int;
+  g int;
+BEGIN
+  IF cm >= 10 THEN pocetak := cy; ELSE pocetak := cy - 1; END IF;
+  g := pocetak - gu + 1;
+  RETURN LEAST(GREATEST(g, 1), 6);
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION nais_zavrseni_sem_u_godini(d date) RETURNS int AS $$
+DECLARE m int := EXTRACT(MONTH FROM d)::int;
+BEGIN
+  IF m >= 10 OR m = 1 THEN RETURN 0; END IF;
+  IF m BETWEEN 2 AND 6 THEN RETURN 1; END IF;
+  RETURN 2;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION nais_ukupno_zavrsenih_semestara(gu int, d date) RETURNS int AS $$
+  SELECT 2 * (nais_procenjena_godina_studija(gu, d) - 1) + nais_zavrseni_sem_u_godini(d);
+$$ LANGUAGE SQL IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION nais_ocena_je_u_redu(gu int, exam_ts timestamptz, kg int, ks int) RETURNS boolean AS $$
+  SELECT nais_ukupno_zavrsenih_semestara(gu, nais_datum_ispita_bg(exam_ts)) >= (kg - 1) * 2 + ks;
+$$ LANGUAGE SQL IMMUTABLE;

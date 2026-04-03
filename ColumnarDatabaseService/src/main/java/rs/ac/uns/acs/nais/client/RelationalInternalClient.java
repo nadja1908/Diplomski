@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import rs.ac.uns.acs.nais.config.ColumnarProperties;
 import rs.ac.uns.acs.nais.internal.dto.StatisticsAggregatesResponse;
+import rs.ac.uns.acs.nais.internal.dto.StudentProgramPredmetMin;
 
 import java.util.List;
 
@@ -38,6 +39,16 @@ public class RelationalInternalClient {
                 .headers(this::internalHeaders)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Long>>() {
+                });
+    }
+
+    /** Predmeti na studijskom programu studenta (puna lista za statistiku na nivou predmeta). */
+    public List<StudentProgramPredmetMin> studentProgramPredmeti(Long korisnikId) {
+        return client().get()
+                .uri("/internal/student/korisnik/{id}/program-predmeti", korisnikId)
+                .headers(this::internalHeaders)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<StudentProgramPredmetMin>>() {
                 });
     }
 

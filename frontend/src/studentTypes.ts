@@ -22,8 +22,12 @@ export type SubjectGrade = {
 }
 
 export type Gpa = {
+  /** Prosek ponderisan ESPB bodovima (najbolja ocena po predmetu, samo položeno 6–10). */
   prosekNaEspb: number | null
+  /** Aritmetička sredina najboljih ocena po položenom predmetu (6–10). */
+  prosekAritmetickiPolozenihPredmeta?: number | null
   zbirEspbPolozenih: number
+  /** Evidentirani izlasci (redovi u ocena), posle pravila napredovanja. */
   ukupnoIspita: number
   brojPolozenihPredmeta: number
   ukupnoPredmetaNaProgramu: number
@@ -32,6 +36,8 @@ export type Gpa = {
 export type SubjectStat = {
   predmetId: number
   nazivPredmeta: string
+  /** Šifra predmeta (kad je u JSON-u; Cassandrina statistika po programu). */
+  sifra?: string | null
   ukupnoPolaganja: number
   polozeno: number
   pali: number

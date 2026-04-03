@@ -1,11 +1,11 @@
 import type { HeadProgramPregled, HeadProgramSummary, HeadStudentsBundle } from './headTypes'
-import type {
-  CurriculumProgress,
-  Gpa,
-  StudentProfile,
-  SubjectGrade,
-  SubjectStat,
-} from './studentTypes'
+import type { CurriculumProgress, Gpa, StudentProfile, SubjectGrade } from './studentTypes'
+import type { ColumnarSubjectStat, PassFailTrend, PerformanceOverview } from './columnarTypes'
+import {
+  parseUnpassedSubjectPassRate,
+  type ProgramStatisticsResponse,
+  type StatisticsFilterOptions,
+} from './statisticsTypes'
 
 const base = ''
 
@@ -56,25 +56,69 @@ export const naisApi = {
   studentGrades: () => api<SubjectGrade[]>('/api/student/me/subjects-grades'),
   studentGpa: () => api<Gpa>('/api/student/me/gpa'),
   studentCurriculum: () => api<CurriculumProgress>('/api/student/me/curriculum-progress'),
-  studentStats: () => api<SubjectStat[]>('/api/student/me/statistics'),
+  /** Predmeti koje student još nije položio + programska stopa prolaznosti (sort backend). */
+  studentUnpassedSubjectPassRates: async () => {
+    const rows = await api<unknown[]>('/api/student/me/unpassed-subject-pass-rates')
+    return Array.isArray(rows) ? rows.map(parseUnpassedSubjectPassRate) : []
+  },
   /** Isti URL kao bundle; vraća { programi, studenti } ili treba koristiti headStudentsBundle. */
   headStudents: () => api<unknown>('/api/head/students'),
   headStudentsBundle: () => api<HeadStudentsBundle>('/api/head/students'),
   headPrograms: () => api<HeadProgramSummary[]>('/api/head/programs'),
   /** Koristi /api/head/students?programPregledId= da radi bez rute /api/head/program/** na gatewayju. */
-  headProgramPregled: (programId: number, statistikaGodinaUpisa?: number | null) => {
+  headProgramPregled: (
+    programId: number,
+    opts?: {
+      statistikaGodinaUpisa?: number | null
+      /** true = svi studenti smera × svi predmeti, bez uzorka po semestru/generaciji */
+      statistikaCeoProgram?: boolean
+    },
+  ) => {
     const q = new URLSearchParams()
     q.set('programPregledId', String(programId))
-    if (statistikaGodinaUpisa != null) q.set('statistikaGodinaUpisa', String(statistikaGodinaUpisa))
+    if (opts?.statistikaGodinaUpisa != null) q.set('statistikaGodinaUpisa', String(opts.statistikaGodinaUpisa))
+    if (opts?.statistikaCeoProgram === true) q.set('statistikaCeoProgram', 'true')
     return api<HeadProgramPregled>(`/api/head/students?${q}`)
   },
-  headAnalytics: () => api<unknown>('/api/head/subjects/analytics'),
-  headTrends: () => api<unknown>('/api/head/trends/pass-fail'),
-  headPerf: () => api<unknown>('/api/head/performance-overview'),
-  rankings: () => api<unknown>('/api/stats/rankings'),
+  /** Cassandra — predmeti katedre (samo šef). */
+  headAnalytics: () => api<ColumnarSubjectStat[]>('/api/head/subjects/analytics'),
+  /** Cassandra — mesečni trend položeno / palo (samo šef). */
+  headTrends: () => api<PassFailTrend>('/api/head/trends/pass-fail'),
+  /** Cassandra — zbirni KPI + najlakši / najteži predmet katedre (samo šef). */
+  headPerf: () => api<PerformanceOverview>('/api/head/performance-overview'),
+  /** Cassandra — globalni rang svih predmeta (sinhronizovano iz PostgreSQL-a). */
+  rankings: () => api<ColumnarSubjectStat[]>('/api/stats/rankings'),
   assistant: (question: string) =>
     api<{ answer: string; sources: string[] }>('/api/assistant/query', {
       method: 'POST',
       body: JSON.stringify({ question }),
     }),
+
+  /** Statistika predmeta iz PostgreSQL-a — samo šef katedre (studyProgramId obavezan). */
+  programStatistics: (opts: {
+    studyProgramId: number
+    godinaUpisa?: number
+    skolskaGodina?: string
+    kurikulumGodina?: number
+    semestar?: number
+    predmetId?: number
+    includeGenerationBreakdown?: boolean
+  }) => {
+    const q = new URLSearchParams()
+    q.set('studyProgramId', String(opts.studyProgramId))
+    if (opts.godinaUpisa != null) q.set('godinaUpisa', String(opts.godinaUpisa))
+    if (opts.skolskaGodina) q.set('skolskaGodina', opts.skolskaGodina)
+    if (opts.kurikulumGodina != null) q.set('kurikulumGodina', String(opts.kurikulumGodina))
+    if (opts.semestar != null) q.set('semestar', String(opts.semestar))
+    if (opts.predmetId != null) q.set('predmetId', String(opts.predmetId))
+    if (opts.includeGenerationBreakdown) q.set('includeGenerationBreakdown', 'true')
+    const qs = q.toString()
+    return api<ProgramStatisticsResponse>(`/api/statistics/subjects?${qs}`)
+  },
+
+  statisticsFilterOptions: (studyProgramId: number, godinaUpisa?: number) => {
+    const q = new URLSearchParams({ studyProgramId: String(studyProgramId) })
+    if (godinaUpisa != null) q.set('godinaUpisa', String(godinaUpisa))
+    return api<StatisticsFilterOptions>(`/api/statistics/filter-options?${q}`)
+  },
 }

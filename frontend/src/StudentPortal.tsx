@@ -2,31 +2,41 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { naisApi } from './api'
 import { normalizeCurriculumFromApi } from './godinaStudija'
 import { naslovGodineKurikulumaZaStudenta } from './studijskeGodineLabele'
+import type { UnpassedSubjectPassRate } from './statisticsTypes'
+
+function formatKurikulumGodinaSr(kg: number | undefined): string {
+  const k = typeof kg === 'number' && Number.isFinite(kg) ? Math.trunc(kg) : NaN
+  if (k === 1) return '1. godina'
+  if (k === 2) return '2. godina'
+  if (k === 3) return '3. godina'
+  if (k === 4) return '4. godina'
+  if (k >= 5) return `${k}. godina`
+  return 'Godina kurikuluma —'
+}
 import type {
   CurriculumProgress,
   CurriculumSubject,
   Gpa,
   StudentProfile,
   SubjectGrade,
-  SubjectStat,
 } from './studentTypes'
 
-type LoadErr = Partial<Record<'profile' | 'grades' | 'gpa' | 'stats' | 'curriculum', string>>
+type LoadErr = Partial<Record<'profile' | 'grades' | 'gpa' | 'curriculum' | 'unpassed', string>>
 
 type SpPage = 'overview' | 'curriculum' | 'grades' | 'analytics'
 
 const PAGE_COPY: Record<SpPage, { title: string; sub?: string }> = {
   overview: {
     title: 'Pregled',
-    sub: 'Sažetak profila, proseka i predmeta na koje obrati pažnju.',
+    sub: 'Sažetak profila, proseka i predmeta na koje treba obratiti pažnju.',
   },
   grades: {
     title: 'Izlasci',
     sub: 'Svi izlasci na ispit iz evidencije — svaki red je jedan termin. Koristi pretragu da suziš listu.',
   },
   analytics: {
-    title: 'Statistika predmeta',
-    sub: 'Agregati iz Cassandre za predmete tvog programa (položeno / pali).',
+    title: 'Statistika',
+    sub: 'Za predmete koje još niješ položio/la — samo stopa prolaznosti na celom studijskom programu (iz baze).',
   },
   curriculum: { title: 'Studijski program po godinama' },
 }
@@ -59,12 +69,6 @@ function notPassedBestAttempts(grades: SubjectGrade[]): SubjectGrade[] {
   return bestGradePerSubject(grades).filter((g) => g.ocena < PASSING_GRADE)
 }
 
-function passRatePct(s: SubjectStat): number {
-  const t = s.polozeno + s.pali
-  if (t <= 0) return 0
-  return Math.round((100 * s.polozeno) / t)
-}
-
 type Props = {
   displayName: string
   onLogout: () => void
@@ -77,7 +81,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
   const [grades, setGrades] = useState<SubjectGrade[] | null>(null)
   const [gpa, setGpa] = useState<Gpa | null>(null)
   const [curriculum, setCurriculum] = useState<CurriculumProgress | null>(null)
-  const [stats, setStats] = useState<SubjectStat[] | null>(null)
+  const [unpassedRates, setUnpassedRates] = useState<UnpassedSubjectPassRate[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [errors, setErrors] = useState<LoadErr>({})
   const [gradeFilter, setGradeFilter] = useState('')
@@ -86,12 +90,12 @@ export function StudentPortal({ displayName, onLogout }: Props) {
   const refresh = useCallback(async () => {
     setLoading(true)
     setErrors({})
-    const [rP, rG, rA, rC, rS] = await Promise.allSettled([
+    const [rP, rG, rA, rC, rU] = await Promise.allSettled([
       naisApi.studentProfile(),
       naisApi.studentGrades(),
       naisApi.studentGpa(),
       naisApi.studentCurriculum(),
-      naisApi.studentStats(),
+      naisApi.studentUnpassedSubjectPassRates(),
     ])
     const nextErr: LoadErr = {}
     if (rP.status === 'fulfilled') setProfile(rP.value)
@@ -126,8 +130,8 @@ export function StudentPortal({ displayName, onLogout }: Props) {
       nextErr.curriculum = msg
       setCurriculum(null)
     }
-    if (rS.status === 'fulfilled') setStats(rS.value)
-    else nextErr.stats = 'Statistika nije učitana.'
+    if (rU.status === 'fulfilled') setUnpassedRates(rU.value)
+    else nextErr.unpassed = 'Podaci o stopama prolaznosti nisu učitani.'
     setErrors(nextErr)
     setLoading(false)
   }, [])
@@ -160,11 +164,6 @@ export function StudentPortal({ displayName, onLogout }: Props) {
         g.ispitniRok.toLowerCase().includes(q)
     )
   }, [grades, gradeFilter])
-
-  const statRowsSorted = useMemo(() => {
-    if (!stats) return []
-    return [...stats].sort((a, b) => passRatePct(a) - passRatePct(b))
-  }, [stats])
 
   const curriculumByYear = useMemo(() => {
     if (!curriculum?.predmeti?.length) return new Map<number, CurriculumSubject[]>()
@@ -258,8 +257,11 @@ export function StudentPortal({ displayName, onLogout }: Props) {
         </article>
 
         <article className="dj-card">
-          <h3 className="dj-card-title">Treba pažnje</h3>
-          <p className="dj-card-hint">Najbolji pokušaj ispod 6 — kao paralelno programiranje sa ocenom 5.</p>
+          <h3 className="dj-card-title">Obratiti pažnju</h3>
+          <p className="dj-card-hint">
+            Predmeti na koje ste izašli na ispit, a nije postignuta položena ocena — najbolji pokušaj je ispod 6 (npr.
+            ocena 5).
+          </p>
           {!grades || loading ? (
             <div className="sp-skeleton-block" />
           ) : notPassedBest.length ? (
@@ -272,7 +274,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
               ))}
             </ul>
           ) : (
-            <p className="dj-muted">Nema takvih predmeta — ili još učitavam ocene.</p>
+            <p className="dj-muted">Nema takvih predmeta</p>
           )}
         </article>
 
@@ -486,33 +488,50 @@ export function StudentPortal({ displayName, onLogout }: Props) {
 
   const analyticsView = (
     <>
-      {errors.stats ? <p className="sp-banner sp-banner--warn">{errors.stats}</p> : null}
-      <div className="sp-bars">
-        {loading && !stats ? (
-          <div className="sp-skeleton-block sp-skeleton-block--tall" />
-        ) : statRowsSorted.length ? (
-          statRowsSorted.map((s) => {
-            const pct = passRatePct(s)
-            return (
-              <div key={s.predmetId} className="sp-bar-row">
-                <div className="sp-bar-head">
-                  <span className="sp-bar-name">{s.nazivPredmeta}</span>
-                  <span className="sp-bar-meta">
-                    položeno {s.polozeno} · pali {s.pali}
-                    {s.prosecnaOcena != null ? ` · prosečna ${s.prosecnaOcena.toFixed(2)}` : ''}
-                  </span>
-                </div>
-                <div className="sp-bar-track" role="presentation">
-                  <div className="sp-bar-fill" style={{ width: `${pct}%` }} />
-                </div>
-                <span className="sp-bar-pct">{pct}% položeno</span>
-              </div>
-            )
-          })
-        ) : (
-          <p className="sp-muted sp-pad">{loading ? '…' : 'Nema redova statistike za tvoj program.'}</p>
-        )}
-      </div>
+      {errors.unpassed ? <p className="sp-banner sp-banner--warn">{errors.unpassed}</p> : null}
+      <article className="dj-card">
+        <h2 className="dj-card-title">Nepoloženi predmeti — stopa prolaznosti na programu</h2>
+        <div className="sp-table-wrap">
+          {loading && !unpassedRates ? (
+            <div className="sp-skeleton-block sp-skeleton-block--tall" />
+          ) : unpassedRates?.length ? (
+            <table className="sp-table sp-table--compact">
+              <thead>
+                <tr>
+                  <th>Predmet</th>
+                  <th>Godina studija (kurikulum)</th>
+                  <th>Stopa prolaznosti</th>
+                </tr>
+              </thead>
+              <tbody>
+                {unpassedRates.map((r) => (
+                  <tr key={`${r.subjectCode}-${r.kurikulumGodina}-${r.kurikulumSemestar}`}>
+                    <td>
+                      <span style={{ fontWeight: 600 }}>{r.subjectName}</span>
+                      <span className="sp-muted"> · </span>
+                      <code className="sp-code">{r.subjectCode}</code>
+                    </td>
+                    <td>{formatKurikulumGodinaSr(r.kurikulumGodina)}</td>
+                    <td>
+                      {r.passRate != null ? (
+                        <span className="sp-grade-badge">{r.passRate.toFixed(0)}%</span>
+                      ) : (
+                        <span className="sp-muted">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="sp-muted sp-pad">
+              {loading
+                ? '…'
+                : 'Nema predmeta koje treba da položiš — ili podaci još nisu učitani.'}
+            </p>
+          )}
+        </div>
+      </article>
     </>
   )
 
@@ -603,7 +622,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
           </header>
         ) : null}
 
-        {Object.keys(errors).length === 4 ? (
+        {['profile', 'grades', 'gpa', 'curriculum'].every((k) => errors[k as keyof LoadErr]) ? (
           <div className="sp-banner sp-banner--err">
             Nije moguće učitati podatke. Proveri da li je gateway pokrenut i da li si ulogovan kao student.
           </div>

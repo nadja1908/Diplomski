@@ -1,24 +1,17 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import './App.css'
 import { naisApi, setToken } from './api'
-import { HeadPortal } from './HeadPortal'
+import { CassandraStatsPage } from './CassandraStatsPage'
+import { HeadPortal, type HeadPortalView } from './HeadPortal'
 import { StudentPortal } from './StudentPortal'
 
 type Role = string | null
 
+type StaffSection = HeadPortalView | 'stats'
+
 type ChatMessage =
   | { id: string; role: 'user'; text: string }
   | { id: string; role: 'assistant'; text: string; sources: string[] }
-
-function JsonBlock({ data }: { data: unknown }) {
-  return (
-    <pre className="json-out">
-      {data === undefined || data === null
-        ? '—'
-        : JSON.stringify(data, null, 2)}
-    </pre>
-  )
-}
 
 const WELCOME_TEXT =
   'Zdravo! Pitaj me o predmetima, ocenama, proseku ili sadržaju kurseva — odgovaram iz tvog studijskog programa.'
@@ -209,13 +202,11 @@ export default function App() {
   const [role, setRole] = useState<Role>(null)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState('home')
+  const [staffSection, setStaffSection] = useState<StaffSection>('analytics')
   const [authLoading, setAuthLoading] = useState(false)
-  const [pageLoading, setPageLoading] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
   const [chatPending, setChatPending] = useState(false)
   const [chatError, setChatError] = useState('')
-  const [payload, setPayload] = useState<unknown>(null)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { id: 'welcome', role: 'assistant', text: WELCOME_TEXT, sources: [] },
   ])
@@ -227,8 +218,7 @@ export default function App() {
     setToken(null)
     setRole(null)
     setName('')
-    setPayload(null)
-    setTab('home')
+    setStaffSection('analytics')
     setChatOpen(false)
     setChatMessages([
       { id: newId(), role: 'assistant', text: WELCOME_TEXT, sources: [] },
@@ -246,7 +236,8 @@ export default function App() {
       setToken(r.token)
       setRole(r.role)
       setName(`${r.ime} ${r.prezime}`)
-      setTab(r.role === 'SEF_KATEDRE' ? 'head' : r.role === 'STUDENT' ? 'home' : 'stats')
+      if (r.role === 'SEF_KATEDRE') setStaffSection('analytics')
+      else if (r.role !== 'STUDENT') setStaffSection('stats')
       if (rememberMe) {
         localStorage.setItem('nais_remember_email', email.trim())
       } else {
@@ -258,19 +249,6 @@ export default function App() {
       setAuthLoading(false)
     }
   }
-
-  const load = useCallback(async (fn: () => Promise<unknown>) => {
-    setPageLoading(true)
-    setError('')
-    try {
-      setPayload(await fn())
-    } catch {
-      setError('Zahtev nije uspeo (proverite ulogu ili token).')
-      setPayload(null)
-    } finally {
-      setPageLoading(false)
-    }
-  }, [])
 
   const sendAssistantMessage = async (presetText?: string) => {
     const text = (presetText ?? chatInput).trim()
@@ -552,23 +530,34 @@ export default function App() {
                   />
                   <div className="dj-brand-text">
                     <span className="dj-brand-name">DjordUNI</span>
-                    <span className="dj-brand-tag">šef katedre</span>
+                    <span className="dj-brand-tag">
+                      {role === 'SEF_KATEDRE' ? 'šef katedre' : 'nastavnik'}
+                    </span>
                   </div>
                 </div>
-                <nav className="dj-nav" aria-label="Navigacija šefa katedre">
+                <nav className="dj-nav" aria-label="Glavna navigacija">
                   {role === 'SEF_KATEDRE' ? (
-                    <button
-                      type="button"
-                      className={`dj-nav-item${tab === 'head' ? ' dj-nav-item--active' : ''}`}
-                      onClick={() => setTab('head')}
-                    >
-                      Pregled katedre
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className={`dj-nav-item${staffSection === 'analytics' ? ' dj-nav-item--active' : ''}`}
+                        onClick={() => setStaffSection('analytics')}
+                      >
+                        Analitika
+                      </button>
+                      <button
+                        type="button"
+                        className={`dj-nav-item${staffSection === 'students' ? ' dj-nav-item--active' : ''}`}
+                        onClick={() => setStaffSection('students')}
+                      >
+                        Studenti
+                      </button>
+                    </>
                   ) : null}
                   <button
                     type="button"
-                    className={`dj-nav-item${tab === 'stats' ? ' dj-nav-item--active' : ''}`}
-                    onClick={() => setTab('stats')}
+                    className={`dj-nav-item${staffSection === 'stats' ? ' dj-nav-item--active' : ''}`}
+                    onClick={() => setStaffSection('stats')}
                   >
                     Statistika
                   </button>
@@ -582,27 +571,15 @@ export default function App() {
               </header>
 
               <div className="sp-main dj-main head-portal-main">
-                {tab === 'head' && role === 'SEF_KATEDRE' ? <HeadPortal /> : null}
+                {role === 'SEF_KATEDRE' && staffSection !== 'stats' ? (
+                  <HeadPortal view={staffSection} />
+                ) : null}
 
-                {tab === 'stats' ? (
-                  <article className="dj-card head-work-card">
-                    <h2 className="dj-card-title">Globalni rang predmeta</h2>
-                    <p className="dj-card-hint">
-                      Agregati u Apache Cassandri (sinhronizacija sa PostgreSQL pri pokretanju backend-a).
-                    </p>
-                    <div className="dj-head-actions">
-                      <button type="button" onClick={() => load(naisApi.rankings)}>
-                        Učitaj rang listu
-                      </button>
-                    </div>
-                    <div className="dj-json-wrap">
-                      <JsonBlock data={payload} />
-                    </div>
-                  </article>
+                {(role !== 'SEF_KATEDRE' || staffSection === 'stats') ? (
+                  <CassandraStatsPage isHeadOfDepartment={role === 'SEF_KATEDRE'} />
                 ) : null}
 
                 {error ? <p className="err head-portal-err">{error}</p> : null}
-                {pageLoading ? <p className="loading head-portal-loading">Učitavanje…</p> : null}
               </div>
             </div>
           )}

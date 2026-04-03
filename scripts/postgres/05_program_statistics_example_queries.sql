@@ -1,0 +1,38 @@
+-- Primeri SQL za statistiku predmeta po studijskom programu (isti princip kao ProgramSubjectAnalyticsService).
+-- Pokreni na bazi `nais` nakon inicijalizacije (02_data.sql).
+--
+-- 1) Broj studenata koji su polagali vs položili (najbolja ocena >= 6) po predmetu, program id = 1:
+--
+-- WITH filtered AS (
+--   SELECT o.student_id, o.vrednost_ocene, it.predmet_id
+--   FROM ocena o
+--   JOIN ispitni_termin it ON o.ispitni_termin_id = it.id
+--   JOIN predmet p ON it.predmet_id = p.id
+--   JOIN student s ON o.student_id = s.id
+--   WHERE p.studijski_program_id = 1
+-- ),
+-- per_student AS (
+--   SELECT predmet_id, student_id, MAX(vrednost_ocene) AS best
+--   FROM filtered
+--   GROUP BY predmet_id, student_id
+-- )
+-- SELECT predmet_id,
+--        COUNT(*) AS took,
+--        SUM(CASE WHEN best >= 6 THEN 1 ELSE 0 END) AS passed,
+--        ROUND(100.0 * SUM(CASE WHEN best >= 6 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS pass_rate_pct
+-- FROM per_student
+-- GROUP BY predmet_id
+-- ORDER BY predmet_id;
+--
+-- 2) Prosečna ocena samo od položenih (redovi gde je ocena >= 6), program 1:
+--
+-- SELECT it.predmet_id,
+--        AVG(o.vrednost_ocene::numeric) AS avg_passing_only,
+--        percentile_cont(0.5) WITHIN GROUP (ORDER BY o.vrednost_ocene::double precision) AS median_passing
+-- FROM ocena o
+-- JOIN ispitni_termin it ON o.ispitni_termin_id = it.id
+-- JOIN predmet p ON it.predmet_id = p.id
+-- WHERE p.studijski_program_id = 1 AND o.vrednost_ocene >= 6
+-- GROUP BY it.predmet_id;
+
+SELECT 1 AS dokumentacija_zamisljena_upita;

@@ -24,9 +24,11 @@ public class HeadController {
     public Object students(
             @AuthenticationPrincipal Long korisnikId,
             @RequestParam(value = "programPregledId", required = false) Long programPregledId,
-            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa) {
+            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa,
+            @RequestParam(value = "statistikaCeoProgram", required = false) Boolean statistikaCeoProgram) {
         if (programPregledId != null) {
-            return academicQueryService.programPregledForHead(korisnikId, programPregledId, statistikaGodinaUpisa);
+            return academicQueryService.programPregledForHead(
+                    korisnikId, programPregledId, statistikaGodinaUpisa, statistikaCeoProgram);
         }
         return academicQueryService.headStudentsBundle(korisnikId);
     }
@@ -40,7 +42,9 @@ public class HeadController {
     public Object programPregled(
             @AuthenticationPrincipal Long korisnikId,
             @PathVariable long programId,
-            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa) {
-        return academicQueryService.programPregledForHead(korisnikId, programId, statistikaGodinaUpisa);
+            @RequestParam(value = "statistikaGodinaUpisa", required = false) Integer statistikaGodinaUpisa,
+            @RequestParam(value = "statistikaCeoProgram", required = false) Boolean statistikaCeoProgram) {
+        return academicQueryService.programPregledForHead(
+                korisnikId, programId, statistikaGodinaUpisa, statistikaCeoProgram);
     }
 }

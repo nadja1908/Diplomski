@@ -26,6 +26,16 @@ spring:
           uri: lb://relational-database-service
           predicates:
             - Path=/api/student/me/curriculum-progress
+        # Student: samo liste nepoloženih predmeta sa programskom stopom prolaznosti.
+        - id: relational-student-unpassed-stats
+          uri: lb://relational-database-service
+          predicates:
+            - Path=/api/student/me/unpassed-subject-pass-rates
+        # Šef / REST statistika — posebna ruta umesto duge liste predikata.
+        - id: relational-program-statistics
+          uri: lb://relational-database-service
+          predicates:
+            - Path=/api/statistics/**
         - id: relational-auth-student-head-assistant
           uri: lb://relational-database-service
           predicates:

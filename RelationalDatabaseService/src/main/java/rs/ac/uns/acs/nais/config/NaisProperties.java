@@ -27,5 +27,8 @@ public class NaisProperties {
     public static class Llm {
         private String openaiApiKey = "";
         private String openaiModel = "gpt-4o-mini";
+        /** Niža = vernije kontekstu; 0.35–0.55 je razuman opseg za kurikulum. */
+        private double openaiTemperature = 0.4;
+        private int openaiMaxTokens = 900;
     }
 }

@@ -42,6 +42,8 @@ nais:
   llm:
     openai-api-key: ${OPENAI_API_KEY:}
     openai-model: ${OPENAI_MODEL:gpt-4o-mini}
+    openai-temperature: ${OPENAI_TEMPERATURE:0.4}
+    openai-max-tokens: ${OPENAI_MAX_TOKENS:900}
   internal-api-secret: ${INTERNAL_API_SECRET:nais-internal-shared-secret}
 
 logging:

@@ -455,7 +455,7 @@ code {
 
 /* —— Chat (LLM asistent) —— */
 .chat-shell {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -472,13 +472,13 @@ code {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: min(72vh, 640px);
+  height: min(76vh, 720px);
 }
 
 .chat-card--popup {
   margin-top: 0;
-  height: min(520px, calc(100vh - 7.5rem));
-  max-height: calc(100dvh - 7rem);
+  height: min(620px, calc(100vh - 5.5rem));
+  max-height: calc(100dvh - 5.5rem);
   box-shadow: 0 16px 48px rgba(26, 35, 50, 0.12), 0 4px 16px rgba(37, 99, 235, 0.08);
   border-radius: 18px;
 }
@@ -643,7 +643,7 @@ code {
 }
 
 .chat-bubble {
-  max-width: min(100%, 520px);
+  max-width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 16px;
   font-size: 0.92rem;
@@ -703,7 +703,7 @@ code {
 }
 
 .chat-sources-details {
-  max-width: min(100%, 520px);
+  max-width: 100%;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1040,7 +1040,7 @@ code {
 }
 
 .chat-popup {
-  width: min(100vw - 2rem, 420px);
+  width: min(100vw - 2rem, 720px);
   animation: chat-popup-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: bottom right;
   filter: drop-shadow(0 20px 40px rgba(26, 35, 50, 0.12));

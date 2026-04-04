@@ -17,14 +17,20 @@ log = logging.getLogger(__name__)
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
 COLLECTION = os.getenv("QDRANT_COLLECTION", "predmeti")
-EMBED_DIM = 384
+EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-large")
+EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "1024"))
+_preserve_raw = os.getenv("NAIS_EMBED_PRESERVE_DIACRITICS")
+if _preserve_raw is not None:
+    USE_EMBED_PRESERVE_DIACRITICS = _preserve_raw.lower() in ("1", "true", "yes")
+else:
+    USE_EMBED_PRESERVE_DIACRITICS = "embedic" in EMBEDDING_MODEL.lower()
 
 # Qdrant vraća kosinusnu sličnost (veće = bliže). Rezovo slabe pogotke daleko od najboljeg
 # da generički tekst (Matematika, paralelno programiranje…) ne „lepi“ uz specifična pitanja.
-MIN_VECTOR_SIM = float(os.getenv("NAIS_VECTOR_MIN_SIM", "0.30"))
-SIM_GAP_FROM_BEST = float(os.getenv("NAIS_VECTOR_SIM_GAP", "0.13"))
-# Za embedding ukloni „šta je / koji predmet…“ — ostaju nosioci smisla (npr. NoSQL, baze).
-USE_QUERY_FOCUS = os.getenv("NAIS_QUERY_FOCUS", "true").lower() in ("1", "true", "yes")
+MIN_VECTOR_SIM = float(os.getenv("NAIS_VECTOR_MIN_SIM", "0.22"))
+SIM_GAP_FROM_BEST = float(os.getenv("NAIS_VECTOR_SIM_GAP", "0.18"))
+# false = ceo upit ide u embedding (bolje za slobodna pitanja); true = samo ključne reči (rizično za SR).
+USE_QUERY_FOCUS = os.getenv("NAIS_QUERY_FOCUS", "false").lower() in ("1", "true", "yes")
 # Rerang: prvo više pogodaka ključnih reči u payload-u, zatim vektorski skor.
 USE_KEYWORD_RERANK = os.getenv("NAIS_KEYWORD_RERANK", "true").lower() in ("1", "true", "yes")
 
@@ -72,6 +78,20 @@ def _extract_query_keywords(q: str) -> list[str]:
     return list(seen.keys())
 
 
+def _extract_query_keywords_embed(q: str) -> list[str]:
+    """Ključne reči za embedding bez ASCII-foldinga (Embedić: ošišana latinica ruši kvalitet)."""
+    t = q.strip().lower()
+    tokens = re.findall(r"\w+", t, flags=re.UNICODE)
+    seen: dict[str, None] = {}
+    for tok in tokens:
+        if len(tok) < 3:
+            continue
+        if tok in _STOPWORDS or _fold_sr(tok) in _STOPWORDS:
+            continue
+        seen.setdefault(tok, None)
+    return list(seen.keys())
+
+
 def _expand_keyword_stems(kws: list[str]) -> list[str]:
     """Kratki morfološki pomoćnik (matematiku → matematik) za bolji embedding i rerang."""
     out: list[str] = []
@@ -86,7 +106,10 @@ def _expand_keyword_stems(kws: list[str]) -> list[str]:
 def _query_for_embedding(q: str) -> str:
     if not USE_QUERY_FOCUS:
         return q.strip()
-    kws = _extract_query_keywords(q)
+    if USE_EMBED_PRESERVE_DIACRITICS:
+        kws = _extract_query_keywords_embed(q)
+    else:
+        kws = _extract_query_keywords(q)
     if not kws:
         return q.strip()
     return " ".join(_expand_keyword_stems(kws))
@@ -162,7 +185,13 @@ def get_client() -> QdrantClient:
 def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        log.info(
+            "Loading embedding model %s (Qdrant vectors dim=%d, preserve_sr_diacritics=%s)",
+            EMBEDDING_MODEL,
+            EMBED_DIM,
+            USE_EMBED_PRESERVE_DIACRITICS,
+        )
+        _model = SentenceTransformer(EMBEDDING_MODEL)
     return _model
 
 
@@ -184,7 +213,13 @@ def health():
     try:
         get_client().get_collections()
         n = collection_point_count()
-        body: dict[str, Any] = {"status": "ok", "qdrant": QDRANT_HOST, "collection": COLLECTION}
+        body: dict[str, Any] = {
+            "status": "ok",
+            "qdrant": QDRANT_HOST,
+            "collection": COLLECTION,
+            "embedding_model": EMBEDDING_MODEL,
+            "embed_dim": EMBED_DIM,
+        }
         if n is not None:
             body["points"] = n
         return body

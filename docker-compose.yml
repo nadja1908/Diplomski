@@ -76,6 +76,11 @@ services:
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       INGEST_PATH: /data/chunks.jsonl
+      NAIS_EMBEDDING_MODEL: djovak/embedic-large
+      NAIS_EMBED_DIM: "1024"
+      NAIS_QUERY_FOCUS: "false"
+      NAIS_VECTOR_MIN_SIM: "0.22"
+      NAIS_VECTOR_SIM_GAP: "0.18"
     volumes:
       - ./scripts/vector:/data:ro
     ports:

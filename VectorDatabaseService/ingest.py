@@ -1,6 +1,9 @@
 """
 Load chunks from /data/chunks.jsonl into Qdrant.
 Each line: JSON with text, predmet_id, predmet_sifra, predmet_naziv, tip
+
+Embedding: default Embedić (srpski), fine-tuned sa multilingual-e5 — vidi NAIS_EMBEDDING_MODEL.
+Posle promene modela / dimenzije obavezno ponovo pokreni ingest (kolekcija se briše i puni iznova).
 """
 import json
 import logging
@@ -19,12 +22,13 @@ QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
 COLLECTION = os.getenv("QDRANT_COLLECTION", "predmeti")
 DATA_PATH = os.getenv("INGEST_PATH", "/data/chunks.jsonl")
-EMBED_DIM = 384
-BATCH = 64
+EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-large")
+EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "1024"))
+BATCH = 32
 
 
 def main():
-    deadline = time.time() + 180
+    deadline = time.time() + 300
     client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
     while time.time() < deadline:
         try:
@@ -41,7 +45,8 @@ def main():
         log.warning("No data file at %s — service will start with empty collection", DATA_PATH)
         return
 
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    log.info("Loading embedding model %s (vector dim=%d)", EMBEDDING_MODEL, EMBED_DIM)
+    model = SentenceTransformer(EMBEDDING_MODEL)
     if COLLECTION in {c.name for c in client.get_collections().collections}:
         client.delete_collection(COLLECTION)
     client.recreate_collection(
@@ -78,6 +83,7 @@ def main():
             line = line.strip()
             if not line:
                 continue
+            rows_seen += 1
             row = json.loads(line)
             batch_texts.append(row["text"])
             pl = {k: v for k, v in row.items()}

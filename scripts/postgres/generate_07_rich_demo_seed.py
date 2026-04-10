@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Generiše 07_rich_demo_seed.sql — bogat demo: novi predmeti po smerovima (X*), rokovi, termini,
+Generiše 07_rich_demo_seed.sql — prošireni akademski seed: novi predmeti po smerovima (X*), rokovi, termini,
 ~1000+ novih studenata (više generacija × smer), gusto ocenjivanje sa ponovnim pokušajima.
 
-Broj X* demo predmeta po programu je ograničen tako da ukupno sa 02_data.sql ne prelazi ~45
+Broj X* predmeta po programu je ograničen tako da ukupno sa 02_data.sql ne prelazi ~45
 predmeta po studijskom programu (realističan maksimum za osnovne studije).
 
   python scripts/postgres/generate_07_rich_demo_seed.py
@@ -45,12 +45,22 @@ _PROGRAM_SPECS = [
     (6, 4, "tk", "XTK"),
 ]
 
+# Nazivi modula u SQL-u (bez „demo“ u korisničkom tekstu).
+_PROG_NAZIV_LABEL = {
+    1: "informatike",
+    2: "softverskog inženjerstva",
+    3: "automatike",
+    4: "elektrotehnike",
+    5: "računarske tehnike i informatike",
+    6: "telekomunikacija",
+}
+
 
 def broj_demo_x_predmeta(prog_id: int) -> int:
     """Koliko X* predmeta sme da doda seed uz postojeći kurikulum iz 02_data.sql."""
     return max(0, MAX_PREDMETA_PO_PROGRAMU - BROJ_PREDMETA_02_DATA[prog_id])
 
-# Demo studenti: svi programi uključujući RI (godina × generacija)
+# Seed studenti: svi programi uključujući RI (godina × generacija)
 STUDENT_PROGRAMS = [
     (1, "ri", "RI"),
     (2, "si", "SI"),
@@ -60,13 +70,13 @@ STUDENT_PROGRAMS = [
     (6, "tk", "TK"),
 ]
 
-# Samo generacije 2022–2025 — u skladu sa linearnim modelom (bez starijih „zaostalih“ demo krugova).
+# Samo generacije 2022–2025 — u skladu sa linearnim modelom (bez starijih zaostalih kohorti).
 YEARS = (2022, 2023, 2024, 2025)
 STUDENTS_PER_PROGRAM_YEAR = 42
 
 # Morati da se poklopi sa nais.academic.reference-intake-year u backendu.
 REFERENCE_INTAKE_YEAR = 2025
-# Kraj letnjeg ispita posle referentne godine — za whitelist X* u demo seedu (usklađeno sa napredovanjem).
+# Kraj letnjeg ispita posle referentne godine — za whitelist X* u seed podacima (usklađeno sa napredovanjem).
 DEMO_PROGRESSION_END = date(REFERENCE_INTAKE_YEAR + 1, 6, 30)
 
 ISPITNI_ROKOVI = [
@@ -126,7 +136,7 @@ def main() -> None:
     lines: list[str] = []
     w = lines.append
 
-    w("-- Bogati demo podaci (NAIS). Učitava se posle 02_data.sql; 06 je opciono.")
+    w("-- Prošireni akademski podaci (NAIS). Učitava se posle 02_data.sql; 06 je opciono.")
     w("BEGIN;")
     w("")
 
@@ -146,14 +156,15 @@ def main() -> None:
         slot_list = allocate_demo_x_kurikulum_slots(prog_id, nmod) if nmod > 0 else []
         for i in range(1, nmod + 1):
             sifra = f"{prefix}{i:03d}"
-            naziv = f"Demo modul {prefix} {i} (program {prog_id})"
+            label = _PROG_NAZIV_LABEL[prog_id]
+            naziv = f"Izborni modul {label} {i}"
             espb = 5 + (i % 5)
             kg, ks = slot_list[i - 1]
             w(
                 "INSERT INTO predmet (sifra, naziv, espb, studijski_program_id, katedra_id, kratak_opis, "
                 f"kurikulum_godina, kurikulum_semestar) VALUES ("
                 f"'{sifra}', '{esc(naziv)}', {espb}, {prog_id}, {katedra_id}, "
-                f"'Automatski generisan demo predmet za statistiku i kurikulum.', {kg}, {ks}) "
+                f"'Modul izbornog dela studijskog programa, usklađen sa nastavnim planom.', {kg}, {ks}) "
                 "ON CONFLICT (sifra) DO NOTHING;"
             )
     w("")
@@ -163,7 +174,7 @@ def main() -> None:
         "'Cilj: usvojiti ključne koncepte modula kroz vežbe i ispit.', "
         "'Ishodi: primena znanja u projektnim zadacima.', "
         "'Predavanja, vežbe, laboratorija, ispit.', "
-        "'Teme: generisan demo sadržaj za NAIS prototip.' "
+        "'Teme: sadržaj modula u skladu sa nastavnim planom i programom.' "
         "FROM predmet p WHERE p.sifra LIKE 'X%' "
         "AND NOT EXISTS (SELECT 1 FROM sadrzaj_predmeta s WHERE s.predmet_id = p.id);"
     )
@@ -188,7 +199,7 @@ def main() -> None:
     w("SELECT setval(pg_get_serial_sequence('ispitni_termin','id'), (SELECT MAX(id) FROM ispitni_termin));")
     w("")
 
-    # Korisnici: email demo26_{stub}_{year}_{nn}@ftn.rs — jedinstveno
+    # Korisnici: sintetički nalog seed26_{stub}_{year}_{nn}@ftn.rs — jedinstveno
     w("-- Novi studenti (više generacija × smer iznad)")
     vals_k: list[str] = []
     n = 0
@@ -197,9 +208,9 @@ def main() -> None:
         for year in YEARS:
             for seq in range(1, STUDENTS_PER_PROGRAM_YEAR + 1):
                 n += 1
-                email = f"demo26_{stub}_{year}_{seq:03d}@ftn.rs"
+                email = f"seed26_{stub}_{year}_{seq:03d}@ftn.rs"
                 ime = IMENA[seq % len(IMENA)]
-                prez = f"Demo{n}"
+                prez = f"Kandidat{n}"
                 vals_k.append(
                     f"('{esc(email)}', '{DEMO_LOZINKA}', '{ime}', '{esc(prez)}', 'STUDENT')"
                 )
@@ -237,9 +248,9 @@ def main() -> None:
     allowed = build_allowed_demo_rows(all_expand)
     vals_allowed = allowed_values_sql(allowed)
 
-    w("-- Glavni sloj ocena za demo studente (linearni raspored + školske godine u skupu dozvoljenih)")
+    w("-- Glavni sloj ocena za seed studente (linearni raspored + školske godine u skupu dozvoljenih)")
     w(
-        f"WITH allowed_demo_linear(program_id, predmet_sifra, godina_upisa) AS (\n"
+        f"WITH allowed_seed_linear(program_id, predmet_sifra, godina_upisa) AS (\n"
         f"  VALUES\n    {vals_allowed}\n)\n"
         "INSERT INTO ocena (student_id, ispitni_termin_id, poeni, vrednost_ocene) "
         "SELECT q.student_id, q.ispitni_termin_id, q.poeni, q.vrednost_ocene FROM ( "
@@ -249,13 +260,13 @@ def main() -> None:
         "      (38 + (abs(hashtext(it.predmet_id::text)) % 45)) "
         "      THEN 6 + (abs(hashtext(concat_ws('z', s.id, it.id))) % 5) ELSE 5 END AS vrednost_ocene "
         "  FROM student s "
-        "  JOIN allowed_demo_linear a ON a.program_id = s.studijski_program_id "
+        "  JOIN allowed_seed_linear a ON a.program_id = s.studijski_program_id "
         "    AND a.godina_upisa = s.godina_upisa "
         "  JOIN predmet pr ON pr.studijski_program_id = s.studijski_program_id "
         "    AND pr.sifra = a.predmet_sifra "
         "  JOIN ispitni_termin it ON it.predmet_id = pr.id "
         "  JOIN ispitni_rok ir ON ir.id = it.ispitni_rok_id "
-        "  JOIN korisnik ku ON ku.id = s.korisnik_id AND ku.email LIKE 'demo26_%@ftn.rs' "
+        "  JOIN korisnik ku ON ku.id = s.korisnik_id AND ku.email LIKE 'seed26_%@ftn.rs' "
         "  WHERE split_part(ir.skolska_godina, '/', 1)::int >= s.godina_upisa "
         f"    AND split_part(ir.skolska_godina, '/', 1)::int <= {REFERENCE_INTAKE_YEAR} "
         "    AND nais_ocena_je_u_redu(s.godina_upisa, it.datum_vreme, pr.kurikulum_godina, pr.kurikulum_semestar) "
@@ -268,7 +279,7 @@ def main() -> None:
 
     w("-- Drugi pokušaj posle petice (isti predmet, kasniji termin) — uz linearni + školsku godinu")
     w(
-        f"WITH allowed_demo_linear(program_id, predmet_sifra, godina_upisa) AS (\n"
+        f"WITH allowed_seed_linear(program_id, predmet_sifra, godina_upisa) AS (\n"
         f"  VALUES\n    {vals_allowed}\n)\n"
         "INSERT INTO ocena (student_id, ispitni_termin_id, poeni, vrednost_ocene) "
         "SELECT q.student_id, it2.id, q.poeni2, q.oc2 FROM ( "
@@ -279,13 +290,13 @@ def main() -> None:
         "    min(it.id) AS first_tid "
         "  FROM ocena o JOIN ispitni_termin it ON o.ispitni_termin_id = it.id "
         "  JOIN student s ON s.id = o.student_id "
-        "  JOIN korisnik ku ON ku.id = s.korisnik_id AND ku.email LIKE 'demo26_%@ftn.rs' "
+        "  JOIN korisnik ku ON ku.id = s.korisnik_id AND ku.email LIKE 'seed26_%@ftn.rs' "
         "  WHERE o.vrednost_ocene = 5 "
         "    AND (abs(hashtext(concat_ws('m', o.student_id, it.predmet_id))) % 100) < 62 "
         "  GROUP BY o.student_id, it.predmet_id, s.studijski_program_id, s.godina_upisa "
         ") q "
         "JOIN predmet pr ON pr.id = q.predmet_id "
-        "JOIN allowed_demo_linear a ON a.program_id = q.studijski_program_id "
+        "JOIN allowed_seed_linear a ON a.program_id = q.studijski_program_id "
         "  AND a.godina_upisa = q.godina_upisa AND a.predmet_sifra = pr.sifra "
         "JOIN ispitni_termin it2 ON it2.predmet_id = q.predmet_id AND it2.id > q.first_tid "
         "JOIN ispitni_rok ir2 ON ir2.id = it2.ispitni_rok_id "
@@ -307,7 +318,7 @@ def main() -> None:
     w("COMMIT;")
 
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"Wrote {OUT} ({OUT.stat().st_size // 1024} KiB), demo students: {len(vals_k)}")
+    print(f"Wrote {OUT} ({OUT.stat().st_size // 1024} KiB), seed students: {len(vals_k)}")
 
 
 if __name__ == "__main__":

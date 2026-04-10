@@ -158,7 +158,7 @@ public class AssistantService {
                         m.predmetNaziv(),
                         m.predmetSifra(),
                         m.espb(),
-                        m.profesor().isBlank() ? "profesor nije dodeljen u seed podacima" : m.profesor()
+                        m.profesor().isBlank() ? "predavač nije dodeljen u nastavnoj evidenciji" : m.profesor()
                 ))
                 .collect(Collectors.toList());
 

@@ -11,9 +11,10 @@ public interface OcenaRepository extends JpaRepository<Ocena, Long> {
 
     @Query("""
             SELECT o FROM Ocena o
+            JOIN FETCH o.student s
             JOIN FETCH o.ispitniTermin t
             JOIN FETCH t.predmet p
-            WHERE o.student.id = :studentId
+            WHERE s.id = :studentId
             ORDER BY t.datumVreme DESC
             """)
     List<Ocena> findByStudentIdWithDetails(@Param("studentId") Long studentId);

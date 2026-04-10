@@ -103,7 +103,7 @@ def main() -> None:
         )
         nz, sif, espb, opis = p["naziv"], p["sifra"], p["espb"], p["kratak_opis"]
         embed_text = (
-            f"{nz} ({sif}), {espb} ESPB. Predavač: {profesor or 'nije dodeljen u seed podacima'}. "
+            f"{nz} ({sif}), {espb} ESPB. Predavač: {profesor or 'nije dodeljen u nastavnoj evidenciji'}. "
             f"Kratak opis: {opis} Cilj: {cilj} Ishodi učenja: {ishod} "
             f"Metode nastave: {metode} Sadržaj kursa: {teme}"
         )

@@ -55,6 +55,8 @@ export type CurriculumSubject = {
   semestar?: number
   status: 'POLOZENO' | 'PALI' | 'BEZ_IZLAZAKA' | 'KASNIJE'
   najboljaOcena: number | null
+  /** Poeni sa izlaska koji je dao najbolju ocenu (max poeni među tim izlascima). */
+  najboljiPoeni: number | null
   izlasci: CurriculumAttempt[]
 }
 

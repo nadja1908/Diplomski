@@ -1,4 +1,11 @@
 import type { CurriculumProgress, CurriculumSubject } from './studentTypes'
+import { predstavniPoeniZaOcenu } from './poeniSkala'
+
+function effectiveNajboljiPoeni(p: Pick<CurriculumSubject, 'najboljiPoeni' | 'najboljaOcena'>): number | null {
+  if (p.najboljiPoeni != null) return p.najboljiPoeni
+  if (p.najboljaOcena == null) return null
+  return predstavniPoeniZaOcenu(p.najboljaOcena)
+}
 
 export function godinaStudijaBlokKurikuluma(redniBrojOdNule: number): number {
   if (redniBrojOdNule < 0) return 1
@@ -25,7 +32,7 @@ export function normalizeCurriculumFromApi(raw: CurriculumProgress): CurriculumP
 
   const predmeti = sorted.map((p, i) => {
     if (typeof p.semestar === 'number' && p.status && typeof p.godinaStudija === 'number') {
-      return { ...p, izlasci: p.izlasci ?? [] }
+      return { ...p, izlasci: p.izlasci ?? [], najboljiPoeni: effectiveNajboljiPoeni(p) }
     }
     const gs = godinaStudijaBlokKurikuluma(i)
     const status = curriculumStatusForRow(gs, procenjena, p.najboljaOcena)
@@ -34,6 +41,7 @@ export function normalizeCurriculumFromApi(raw: CurriculumProgress): CurriculumP
       godinaStudija: gs,
       status,
       izlasci: p.izlasci ?? [],
+      najboljiPoeni: effectiveNajboljiPoeni(p),
     }
   })
 

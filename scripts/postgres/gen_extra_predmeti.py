@@ -1,6 +1,8 @@
 # Generates bulk predmet + sadrzaj for programs 2-6 (~40 each). Run: python gen_extra_predmeti.py
 from pathlib import Path
 
+from curriculum_subject_titles import AUT_NAMES, EE_NAMES, RT_NAMES, SI_NAMES, TK_NAMES
+
 rows = []
 sid = 55
 for i in range(1, 36):
@@ -8,11 +10,11 @@ for i in range(1, 36):
         (
             sid,
             f"13Q{i:02d}",
-            f"SI - modul {i:02d}",
+            SI_NAMES[i - 1],
             6 + (i % 3),
             2,
             1,
-            "Strukturni predmet programa SI (demo baza).",
+            "Strukturni predmet softverskog inženjerstva, prema nastavnom planu studijskog programa.",
         )
     )
     sid += 1
@@ -21,11 +23,11 @@ for i in range(1, 39):
         (
             sid,
             f"13U{i:02d}",
-            f"AUT - modul {i:02d}",
+            AUT_NAMES[i - 1],
             6 + (i % 3),
             3,
             2,
-            "Strukturni predmet programa AUT (demo baza).",
+            "Strukturni predmet automatike, prema nastavnom planu studijskog programa.",
         )
     )
     sid += 1
@@ -34,11 +36,11 @@ for i in range(1, 39):
         (
             sid,
             f"13L{i:02d}",
-            f"EE - modul {i:02d}",
+            EE_NAMES[i - 1],
             6 + (i % 3),
             4,
             3,
-            "Strukturni predmet programa EE (demo baza).",
+            "Strukturni predmet elektrotehnike, prema nastavnom planu studijskog programa.",
         )
     )
     sid += 1
@@ -47,11 +49,11 @@ for i in range(1, 39):
         (
             sid,
             f"13V{i:02d}",
-            f"RT - modul {i:02d}",
+            RT_NAMES[i - 1],
             6 + (i % 3),
             5,
             4,
-            "Strukturni predmet programa RT (demo baza).",
+            "Strukturni predmet računarske tehnike i informatike, prema nastavnom planu studijskog programa.",
         )
     )
     sid += 1
@@ -60,11 +62,11 @@ for i in range(1, 40):
         (
             sid,
             f"13M{i:02d}",
-            f"TK - modul {i:02d}",
+            TK_NAMES[i - 1],
             6 + (i % 3),
             6,
             4,
-            "Strukturni predmet programa TK master (demo baza).",
+            "Strukturni predmet master studija telekomunikacija, prema nastavnom planu.",
         )
     )
     sid += 1
@@ -82,7 +84,7 @@ pred_lines.append(
 (out_dir / "_gen_predmet_extra.sql").write_text("\n".join(pred_lines), encoding="utf-8")
 
 srows = ",\n".join(
-    f"({r[0]}, 'Cilj modula (demo): ishodi studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Kurikulum demo tekst.')"
+    f"({r[0]}, 'Cilj modula: ostvarivanje definisanih ishoda studijskog programa.', 'Ishodi po nastavnom planu.', 'Predavanja, vezbe, ispit.', 'Sadržaj kursa u skladu sa nastavnim planom i programom.')"
     for r in rows
 )
 (out_dir / "_gen_sadrzaj_extra.sql").write_text(

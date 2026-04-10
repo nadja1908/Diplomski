@@ -23,7 +23,7 @@ MAX_SUBJECTS_PER_CURRICULUM_SEMESTER = 6
 
 def allocate_demo_x_kurikulum_slots(prog_id: int, n_new: int) -> list[tuple[int, int]]:
     """
-    Next n_new (godina, semestar) slots for X* demo predmeti, after real 02_data layout.
+    Next n_new (godina, semestar) slots for X* predmeta, after real 02_data layout.
     Greedy: fill later kurikulum years first (4→1), semestar 1 then 2; respects 12/year and 6/semester.
     """
     if n_new <= 0:
@@ -47,7 +47,7 @@ def allocate_demo_x_kurikulum_slots(prog_id: int, n_new: int) -> list[tuple[int,
             if chosen:
                 break
         if chosen is None:
-            raise RuntimeError(f"cannot place demo X module for prog {prog_id}: caps exceeded")
+            raise RuntimeError(f"cannot place X module for prog {prog_id}: caps exceeded")
         occ[chosen] += 1
         out.append(chosen)
     return out

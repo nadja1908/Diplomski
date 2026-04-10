@@ -14,7 +14,7 @@ services:
       - "5432:5432"
     # Init SQL u scripts/postgres/ pokreće se samo pri prvom kreiranju volumena. Posle promene šeme
     # (npr. nove kolone na predmet) obavezno: docker compose down -v && docker compose up -d
-    # Akademski demo (generacije 2022–2025, guste ocene): 11_academic_demo_seed.sql (generate_11_academic_demo_seed.py)
+    # Akademski seed (generacije 2022–2025, guste ocene): 11_academic_demo_seed.sql (generate_11_academic_demo_seed.py)
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/postgres:/docker-entrypoint-initdb.d:ro
@@ -92,6 +92,7 @@ services:
   # env_file: lista stringova (ne "path/required") radi na svim verzijama Compose-a.
   relational-database-service:
     build: ./RelationalDatabaseService
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -141,6 +142,7 @@ services:
 
   gateway-api:
     build: ./GatewayService
+    restart: unless-stopped
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
     ports:

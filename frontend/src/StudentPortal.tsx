@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { naisApi } from './api'
 import { normalizeCurriculumFromApi } from './godinaStudija'
 import { naslovGodineKurikulumaZaStudenta } from './studijskeGodineLabele'
+import { prikazRokaIDatumaZaIzlasak } from './ispitniRokDatum'
+import { predstavniPoeniZaOcenu } from './poeniSkala'
 import type { UnpassedSubjectPassRate } from './statisticsTypes'
 
 function formatKurikulumGodinaSr(kg: number | undefined): string {
@@ -37,11 +39,6 @@ const STATUS_COPY: Record<CurriculumSubject['status'], { label: string }> = {
   PALI: { label: 'Nije položeno' },
   BEZ_IZLAZAKA: { label: 'Nije izlazio/la' },
   KASNIJE: { label: 'Kasnije' },
-}
-
-function formatDate(iso: string) {
-  if (!iso || iso.length < 10) return iso
-  return iso.slice(0, 10)
 }
 
 const PASSING_GRADE = 6
@@ -147,12 +144,15 @@ export function StudentPortal({ displayName, onLogout }: Props) {
     if (!grades) return []
     const q = gradeFilter.trim().toLowerCase()
     if (!q) return grades
-    return grades.filter(
-      (g) =>
+    return grades.filter((g) => {
+      const { rok } = prikazRokaIDatumaZaIzlasak(g.datumIspita, g.predmetSifra)
+      return (
         g.predmetNaziv.toLowerCase().includes(q) ||
         g.predmetSifra.toLowerCase().includes(q) ||
-        g.ispitniRok.toLowerCase().includes(q)
-    )
+        g.ispitniRok.toLowerCase().includes(q) ||
+        rok.toLowerCase().includes(q)
+      )
+    })
   }, [grades, gradeFilter])
 
   const curriculumByYear = useMemo(() => {
@@ -306,13 +306,17 @@ export function StudentPortal({ displayName, onLogout }: Props) {
                 <th>Predmet</th>
                 <th>Šifra</th>
                 <th>Ocena</th>
+                <th>Bodovi</th>
                 <th>ESPB</th>
                 <th>Rok</th>
                 <th>Datum</th>
               </tr>
             </thead>
             <tbody>
-              {filteredGrades.map((g, i) => (
+              {filteredGrades.map((g, i) => {
+                const bodovi = g.poeni ?? predstavniPoeniZaOcenu(g.ocena)
+                const { rok, datum } = prikazRokaIDatumaZaIzlasak(g.datumIspita, g.predmetSifra)
+                return (
                 <tr
                   key={`${g.predmetSifra}-${g.datumIspita}-${i}`}
                   className={g.ocena < PASSING_GRADE ? 'sp-tr-fail' : undefined}
@@ -332,11 +336,19 @@ export function StudentPortal({ displayName, onLogout }: Props) {
                       {g.ocena}
                     </span>
                   </td>
+                  <td>
+                    {bodovi != null ? (
+                      <span className="sp-cur-poeni-num">{bodovi}</span>
+                    ) : (
+                      <span className="sp-muted">—</span>
+                    )}
+                  </td>
                   <td>{g.espb}</td>
-                  <td>{g.ispitniRok}</td>
-                  <td>{formatDate(g.datumIspita)}</td>
+                  <td>{rok}</td>
+                  <td>{datum}</td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         ) : (
@@ -382,6 +394,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
                         <th>ESPB</th>
                         <th>Status</th>
                         <th>Najbolja</th>
+                        <th>Poeni</th>
                         <th>Izlasci</th>
                       </tr>
                     </thead>
@@ -424,6 +437,16 @@ export function StudentPortal({ displayName, onLogout }: Props) {
                             )}
                           </td>
                           <td>
+                            {r.najboljiPoeni != null ? (
+                              <span className="sp-cur-poeni-cell">
+                                <span className="sp-cur-poeni-num">{r.najboljiPoeni}</span>
+                                <span className="sp-muted"> bod.</span>
+                              </span>
+                            ) : (
+                              <span className="sp-muted">—</span>
+                            )}
+                          </td>
+                          <td>
                             {r.izlasci.length ? (
                               <details className="sp-cur-details">
                                 <summary>
@@ -431,24 +454,31 @@ export function StudentPortal({ displayName, onLogout }: Props) {
                                   {r.izlasci.length === 1 ? 'izlazak' : 'izlaska'}
                                 </summary>
                                 <ul className="sp-cur-attempt-list">
-                                  {r.izlasci.map((a, ai) => (
-                                    <li key={`${a.datumIspita}-${ai}`}>
-                                      <span className="sp-cur-attempt-date">{formatDate(a.datumIspita)}</span>
-                                      <span className="sp-muted"> · {a.ispitniRok} · </span>
-                                      <span
-                                        className={
-                                          a.ocena < PASSING_GRADE
-                                            ? 'sp-grade-badge sp-grade-badge--fail sp-grade-badge--sm'
-                                            : 'sp-grade-badge sp-grade-badge--sm'
-                                        }
-                                      >
-                                        {a.ocena}
-                                      </span>
-                                      {a.poeni != null ? (
-                                        <span className="sp-muted"> · {a.poeni} poena</span>
-                                      ) : null}
-                                    </li>
-                                  ))}
+                                  {r.izlasci.map((a, ai) => {
+                                    const bodovi = a.poeni ?? predstavniPoeniZaOcenu(a.ocena)
+                                    const { rok: rokPrikaz, datum: datumPrikaz } = prikazRokaIDatumaZaIzlasak(
+                                      a.datumIspita,
+                                      r.sifra,
+                                    )
+                                    return (
+                                      <li key={`${a.datumIspita}-${ai}`}>
+                                        <span className="sp-cur-attempt-date">{datumPrikaz}</span>
+                                        <span className="sp-muted"> · {rokPrikaz} · </span>
+                                        <span
+                                          className={
+                                            a.ocena < PASSING_GRADE
+                                              ? 'sp-grade-badge sp-grade-badge--fail sp-grade-badge--sm'
+                                              : 'sp-grade-badge sp-grade-badge--sm'
+                                          }
+                                        >
+                                          {a.ocena}
+                                        </span>
+                                        {bodovi != null ? (
+                                          <span className="sp-muted"> · {bodovi} bod.</span>
+                                        ) : null}
+                                      </li>
+                                    )
+                                  })}
                                 </ul>
                               </details>
                             ) : (
@@ -560,7 +590,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
             <h2 id="dj-objave-title" className="dj-objave-title">
               Objave
             </h2>
-            <p className="dj-objave-intro">Obaveštenja za studente (demo — statička lista).</p>
+            <p className="dj-objave-intro">Obaveštenja za studente (statički prikaz liste).</p>
             <ul className="dj-objave-list">
               <li>
                 <time className="dj-objave-date">01. 04. 2026.</time> — Početak letnjeg upisnog roka za izborne predmete.

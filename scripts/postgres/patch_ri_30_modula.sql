@@ -89,14 +89,14 @@ BEGIN
             INSERT INTO sadrzaj_predmeta (predmet_id, cilj, ishodi_ucenja, metode_nastave, teme_kursa)
             VALUES (
                 pid,
-                'Cilj predmeta ' || titles[i] || ' je usvajanje ishoda predviđenih za odgovarajuću godinu programa RI (demo kurikulum).',
+                'Cilj predmeta ' || titles[i] || ' je usvajanje ishoda predviđenih za odgovarajuću godinu programa RI (nastavni plan i program).',
                 'Ovladavanje temama iz kratak_opis.',
                 'Predavanja, vežbe i ispitivanje.',
                 'Detalji u skladu sa temama istaknutim u kratak_opis.'
             );
         ELSIF pid IS NOT NULL THEN
             UPDATE sadrzaj_predmeta
-            SET cilj = 'Cilj predmeta ' || titles[i] || ' je usvajanje ishoda predviđenih za odgovarajuću godinu programa RI (demo kurikulum).',
+            SET cilj = 'Cilj predmeta ' || titles[i] || ' je usvajanje ishoda predviđenih za odgovarajuću godinu programa RI (nastavni plan i program).',
                 ishodi_ucenja = 'Ovladavanje temama iz kratak_opis.',
                 metode_nastave = 'Predavanja, vežbe i ispitivanje.',
                 teme_kursa = 'Detalji u skladu sa temama istaknutim u kratak_opis.'

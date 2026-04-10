@@ -6,10 +6,14 @@ spring:
     username: ${DB_USER:nais}
     password: ${DB_PASSWORD:nais}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      # Docker: Postgres može kratko odbijati konekciju i posle service_healthy; -1 = čekaj dok ne uspe (bez pada aplikacije).
+      initialization-fail-timeout: -1
   jpa:
     hibernate:
       ddl-auto: none
     open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         default_schema: public

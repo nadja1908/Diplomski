@@ -5,16 +5,14 @@ data = (base / "02_data.sql").read_text(encoding="utf-8")
 ins1 = (base / "_gen_predmet_extra.sql").read_text(encoding="utf-8")
 ins2 = (base / "_gen_sadrzaj_extra.sql").read_text(encoding="utf-8")
 needle = (
-    "(54, 'Cilj modula 30: usvojenje ishoda modula (demo).', 'Ishodi po nastavnom planu.', "
-    "'Predavanja, vezbe i ispitivanje.', 'Sadrzaj u skladu sa kurikulumom (demo tekst).');\n"
+    "-- Kurikulum: najviše 45 predmeta po programu; godine i semestar usklađeni sa kolonama kurikulum_*.\n"
     "INSERT INTO preduslov"
 )
 if needle not in data:
     raise SystemExit("needle missing — 02_data.sql changed?")
 repl = (
-    "(54, 'Cilj modula 30: usvojenje ishoda modula (demo).', 'Ishodi po nastavnom planu.', "
-    "'Predavanja, vezbe i ispitivanje.', 'Sadrzaj u skladu sa kurikulumom (demo tekst).');\n\n"
-    "-- Demo kurikulum: ~40 predmeta po studijskom programu (SI, AUT, EE, RT, TK)\n"
+    "-- Kurikulum: najviše 45 predmeta po programu; godine i semestar usklađeni sa kolonama kurikulum_*.\n\n"
+    "-- Proširenje: ~40 predmeta po studijskom programu (SI, AUT, EE, RT, TK)\n"
     + ins1
     + "\n\n"
     + ins2

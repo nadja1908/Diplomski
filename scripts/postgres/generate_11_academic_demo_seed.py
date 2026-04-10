@@ -125,11 +125,11 @@ def parse_ui_students_from_02(text: str) -> list[dict]:
     return rows
 
 
-def grade_source_demo_email(program_id: int, godina_upisa: int) -> str:
-    """Izvor ocena: prvi demo student istog programa; 2021 itd. → 2025 jer demo nema te godine."""
+def grade_source_seed_email(program_id: int, godina_upisa: int) -> str:
+    """Izvor ocena: prvi sintetički student istog programa; 2021 itd. → 2025 ako godina nije u seed opsegu."""
     stub = STUB_BY_PROGRAM_ID[program_id]
     gy = godina_upisa if godina_upisa in YEARS else 2025
-    return f"naisademo_{stub}_{gy}_001@ftn.rs"
+    return f"naisa_stud_{stub}_{gy}_001@ftn.rs"
 
 
 def parse_x_predmet_from_07(text: str) -> list[dict]:
@@ -207,10 +207,24 @@ def pick_subjects_for_ects(pool: list[dict], min_sum: int) -> list[dict]:
     return out
 
 
-def poeni_za_ocenu(ocena: int) -> int:
+def poeni_za_ocenu(student_sid: int, termin_id: int, ocena: int) -> int:
+    """Škala: 6→51–60, 7→61–70, 8→71–80, 9→81–90, 10→91–100, 5→0–50 (usklađeno sa API normalizacijom)."""
     if ocena == 5:
-        return 18 + (ocena * 3) % 15
-    return min(100, 30 + ocena * 7 + (ocena % 4) * 3)
+        lo, hi = 0, 50
+    elif ocena == 6:
+        lo, hi = 51, 60
+    elif ocena == 7:
+        lo, hi = 61, 70
+    elif ocena == 8:
+        lo, hi = 71, 80
+    elif ocena == 9:
+        lo, hi = 81, 90
+    elif ocena == 10:
+        lo, hi = 91, 100
+    else:
+        lo, hi = 0, 50
+    h = (student_sid * 1_000_003 + termin_id * 7_919 + ocena * 13) & 0x7FFFFFFF
+    return lo + h % (hi - lo + 1)
 
 
 # (mesec, težina): jan/feb manje, jun/jul više, avg/okt srednje — realističnija raspodela rokova
@@ -323,9 +337,9 @@ def main() -> None:
     for prog_id, stub, indeks_prefix in PROGRAMS:
         for gu in YEARS:
             for seq in range(1, STUDENTS_PER_PROGRAM_YEAR + 1):
-                email = f"naisademo_{stub}_{gu}_{seq:03d}@ftn.rs"
+                email = f"naisa_stud_{stub}_{gu}_{seq:03d}@ftn.rs"
                 ime = IMENA[seq % len(IMENA)]
-                prez = f"Demo{sid}"
+                prez = f"Kandidat{sid}"
                 korisnik_rows.append(
                     f"({kid}, '{esc(email)}', '{DEMO_LOZINKA}', '{ime}', '{esc(prez)}', 'STUDENT')"
                 )
@@ -359,7 +373,7 @@ def main() -> None:
                 return
             used_termin_pairs.add((student_sid, tid))
             ocena_sql.append(
-                f"({student_sid}, {tid}, {poeni_za_ocenu(ocena)}, {ocena})"
+                f"({student_sid}, {tid}, {poeni_za_ocenu(student_sid, tid, ocena)}, {ocena})"
             )
 
         must_pass_sifre: set[str] = set()
@@ -498,7 +512,7 @@ def main() -> None:
 
     lines: list[str] = []
     w = lines.append
-    w("-- Demo akademski seed: samo generacije 2022–2025, guste ocene, ≥36 ESPB po završenoj kurikulum godini.")
+    w("-- Akademski seed podaci: generacije 2022–2025, guste ocene, ≥36 ESPB po završenoj kurikulum godini.")
     w("-- Generisano: generate_11_academic_demo_seed.py")
     w("BEGIN;")
     w("")
@@ -530,7 +544,7 @@ def main() -> None:
     w("")
     w(
         "-- UI nalozi student001… iz 02_data / student123 (isti hash); indeks i program kao u seed-u. "
-        "Ocene: kopija od naisademo_{program}_{godina}_001; godina upisa van 2022–2025 → izvor 2025."
+        "Ocene: kopija od prvog naisa_stud_{program}_{godina}_001; godina upisa van 2022–2025 → izvor 2025."
     )
     kor_vals = [
         f"('{esc(u['email'])}', '{DEMO_LOZINKA}', '{esc(u['ime'])}', '{esc(u['prezime'])}', 'STUDENT')"
@@ -547,7 +561,7 @@ def main() -> None:
         bi = esc(u["broj_indeksa"])
         pid = u["studijski_program_id"]
         gu = u["godina_upisa"]
-        src = grade_source_demo_email(pid, gu)
+        src = grade_source_seed_email(pid, gu)
         w(
             "INSERT INTO student (korisnik_id, broj_indeksa, studijski_program_id, godina_upisa) "
             f"SELECT k.id, '{bi}', {pid}, {gu} FROM korisnik k WHERE k.email = '{em}' "

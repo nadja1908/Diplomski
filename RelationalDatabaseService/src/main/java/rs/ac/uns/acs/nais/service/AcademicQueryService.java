@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalInt;
 
 @Service
 @RequiredArgsConstructor
@@ -168,9 +169,11 @@ public class AcademicQueryService {
             } else {
                 status = "BEZ_IZLAZAKA";
             }
-            List<CurriculumAttemptDto> izlasci = izlasciPoSifri.getOrDefault(p.getSifra(), List.of()).stream()
+            List<Ocena> izlasciRaw = izlasciPoSifri.getOrDefault(p.getSifra(), List.of());
+            List<CurriculumAttemptDto> izlasci = izlasciRaw.stream()
                     .map(this::toCurriculumAttempt)
                     .toList();
+            Integer najboljiPoeni = resolveNajboljiPoeni(izlasciRaw, najbolja);
             redovi.add(new CurriculumSubjectDto(
                     p.getId(),
                     p.getSifra(),
@@ -180,6 +183,7 @@ public class AcademicQueryService {
                     sem,
                     status,
                     najbolja,
+                    najboljiPoeni,
                     izlasci
             ));
         }
@@ -222,8 +226,74 @@ public class AcademicQueryService {
                 t.getDatumVreme().toString(),
                 t.getIspitniRok().getNaziv(),
                 o.getVrednostOcene(),
-                o.getPoeni()
+                uskladjeniPoeniZaOcenu(o)
         );
+    }
+
+    /**
+     * Poeni sa izlaska koji je dao najbolju ocenu (maksimum među usklađenim vrednostima).
+     */
+    private static Integer resolveNajboljiPoeni(List<Ocena> izlasciRaw, Integer najboljaOcena) {
+        if (najboljaOcena == null) {
+            return null;
+        }
+        OptionalInt m = izlasciRaw.stream()
+                .filter(o -> Objects.equals(o.getVrednostOcene(), najboljaOcena))
+                .mapToInt(AcademicQueryService::uskladjeniPoeniZaOcenu)
+                .max();
+        return m.isPresent() ? m.getAsInt() : null;
+    }
+
+    /** Škala: 6→51–60, 7→61–70, 8→71–80, 9→81–90, 10→91–100, 5→0–50. */
+    private static int minPoeniZaOcenu(int ocena) {
+        return switch (ocena) {
+            case 5 -> 0;
+            case 6 -> 51;
+            case 7 -> 61;
+            case 8 -> 71;
+            case 9 -> 81;
+            case 10 -> 91;
+            default -> 0;
+        };
+    }
+
+    private static int maxPoeniZaOcenu(int ocena) {
+        return switch (ocena) {
+            case 5 -> 50;
+            case 6 -> 60;
+            case 7 -> 70;
+            case 8 -> 80;
+            case 9 -> 90;
+            case 10 -> 100;
+            default -> 50;
+        };
+    }
+
+    private static boolean poeniUOpseguZaOcenu(int poeni, int ocena) {
+        return poeni >= minPoeniZaOcenu(ocena) && poeni <= maxPoeniZaOcenu(ocena);
+    }
+
+    /**
+     * Stabilan broj bodova unutar opsega za datu ocenu (isti student + isti termin → isti rezultat).
+     * Ako su poeni u bazi van opsega za tu ocenu, zamenjuju se.
+     */
+    private static int deterministickiPoeniUOpsegu(int ocena, long studentId, long terminId) {
+        int lo = minPoeniZaOcenu(ocena);
+        int hi = maxPoeniZaOcenu(ocena);
+        int span = hi - lo + 1;
+        long h = (studentId * 1_000_003L + terminId * 7_919L + (long) ocena * 13L) & 0x7FFF_FFFFL;
+        return lo + (int) (h % span);
+    }
+
+    private static int uskladjeniPoeniZaOcenu(Ocena o) {
+        int ocena = o.getVrednostOcene();
+        Integer db = o.getPoeni();
+        long sid = o.getStudent().getId();
+        long tid = o.getIspitniTermin().getId();
+        if (db != null && poeniUOpseguZaOcenu(db, ocena)) {
+            return db;
+        }
+        return deterministickiPoeniUOpsegu(ocena, sid, tid);
     }
 
     static int procenjenaGodinaStudijaAkademska(int godinaUpisa, LocalDate d) {
@@ -483,7 +553,7 @@ public class AcademicQueryService {
                 p.getNaziv(),
                 p.getEspb(),
                 o.getVrednostOcene(),
-                o.getPoeni(),
+                uskladjeniPoeniZaOcenu(o),
                 t.getDatumVreme().toString(),
                 t.getIspitniRok().getNaziv()
         );
@@ -534,6 +604,7 @@ public class AcademicQueryService {
             int semestar,
             String status,
             Integer najboljaOcena,
+            Integer najboljiPoeni,
             List<CurriculumAttemptDto> izlasci
     ) {
     }

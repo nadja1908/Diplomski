@@ -1,4 +1,4 @@
--- Dodatni sintetički izlasci (tanak sloj). Glavni demo skup je 07_rich_demo_seed.sql
+-- Dodatni sintetički izlasci (tanak sloj). Glavni prošireni skup studenata je 07_rich_demo_seed.sql
 -- (generiše se sa generate_07_rich_demo_seed.py). Ovaj fajl može ostati za dodatnu gustinu ocena.
 
 WITH pairs AS (

@@ -1,4 +1,4 @@
--- Demo: godina_upisa 2019–2023 → 2021–2025 i sufiks indeksa /19–/23 → /21–/25 (usklađeno sa 02_data.sql).
+-- Migracija: godina_upisa 2019–2023 → 2021–2025 i sufiks indeksa /19–/23 → /21–/25 (usklađeno sa 02_data.sql).
 -- Na bazi već učitanoj NOVIM 02_data.sql nema 2019–2023 ni /19 — migracija menja samo godinu_upisa (0 redova) i preskače indekse.
 -- Staru bazu: pokrenuti npr.
 --   docker compose exec -T postgres psql -U nais -d nais -f /docker-entrypoint-initdb.d/03_migrate_demo_godine.sql

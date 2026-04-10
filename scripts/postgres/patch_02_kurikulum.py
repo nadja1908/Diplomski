@@ -122,7 +122,7 @@ def render_curriculum_block(rows: list[dict], sadrzaj: dict[int, dict], slots: d
 
     lines.append("")
     lines.append(
-        "-- Demo kurikulum: ≤45 predmeta po programu; godine i semestar usklađeni sa kolonama kurikulum_*."
+        "-- Kurikulum: najviše 45 predmeta po programu; godine i semestar usklađeni sa kolonama kurikulum_*."
     )
     return "\n".join(lines) + "\n"
 

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,6 +41,10 @@ public class AssistantService {
 
     private static final double VECTOR_SCORE_GAP_FROM_BEST = 0.14;
     private static final double VECTOR_MIN_ABSOLUTE_SCORE = 0.22;
+
+    /** U leksičkom fallbacku (kad Qdrant vrati 0 pogodaka) ignoriši ove reči — ne donose sadržaj teme. */
+    private static final Set<String> LEXICAL_FALLBACK_SKIP = Set.of(
+            "imam", "imas", "imate", "imaju", "imamo", "bio", "bila", "bili", "bile");
 
     private static final String MSG_VECTOR_LLM_EMPTY =
             "Jezički model je vratio prazan odgovor. Probaj drugačije pitanje ili proveri OPENAI_MODEL i OPENAI_BASE_URL.";
@@ -110,19 +115,10 @@ public class AssistantService {
         if (wantsTotalExamAttempts(fq)) {
             return buildExamAttemptsSummaryResponse(korisnikId, question);
         }
-        AssistantResponse topicList = tryCurriculumTopicListing(question, fq, programId);
-        if (topicList != null) {
-            return topicList;
-        }
 
         AssistantResponse syllabus = trySubjectSyllabusDetailResponse(question, fq, programId, allowed);
         if (syllabus != null) {
             return syllabus;
-        }
-
-        AssistantResponse sqlByWords = trySqlCurriculumKeywordAnswer(question, fq, programId);
-        if (sqlByWords != null) {
-            return sqlByWords;
         }
 
         if (asksEverythingAboutStudent(fq)) {
@@ -139,9 +135,6 @@ public class AssistantService {
         }
 
         List<VectorSearchClient.VectorMatch> matches = searchVectorWithExplicitCourseBoost(question, allowed, programId);
-        if (matches.isEmpty()) {
-            matches = mergeLexicalKurikulumHits(question, programId, List.of());
-        }
         if (matches.isEmpty()) {
             return new AssistantResponse(
                     "Među predmetima na tvom programu nisam našao pouzdan pogodak za ovo pitanje u pretrazi kurikuluma. "
@@ -235,8 +228,10 @@ public class AssistantService {
     ) {
         List<VectorSearchClient.VectorMatch> broad = vectorSearchClient.search(question, 32, allowed);
         broad = dedupeByPredmetKeepBestScore(broad);
-        broad = mergeLexicalKurikulumHits(question, programId, broad);
-        broad = dedupeByPredmetKeepBestScore(broad);
+        if (broad.isEmpty()) {
+            broad = fallbackLexicalCurriculumHits(question, programId, allowed);
+            broad = dedupeByPredmetKeepBestScore(broad);
+        }
         Optional<Predmet> explicit = findPredmetExplicitlyNamedInQuestion(question, programId);
         if (explicit.isEmpty()) {
             return pruneMatchesByRelativeScore(broad);
@@ -291,70 +286,106 @@ public class AssistantService {
         return out;
     }
 
-    private List<VectorSearchClient.VectorMatch> mergeLexicalKurikulumHits(
+    /**
+     * Kada vektorski servis / Qdrant ne vrati ništa (prazna kolekcija, mreža, nepoklapanje id-jeva),
+     * ipak pokušaj naziv + kratak opis predmeta na programu — npr. „engleski jezik“ / „English“.
+     */
+    private List<VectorSearchClient.VectorMatch> fallbackLexicalCurriculumHits(
             String question,
             Long programId,
-            List<VectorSearchClient.VectorMatch> vectorMatches
+            List<Long> allowed
     ) {
-        LinkedHashSet<String> stemSet = new LinkedHashSet<>(extractQuestionStems(question));
-        stemSet.addAll(looseCurriculumTokens(question));
-        addDevopsCiCdLexicalHints(question, stemSet);
-        List<String> stems = new ArrayList<>(stemSet);
-        if (stems.isEmpty()) {
-            return vectorMatches;
+        LinkedHashSet<String> needles = new LinkedHashSet<>(extractQuestionStems(question));
+        needles.addAll(looseCurriculumTokens(question));
+        addLanguageCourseAliasNeedles(foldSerbian(question), needles);
+        needles.removeIf(n -> n.length() < 3 || LEXICAL_FALLBACK_SKIP.contains(n));
+        if (needles.isEmpty()) {
+            return List.of();
         }
-        Map<Long, Double> scoreByPredmet = new LinkedHashMap<>();
-        Map<Long, Predmet> predmetById = new LinkedHashMap<>();
+        Set<Long> allow = new HashSet<>(allowed);
         List<Predmet> all = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
+        record Hit(Predmet p, int score, int titleMatches) {
+        }
+        List<Hit> hits = new ArrayList<>();
         for (Predmet p : all) {
+            if (!allow.contains(p.getId())) {
+                continue;
+            }
             String title = foldSerbian(p.getNaziv());
             String desc = p.getKratakOpis() == null ? "" : foldSerbian(p.getKratakOpis());
-            double best = 0;
-            for (String stem : stems) {
-                if (stem.length() < 3) {
-                    continue;
-                }
-                if (title.contains(stem)) {
-                    best = Math.max(best, stem.length() >= 4 ? 0.86 : 0.8);
-                } else if (stem.length() >= 3 && desc.contains(stem)) {
-                    best = Math.max(best, stem.length() >= 4 ? 0.72 : 0.66);
+            int score = 0;
+            int titleMatches = 0;
+            for (String n : needles) {
+                if (title.contains(n)) {
+                    int w = Math.min(n.length(), 10);
+                    score += 4 + w;
+                    titleMatches++;
+                } else if (desc.contains(n)) {
+                    score += 2 + Math.min(n.length(), 8);
                 }
             }
-            if (best > 0) {
-                scoreByPredmet.merge(p.getId(), best, Math::max);
-                predmetById.putIfAbsent(p.getId(), p);
+            if (score > 0) {
+                hits.add(new Hit(p, score, titleMatches));
             }
         }
-        if (scoreByPredmet.isEmpty()) {
-            return vectorMatches;
+        if (hits.isEmpty()) {
+            return List.of();
         }
-        List<VectorSearchClient.VectorMatch> lexicalRows = new ArrayList<>();
-        for (var e : scoreByPredmet.entrySet()) {
-            lexicalRows.add(vectorMatchFromPredmetLexical(predmetById.get(e.getKey()), e.getValue()));
+        hits.sort(Comparator.<Hit>comparingInt(Hit::score).reversed()
+                .thenComparingInt(Hit::titleMatches).reversed());
+        int top = hits.get(0).score;
+        int floor = Math.max(6, top - 4);
+        List<VectorSearchClient.VectorMatch> out = new ArrayList<>();
+        for (Hit h : hits) {
+            if (h.score < floor) {
+                break;
+            }
+            if (out.size() >= 8) {
+                break;
+            }
+            Predmet p = h.p;
+            String ko = p.getKratakOpis() == null ? "" : p.getKratakOpis().trim();
+            String text = ko.isBlank() ? p.getNaziv() : p.getNaziv() + " — " + ko;
+            double sim = 0.42 + Math.min(h.score, 24) * 0.015;
+            out.add(new VectorSearchClient.VectorMatch(
+                    p.getId(),
+                    p.getSifra(),
+                    p.getNaziv(),
+                    p.getEspb(),
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    text,
+                    "pg_naziv_opis_fallback",
+                    sim
+            ));
         }
-        lexicalRows.sort(Comparator.comparingDouble(VectorSearchClient.VectorMatch::score).reversed());
-        List<VectorSearchClient.VectorMatch> merged = new ArrayList<>(lexicalRows);
-        merged.addAll(vectorMatches);
-        return merged;
+        return out;
     }
 
-    private static VectorSearchClient.VectorMatch vectorMatchFromPredmetLexical(Predmet p, double score) {
-        String ko = p.getKratakOpis() == null ? "" : p.getKratakOpis().trim();
-        String text = ko.isBlank() ? p.getNaziv() : p.getNaziv() + " — " + ko;
-        return new VectorSearchClient.VectorMatch(
-                p.getId(),
-                p.getSifra(),
-                p.getNaziv(),
-                p.getEspb(),
-                "",
-                "",
-                "",
-                "",
-                "",
-                text,
-                "sql_naziv_opis_lex",
-                score
-        );
+    private static void addLanguageCourseAliasNeedles(String folded, LinkedHashSet<String> out) {
+        if (folded.contains("english") || folded.contains("englisch")) {
+            out.add("engleski");
+        }
+        if (folded.contains("german") || folded.contains("deutsch") || folded.contains("nemac")
+                || folded.contains("nemač")) {
+            out.add("nemack");
+        }
+        if (folded.contains("french") || folded.contains("francais") || folded.contains("francus")) {
+            out.add("francusk");
+        }
+        if (folded.contains("italian") || folded.contains("italijan")) {
+            out.add("italij");
+        }
+        if (folded.contains("spanish") || folded.contains("espanol") || folded.contains("špan")
+                || folded.contains("span")) {
+            out.add("spansk");
+        }
+        if (folded.contains("russian") || folded.contains("ruski") || folded.contains("rusij")) {
+            out.add("rusk");
+        }
     }
 
     private Optional<Predmet> findPredmetExplicitlyNamedInQuestion(String question, Long programId) {
@@ -374,6 +405,9 @@ public class AssistantService {
                 return Optional.of(pr);
             }
         }
+        // Dovoljno je da bar dve značajne reči iz naziva budu u pitanju (npr. „engleski“ + „jezik“ za
+        // „Engleski jezik za inženjere“) — ranije je zahtevano da SVA značajna slova budu u pitanju,
+        // pa je „da li imam engleski jezik“ padalo na reči „inženjere“.
         for (Predmet pr : all) {
             String tn = foldSerbian(pr.getNaziv());
             String[] words = tn.split("\\s+");
@@ -385,11 +419,9 @@ public class AssistantService {
                 if (w.chars().allMatch(Character::isDigit)) {
                     continue;
                 }
-                if (!fq.contains(w)) {
-                    sig = -1;
-                    break;
+                if (fq.contains(w)) {
+                    sig++;
                 }
-                sig++;
             }
             if (sig >= 2) {
                 return Optional.of(pr);
@@ -661,120 +693,6 @@ public class AssistantService {
         return Optional.empty();
     }
 
-    private AssistantResponse tryCurriculumTopicListing(String question, String f, Long programId) {
-        if (!asksBroadCurriculumTopicSearch(f)) {
-            return null;
-        }
-        List<String> terms = expandCurriculumSearchTerms(question);
-        if (terms.isEmpty()) {
-            return null;
-        }
-        List<Predmet> all = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
-        List<Predmet> hits = all.stream()
-                .filter(p -> predmetMatchesCurriculumTerms(p, terms))
-                .toList();
-        if (hits.isEmpty()) {
-            return null;
-        }
-        var sb = new StringBuilder();
-        sb.append("Kontekst pretrage (ključne reči / teme): ").append(String.join(", ", terms)).append("\n\n");
-        sb.append("Pogodci (naziv, šifra, ESPB, kratak opis iz baze):\n\n");
-        for (Predmet p : hits) {
-            sb.append("- ")
-                    .append(p.getNaziv())
-                    .append(" (")
-                    .append(p.getSifra())
-                    .append("), ")
-                    .append(p.getEspb())
-                    .append(" ESPB");
-            if (p.getKratakOpis() != null && !p.getKratakOpis().isBlank()) {
-                sb.append(" — ").append(p.getKratakOpis().trim());
-            }
-            sb.append('\n');
-        }
-        List<String> sources = hits.stream()
-                .map(p -> String.format(
-                        "ID %d · %s (%s) · %d ESPB",
-                        p.getId(), p.getNaziv(), p.getSifra(), p.getEspb()))
-                .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
-    }
-
-    private AssistantResponse trySqlCurriculumKeywordAnswer(String question, String f, Long programId) {
-        if (!sqlCurriculumKeywordQuestion(f)) {
-            return null;
-        }
-        LinkedHashSet<String> termSet = new LinkedHashSet<>(extractQuestionStems(question));
-        termSet.addAll(looseCurriculumTokens(question));
-        termSet.removeIf(t -> "predmet".equals(t) || "kurse".equals(t) || "kurs".equals(t) || "koji".equals(t)
-                || "koje".equals(t) || "kojim".equals(t) || "kojih".equals(t) || "studij".equals(t)
-                || "program".equals(t) || "nesto".equals(t) || "nešto".equals(t));
-        List<String> terms = termSet.stream().filter(t -> t.length() >= 3).toList();
-        if (terms.isEmpty()) {
-            return null;
-        }
-        List<Predmet> all = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
-        List<Predmet> hits = all.stream()
-                .filter(p -> predmetMatchesCurriculumTerms(p, terms))
-                .toList();
-        if (hits.isEmpty()) {
-            return null;
-        }
-        var sb = new StringBuilder();
-        sb.append("Izvučene reči iz pitanja (za SQL/tekstualno poklapanje): ").append(String.join(", ", terms)).append("\n\n");
-        sb.append("Predmeti na programu koji odgovaraju:\n\n");
-        for (Predmet p : hits) {
-            sb.append("- ")
-                    .append(p.getNaziv())
-                    .append(" (")
-                    .append(p.getSifra())
-                    .append("), ")
-                    .append(p.getEspb())
-                    .append(" ESPB");
-            if (p.getKratakOpis() != null && !p.getKratakOpis().isBlank()) {
-                sb.append(" — ").append(p.getKratakOpis().trim());
-            }
-            sb.append('\n');
-        }
-        List<String> sources = hits.stream()
-                .map(p -> String.format(
-                        "ID %d · %s (%s) · %d ESPB",
-                        p.getId(), p.getNaziv(), p.getSifra(), p.getEspb()))
-                .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
-    }
-
-    private static boolean sqlCurriculumKeywordQuestion(String f) {
-        if (wantsFullSubjectSyllabus(f)) {
-            return false;
-        }
-        if (f.contains("koliko puta") || f.contains("broj izlazaka")) {
-            return false;
-        }
-        if (wantsCurriculumRemainder(f) || wantsTotalExamAttempts(f) || wantsPassRokSummary(f)) {
-            return false;
-        }
-        if (wantsUnpassedSubjects(f)) {
-            return false;
-        }
-        if ((f.contains("ocen") || f.contains("prosek") || f.contains("prose"))
-                && !f.contains("sadrzi") && !f.contains("sadrži") && !f.contains("spominje")
-                && !f.contains("pominje")) {
-            return false;
-        }
-        boolean hasPredmetOrKurs = f.contains("predmet") || f.contains("kurse") || f.contains("kurs");
-        if (f.contains("sadrzi") || f.contains("sadrži") || (f.contains("sadrzaj") && hasPredmetOrKurs)) {
-            return hasPredmetOrKurs || f.contains("kurikulum") || f.contains("studij");
-        }
-        if ((f.contains("spominje") || f.contains("pominje") || f.contains("pominju"))
-                && (hasPredmetOrKurs || f.contains("gde") || f.contains("negde"))) {
-            return true;
-        }
-        return f.contains("da li") && hasPredmetOrKurs
-                && (f.contains("unix") || f.contains("linux") || f.contains("masin") || f.contains("ucenje")
-                || f.contains("ucim") || f.contains("algebr"));
-    }
-
     private AssistantResponse trySubjectSyllabusDetailResponse(
             String question,
             String f,
@@ -990,84 +908,6 @@ public class AssistantService {
             out.add(String.format("Qdrant · %s · %.2f", tip, m.score()));
         }
         return out;
-    }
-
-    private static boolean asksBroadCurriculumTopicSearch(String f) {
-        if (f.contains("poloz") || f.contains("polož") || f.contains("nisam")) {
-            return false;
-        }
-        boolean programmingTopic = f.contains("programiranje") || f.contains("programira") || f.contains("kodiranje")
-                || f.contains("objektno") || f.contains("oop");
-        if (programmingTopic
-                && (f.contains("gde") || f.contains("koji") || f.contains("koje") || f.contains("kojim")
-                || wordBound(f, "svi") || f.contains("navedi") || f.contains("ispisi") || f.contains("spisak")
-                || f.contains("povezan") || f.contains("vezan") || f.contains("veza ") || f.contains("veze "))) {
-            return true;
-        }
-        boolean nosqlAsk = f.contains("nosql") || f.contains("mongo");
-        if (nosqlAsk && (f.contains("predmet") || f.contains("kurs") || f.contains("koji") || f.contains("gde"))) {
-            return true;
-        }
-        if (!f.contains("predmet") && !f.contains("kurse") && !f.contains("kurs")) {
-            return false;
-        }
-        if (f.contains("povezan") || f.contains("vezan") || f.contains("veza sa") || f.contains("veze sa")) {
-            return true;
-        }
-        if (f.contains("da li imam predmet") || f.contains("imam li predmet") || f.contains("postoji li predmet")) {
-            return true;
-        }
-        if (f.contains("koji predmeti") || f.contains("kojim predmetima")) {
-            return true;
-        }
-        if (wordBound(f, "svi") && f.contains("predmet")) {
-            return true;
-        }
-        return f.contains("gde se program") || f.contains("u kojim predmetima");
-    }
-
-    private static List<String> expandCurriculumSearchTerms(String question) {
-        LinkedHashSet<String> t = new LinkedHashSet<>(extractQuestionStems(question));
-        String f = foldSerbian(question);
-        if (f.contains("programiranje") || f.contains("programira") || f.contains("kodiranje")) {
-            t.add("program");
-            t.add("programiranje");
-            t.add("oop");
-            t.add("objektno");
-        }
-        if (f.contains("nosql") || f.contains("mongo")) {
-            t.add("nosql");
-            t.add("sql");
-        }
-        if (f.contains("sql") && !f.contains("nosql")) {
-            t.add("sql");
-        }
-        if (f.contains("matematik")) {
-            t.add("matematik");
-            t.add("matematika");
-        }
-        if (f.contains("mrez") || f.contains("mrež")) {
-            t.add("mrez");
-            t.add("mreze");
-        }
-        if (f.contains("bezbednost") || f.contains("bezbednos") || f.contains("sigurnost")) {
-            t.add("sigurnost");
-            t.add("bezbednost");
-        }
-        return t.stream()
-                .filter(s -> s.length() >= 3)
-                .toList();
-    }
-
-    private static boolean predmetMatchesCurriculumTerms(Predmet p, List<String> terms) {
-        String hay = foldSerbian(p.getNaziv() + " "
-                + (p.getKratakOpis() == null ? "" : p.getKratakOpis()));
-        for (String term : terms) {
-            if (hay.contains(term)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static boolean wantsUnpassedSubjects(String f) {
@@ -1560,20 +1400,6 @@ public class AssistantService {
             }
         }
         return new ArrayList<>(out);
-    }
-
-    /** Povezuje „DevOps / CI/CD“ sa naslovima poput „DevOps i neprekidna isporuka“. */
-    private static void addDevopsCiCdLexicalHints(String question, LinkedHashSet<String> stemSet) {
-        String f = foldSerbian(question);
-        boolean cicd = f.contains("ci/cd") || f.contains("cicd") || f.contains("continuous")
-                || (f.contains("ci") && f.contains("cd"));
-        boolean devopsy = f.contains("devops") || f.contains("dev ops") || f.contains("neprekid")
-                || f.contains("isporuc") || f.contains("deployment") || f.contains("pipeline");
-        if (cicd || devopsy) {
-            stemSet.add("devops");
-            stemSet.add("neprekid");
-            stemSet.add("isporuc");
-        }
     }
 
     private static int keywordFitScore(VectorSearchClient.VectorMatch m, List<String> stems) {

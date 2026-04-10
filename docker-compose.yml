@@ -145,6 +145,8 @@ services:
     restart: unless-stopped
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      RELATIONAL_SERVICE_URI: http://relational-database-service:9030
+      COLUMNAR_SERVICE_URI: http://columnar-database-service:9050
     ports:
       - "9000:9000"
     depends_on:

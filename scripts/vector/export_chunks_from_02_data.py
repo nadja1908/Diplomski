@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-Generiše scripts/vector/chunks.jsonl iz scripts/postgres/02_data.sql (predmet + sadrzaj_predmeta).
-
-Pokretanje iz korena NAIS-projekat:
-  python scripts/vector/export_chunks_from_02_data.py
-
-Posle toga ponovo pokreni ingest u vector-database-service (Docker entrypoint).
-"""
 from __future__ import annotations
 
 import json
@@ -17,7 +9,6 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_SQL = ROOT / "scripts" / "postgres" / "02_data.sql"
 OUT_VECTOR = ROOT / "scripts" / "vector" / "chunks.jsonl"
 
-# (id, 'sifra', 'naziv', espb, prog_id, katedra_id, 'kratak_opis', kur_god, kur_sem)
 PRED_ROW = re.compile(
     r"\((\d+),\s*'((?:''|[^'])*)'\s*,\s*'((?:''|[^'])*)'\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*'((?:''|[^'])*)'\s*,\s*(\d+)\s*,\s*(\d+)\s*\)"
 )
@@ -32,7 +23,6 @@ def sql_unquote(s: str) -> str:
 
 
 def find_insert_statement_end(text: str, start: int) -> int:
-    """Prvi ';' van SQL stringa (stringovi su u jednostrukim navodnicima, '' escape)."""
     i = start
     in_str = False
     n = len(text)

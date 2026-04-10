@@ -3,7 +3,6 @@ import { REFERENCE_INTAKE_YEAR } from './studijskeGodineLabele'
 
 const MIN_SHEF_GEN = 2022
 
-/** Parsiranje godine upisa iz API-ja ili sufiksa indeksa /YY. */
 export function godinaUpisaIzStudenta(s: HeadStudentRow): number {
   if (typeof s.godinaUpisa === 'number' && !Number.isNaN(s.godinaUpisa)) return s.godinaUpisa
   const m = /\/(\d{2})$/.exec(s.brojIndeksa.trim())

@@ -1,3 +1,6 @@
+# Lokalni tajni ključevi (Groq, OpenAI, baza…)
+.env
+.env.local
 
 .metadata/*
 /.metadata/

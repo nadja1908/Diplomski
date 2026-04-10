@@ -171,9 +171,6 @@ public class ColumnarStatsService {
         );
     }
 
-    /**
-     * Usklađuje stare ključeve {@code YYYY-MM} sa {@code YYYY-R01..R07} (isti rok → isti bucket pri agregaciji).
-     */
     static String normalizeTrendPeriodKey(String mesec) {
         if (mesec == null || mesec.isBlank()) {
             return mesec;
@@ -191,7 +188,6 @@ public class ColumnarStatsService {
         return mesec;
     }
 
-    /** [0] = rok godina, [1] = indeks roka 1..7 (Jan, Feb, Apr, Jun, Jul, Aug, Oct). */
     private static int[] calendarMonthToRokIndex(int year, int month) {
         return switch (month) {
             case 12 -> new int[] { year + 1, 1 };
@@ -219,7 +215,6 @@ public class ColumnarStatsService {
             long pali,
             Double prosecnaOcena,
             long brojOcena,
-            /** Šifra predmeta (popunjava se za studentsku statistiku; šef/global mogu imati null). */
             String sifra
     ) {
     }

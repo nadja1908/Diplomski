@@ -3,6 +3,7 @@ package rs.ac.uns.acs.nais.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,19 +31,28 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssistantService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /**
-     * Nakon deduplikacije po predmetu: zadrži samo pogotke čiji je skor blizu najboljeg.
-     * Smanjuje „šum“ kad mnogi predmeti dele isti generički opis kursa u embedding prostoru.
-     */
     private static final double VECTOR_SCORE_GAP_FROM_BEST = 0.14;
-    /** Ne suviše visoko — kratki / jednorečeni upiti često imaju niži kosinus u odnosu na chunk. */
     private static final double VECTOR_MIN_ABSOLUTE_SCORE = 0.22;
+
+    private static final String MSG_VECTOR_LLM_EMPTY =
+            "Jezički model je vratio prazan odgovor. Probaj drugačije pitanje ili proveri OPENAI_MODEL i OPENAI_BASE_URL.";
+    /** Direktno iz SQL evidencije — ne zahteva API ključ za LLM. */
+    private static final String SRC_RELATIONAL =
+            "Izvor: PostgreSQL (odgovor iz baze, bez jezičkog modela).";
+    private static final String SRC_SYLLABUS =
+            "Izvor: PostgreSQL + Qdrant fragmenti predmeta (bez LLM).";
+    private static final String SRC_VECTOR_MISS =
+            "Izvor: Qdrant nije našao pogodak za ovo pitanje.";
+    /** Semantički pogodaci iz Qdranta, bez poziva LLM-a (kada nema API ključa ili kao rezerva). */
+    private static final String SRC_VECTOR_NO_LLM =
+            "Izvor: Qdrant (semantička pretraga; bez LLM — za prirodniji odgovor podesi GROQ_API_KEY i ponovo podigni servis).";
 
     private static final Set<String> STOPWORDS = Set.copyOf(Arrays.asList(
             "koji", "koja", "koje", "koju", "čiji", "ciji", "šta", "sta", "predmet", "predmeta", "predmeti", "predmete",
@@ -55,7 +65,6 @@ public class AssistantService {
             "ovo", "tamo", "ovde", "ovdje", "gde", "gdje", "kada", "kad", "samo", "jos", "još"
     ));
 
-    /** Gruba sklanjanja radi poklapanja „bazama“ → „baz“ sa „Baze podataka“. */
     private static final String[] SR_STEM_SUFFIXES = {
             "ovima", "avanje", "ovanje", "ivali", "ivao", "ujes", "ujem", "uješ",
             "ama", "ima", "omu", "ome", "oj", "og", "om", "em", "im", "ih", "ci", "ca", "cu", "ce"
@@ -69,30 +78,37 @@ public class AssistantService {
     private final AcademicQueryService academicQueryService;
 
     public AssistantResponse answerForStudent(String question, Long korisnikId) {
+        if (korisnikId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Niste prijavljeni (nedostaje korisnik iz tokena).");
+        }
         var student = studentRepository.findByKorisnikId(korisnikId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Samo studenti"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Korisnik nema studentski zapis u bazi (nema veze student–korisnik). "
+                                + "Asistent radi samo za naloge koji su u tabeli student."));
         Long programId = student.getStudijskiProgram().getId();
         List<Long> allowed = predmetRepository.findIdsByStudijskiProgramId(programId);
+
         if (allowed.isEmpty()) {
             return new AssistantResponse(
                     "Na tvom studijskom programu još nema upisanih predmeta u sistemu.",
-                    List.of()
-            );
+                    List.of(),
+                    SRC_RELATIONAL);
         }
 
         if (asksForFullCurriculumList(question)) {
-            return buildCurriculumListResponse(student, programId);
+            return buildCurriculumListResponse(student, programId, question);
         }
 
         String fq = foldSerbian(question);
         if (wantsUnpassedSubjects(fq)) {
-            return buildUnpassedSubjectsResponse(korisnikId, programId);
+            return buildUnpassedSubjectsResponse(korisnikId, programId, question);
         }
         if (wantsCurriculumRemainder(fq)) {
-            return buildCurriculumRemainderResponse(korisnikId);
+            return buildCurriculumRemainderResponse(korisnikId, question);
         }
         if (wantsTotalExamAttempts(fq)) {
-            return buildExamAttemptsSummaryResponse(korisnikId);
+            return buildExamAttemptsSummaryResponse(korisnikId, question);
         }
         AssistantResponse topicList = tryCurriculumTopicListing(question, fq, programId);
         if (topicList != null) {
@@ -110,7 +126,7 @@ public class AssistantService {
         }
 
         if (asksEverythingAboutStudent(fq)) {
-            return buildStudentDataResponse(korisnikId, true, true, true);
+            return buildStudentDataResponse(korisnikId, true, true, true, question);
         }
         if (wantsPassRokSummary(fq)) {
             return buildPassRokSummaryResponse(korisnikId, question, programId);
@@ -119,16 +135,19 @@ public class AssistantService {
         boolean wantGr = wantsGradesSection(fq);
         boolean wantGpa = wantsGpaSection(fq);
         if (wantProf || wantGr || wantGpa) {
-            return buildStudentDataResponse(korisnikId, wantProf, wantGr, wantGpa);
+            return buildStudentDataResponse(korisnikId, wantProf, wantGr, wantGpa, question);
         }
 
         List<VectorSearchClient.VectorMatch> matches = searchVectorWithExplicitCourseBoost(question, allowed, programId);
         if (matches.isEmpty()) {
+            matches = mergeLexicalKurikulumHits(question, programId, List.of());
+        }
+        if (matches.isEmpty()) {
             return new AssistantResponse(
-                    "Ne bih da nagađam — među predmetima na tvom programu nisam našao nešto što pouzdano odgovara tom pitanju. "
-                            + "Probaj drugačije reči ili napiši tačan naziv kursa.",
-                    List.of()
-            );
+                    "Među predmetima na tvom programu nisam našao pouzdan pogodak za ovo pitanje u pretrazi kurikuluma. "
+                            + "Probaj drugačije reči ili tačan naziv kursa.",
+                    List.of(),
+                    SRC_VECTOR_MISS);
         }
 
         List<String> sources = matches.stream()
@@ -144,22 +163,71 @@ public class AssistantService {
                 .collect(Collectors.toList());
 
         List<VectorSearchClient.VectorMatch> forLlm = orderMatchesForLlm(question, matches);
-        String context = buildStructuredContext(forLlm);
 
-        String answer;
-        String apiKey = naisProperties.getLlm().getOpenaiApiKey();
-        if (apiKey != null && !apiKey.isBlank()) {
-            answer = callOpenAi(question, context, apiKey, matches);
-        } else {
-            answer = synthesizeNaturalFallbackAnswer(question, matches);
+        if (effectiveLlmApiKey().isBlank()) {
+            return new AssistantResponse(vectorFallbackAnswerFromMatches(forLlm), sources, SRC_VECTOR_NO_LLM);
         }
-        return new AssistantResponse(answer, sources);
+
+        String context = buildStructuredContext(forLlm);
+        LlmOrFallback gen = callOpenAi(question, context, effectiveLlmApiKey());
+        if (gen.usedLlm()) {
+            return new AssistantResponse(gen.text(), sources, buildLlmSuccessAnswerSource());
+        }
+        String fallback = vectorFallbackAnswerFromMatches(forLlm);
+        String note =
+                "—\nJezički model nije vratio odgovor (proveri GROQ_API_KEY, OPENAI_BASE_URL za Groq, OPENAI_MODEL i mrežu). "
+                        + "Gore je sažetak iz pretrage kurikuluma (Qdrant / tekst predmeta).";
+        return new AssistantResponse(fallback + "\n\n" + note, sources, SRC_VECTOR_NO_LLM);
     }
 
-    /**
-     * Ako student u pitanju navede pun naziv predmeta sa programa (npr. „Kompjuterska arhitektura“),
-     * taj predmet se uzima kao primarni — ne slepi vrh vektorske pretrage koji može biti pogrešan kurs.
-     */
+    /** Oznaka za korisnika (čet): jasno „GPT“ ili „Llama“ + provajder i tačan model. */
+    private String buildLlmSuccessAnswerSource() {
+        String model = Optional.ofNullable(naisProperties.getLlm().getOpenaiModel()).orElse("").trim();
+        if (model.isEmpty()) {
+            model = "nepoznat model";
+        }
+        String baseUrl = Optional.ofNullable(naisProperties.getLlm().getOpenaiBaseUrl()).orElse("").trim().toLowerCase(Locale.ROOT);
+        while (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        String m = model.toLowerCase(Locale.ROOT);
+        boolean groq = baseUrl.contains("groq.com");
+        boolean openaiOfficial = baseUrl.contains("api.openai.com") || baseUrl.endsWith("openai.com/v1");
+
+        String family;
+        if (m.contains("llama") || m.contains("mixtral") || m.contains("gemma")) {
+            if (m.contains("llama")) {
+                family = "Llama";
+            } else if (m.contains("mixtral")) {
+                family = "Mixtral";
+            } else {
+                family = "Gemma";
+            }
+        } else if (m.contains("gpt") || m.startsWith("o1") || m.startsWith("o3") || m.startsWith("o4")) {
+            family = "GPT";
+        } else if (groq) {
+            family = "Llama";
+        } else if (openaiOfficial || baseUrl.isEmpty() || baseUrl.equals("https://api.openai.com/v1")) {
+            family = "GPT";
+        } else {
+            family = "LLM";
+        }
+
+        String via;
+        if (groq) {
+            via = "Groq";
+        } else if (openaiOfficial || baseUrl.isEmpty() || baseUrl.contains("openai.com")) {
+            via = "OpenAI";
+        } else {
+            via = "kompatibilan OpenAI API";
+        }
+
+        return "Odgovor generisao " + family + " preko " + via + " · model: " + model + " · kontekst: Qdrant + kurikulum.";
+    }
+
+    private record LlmOrFallback(String text, boolean usedLlm) {
+    }
+
     private List<VectorSearchClient.VectorMatch> searchVectorWithExplicitCourseBoost(
             String question,
             List<Long> allowed,
@@ -223,11 +291,6 @@ public class AssistantService {
         return out;
     }
 
-    /**
-     * Vektorski indeks (chunks.jsonl → Qdrant) često nije ažuran kao PostgreSQL kurikulum. Zato za reči iz
-     * pitanja koje se pojave u nazivu ili kratkom opisu predmeta u bazi umećemo pouzdan pogodak (npr. „etika“
-     * → „Etika i privatnost podataka“ iako u Qdrantu nema chunk-a za taj predmet).
-     */
     private List<VectorSearchClient.VectorMatch> mergeLexicalKurikulumHits(
             String question,
             Long programId,
@@ -235,6 +298,7 @@ public class AssistantService {
     ) {
         LinkedHashSet<String> stemSet = new LinkedHashSet<>(extractQuestionStems(question));
         stemSet.addAll(looseCurriculumTokens(question));
+        addDevopsCiCdLexicalHints(question, stemSet);
         List<String> stems = new ArrayList<>(stemSet);
         if (stems.isEmpty()) {
             return vectorMatches;
@@ -293,10 +357,6 @@ public class AssistantService {
         );
     }
 
-    /**
-     * Pronalazi predmet čiji se pun naziv (ili bar dve značajne reči naziva) pojavljuje u pitanju.
-     * Duži nazivi prvi — da „Računarska i informaciona tehnologija“ pobedi „Računarske mreže“ kad je ceo naziv u tekstu.
-     */
     private Optional<Predmet> findPredmetExplicitlyNamedInQuestion(String question, Long programId) {
         String fq = foldSerbian(question);
         if (fq.length() < 6) {
@@ -338,36 +398,30 @@ public class AssistantService {
         return Optional.empty();
     }
 
-    /** Pitanja tipa „koje predmete imam“ — lista iz PostgreSQL-a, ne Qdrant. */
-    private AssistantResponse buildCurriculumListResponse(Student student, Long programId) {
+    private AssistantResponse buildCurriculumListResponse(Student student, Long programId, String question) {
         List<Predmet> predmeti = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
         String programNaziv = student.getStudijskiProgram().getNaziv();
         var sb = new StringBuilder();
-        sb.append("Na programu „")
-                .append(programNaziv)
-                .append("” imaš ")
-                .append(predmeti.size())
-                .append(" predmeta:\n\n");
+        sb.append("Studijski program: „").append(programNaziv).append("”\n");
+        sb.append("Ukupno predmeta na kurikulumu: ").append(predmeti.size()).append("\n\n");
         for (Predmet p : predmeti) {
-            sb.append("• ")
+            sb.append("- ")
                     .append(p.getNaziv())
-                    .append(" (")
+                    .append(" (šifra ")
                     .append(p.getSifra())
                     .append("), ")
                     .append(p.getEspb())
                     .append(" ESPB\n");
         }
-        sb.append("\nZa šta se radi na pojedinom kursu, pitaj u jednoj rečenici (npr. „šta je u Bazama podataka”).");
         List<String> sources = predmeti.stream()
                 .map(p -> String.format(
                         "ID %d · %s (%s) · %d ESPB",
                         p.getId(), p.getNaziv(), p.getSifra(), p.getEspb()))
                 .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString(), sources);
+        return new AssistantResponse(sb.toString(), sources, SRC_RELATIONAL);
     }
 
-    /** „Koje nisam položio/la“ — kurikulum minus položeni (ocena ≥ 6). */
-    private AssistantResponse buildUnpassedSubjectsResponse(Long korisnikId, Long programId) {
+    private AssistantResponse buildUnpassedSubjectsResponse(Long korisnikId, Long programId, String question) {
         List<Predmet> all = predmetRepository.findAllByStudijskiProgramIdOrderBySifraAsc(programId);
         var grades = academicQueryService.subjectsAndGrades(korisnikId);
         Map<String, Integer> bestBySifra = new HashMap<>();
@@ -383,23 +437,24 @@ public class AssistantService {
                 .toList();
         if (pending.isEmpty()) {
             return new AssistantResponse(
-                    "Po podacima u sistemu izgleda da si položio/la sve predmete sa kurikuluma. Ako nešto fali u evidenciji, proveri kod studentske.",
-                    List.of("Kurikulum + ocene · PostgreSQL"));
+                    "Po podacima u bazi imaš ocenu ≥ 6 za sve predmete sa kurikuluma (nema nepoloženih po ovom pravilu).",
+                    List.of("Kurikulum + ocene · PostgreSQL"),
+                    SRC_RELATIONAL);
         }
         var sb = new StringBuilder();
-        sb.append("Još nemaš položeno (nema ocene ≥ 6) ovo sa programa:\n\n");
+        sb.append("Predmeti bez položene ocene ≥ 6 (ili bez upisanih ispita):\n\n");
         for (Predmet p : pending) {
             Integer g = bestBySifra.get(p.getSifra());
             if (g != null) {
-                sb.append("• ")
+                sb.append("- ")
                         .append(p.getNaziv())
                         .append(" (")
                         .append(p.getSifra())
-                        .append(") — najbolji pokušaj zasad: ")
+                        .append(") — najbolji pokušaj u evidenciji: ")
                         .append(g)
                         .append('\n');
             } else {
-                sb.append("• ")
+                sb.append("- ")
                         .append(p.getNaziv())
                         .append(" (")
                         .append(p.getSifra())
@@ -409,7 +464,7 @@ public class AssistantService {
         List<String> sources = pending.stream()
                 .map(p -> String.format("ID %d · %s (%s)", p.getId(), p.getNaziv(), p.getSifra()))
                 .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString().trim(), sources);
+        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
     }
 
     private static boolean wantsCurriculumRemainder(String f) {
@@ -454,15 +509,12 @@ public class AssistantService {
                 || (f.contains("u kom") && f.contains("rok"));
     }
 
-    /** Šta još nije položeno + status po kurikulumu (iz napredovanja). */
-    private AssistantResponse buildCurriculumRemainderResponse(Long korisnikId) {
+    private AssistantResponse buildCurriculumRemainderResponse(Long korisnikId, String question) {
         AcademicQueryService.CurriculumProgressDto cp = academicQueryService.curriculumProgress(korisnikId);
         var sb = new StringBuilder();
-        sb.append("Evo pregleda na osnovu evidencije u sistemu.\n\n");
         sb.append(String.format(
                 "Program: „%s“ (%s). Ukupno predmeta na kurikulumu: %d.\n"
-                        + "Položeno (ocena ≥ 6): %d. Aktivno nepoloženo (pokušaji ispod 6 ili u toku): %d. "
-                        + "Bez izlaska u ovoj fazi: %d. Kasnije u nastavnom planu: %d.\n\n",
+                        + "Položeno (ocena ≥ 6): %d. Nepoloženo (aktivno): %d. Bez izlaska u ovoj fazi: %d. Kasnije u planu: %d.\n\n",
                 cp.studijskiProgramNaziv(),
                 cp.studijskiProgramSifra(),
                 cp.ukupnoPredmetaNaProgramu(),
@@ -470,7 +522,7 @@ public class AssistantService {
                 cp.brojNepolozenih(),
                 cp.brojBezIzlaska(),
                 cp.brojPredmetaKasnije()));
-        sb.append("Predmeti koje još nemaš položeno (nema ocene ≥ 6):\n\n");
+        sb.append("Predmeti bez položene ocene ≥ 6:\n\n");
         int lines = 0;
         final int maxLines = 40;
         for (AcademicQueryService.CurriculumSubjectDto row : cp.predmeti()) {
@@ -478,24 +530,27 @@ public class AssistantService {
                 continue;
             }
             if (lines >= maxLines) {
-                sb.append("\n… lista je skraćena; ostatak vidi u portfelju / evidenciji ocena.\n");
+                sb.append("\n… (skraćeno; ostatak u portfelju)\n");
                 break;
             }
-            sb.append("• ")
+            sb.append("- ")
                     .append(row.naziv())
                     .append(" (")
                     .append(row.sifra())
                     .append(", ")
                     .append(row.espb())
-                    .append(" ESPB) — ")
+                    .append(" ESPB) — status: ")
                     .append(humanCurriculumStatus(row))
                     .append('\n');
             lines++;
         }
         if (lines == 0) {
-            sb.append("— Nemaš otvorenih nepoloženih predmeta po ovom pregledu.\n");
+            sb.append("(Nema nepoloženih po ovom pregledu.)\n");
         }
-        return new AssistantResponse(sb.toString().trim(), List.of("Kurikulum i napredovanje · PostgreSQL"));
+        return new AssistantResponse(
+                sb.toString().trim(),
+                List.of("Kurikulum i napredovanje · PostgreSQL"),
+                SRC_RELATIONAL);
     }
 
     private static String humanCurriculumStatus(AcademicQueryService.CurriculumSubjectDto row) {
@@ -510,7 +565,7 @@ public class AssistantService {
         };
     }
 
-    private AssistantResponse buildExamAttemptsSummaryResponse(Long korisnikId) {
+    private AssistantResponse buildExamAttemptsSummaryResponse(Long korisnikId, String question) {
         AcademicQueryService.GpaDto g = academicQueryService.gpa(korisnikId);
         List<AcademicQueryService.SubjectGradeDto> list = academicQueryService.subjectsAndGrades(korisnikId);
         var sb = new StringBuilder();
@@ -518,12 +573,12 @@ public class AssistantService {
                 "Ukupan broj evidentiranih izlazaka na ispite (svi predmeti): %d.\n",
                 g.ukupnoIspita()));
         if (list.isEmpty()) {
-            sb.append("Još nemaš pojedinačnih unosa ocena u sistemu — ova informacija nije dostupna po predmetima.");
-            return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"));
+            sb.append("Nema pojedinačnih unosa ocena u sistemu po predmetima.\n");
+            return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"), SRC_RELATIONAL);
         }
         Map<String, Long> countBySifra = list.stream()
                 .collect(Collectors.groupingBy(AcademicQueryService.SubjectGradeDto::predmetSifra, Collectors.counting()));
-        sb.append("Po predmetima (broj izlazaka = broj upisanih termina u evidenciji):\n\n");
+        sb.append("Broj izlazaka po predmetu (broj upisanih termina u evidenciji):\n\n");
         countBySifra.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(25)
@@ -533,18 +588,18 @@ public class AssistantService {
                             .map(AcademicQueryService.SubjectGradeDto::predmetNaziv)
                             .findFirst()
                             .orElse(e.getKey());
-                    sb.append("• ")
+                    sb.append("- ")
                             .append(naziv)
                             .append(" (")
                             .append(e.getKey())
                             .append("): ")
                             .append(e.getValue())
-                            .append("×\n");
+                            .append(" izlazaka\n");
                 });
         if (countBySifra.size() > 25) {
-            sb.append("\n… prikazano 25 predmeta sa najviše izlazaka.");
+            sb.append("\n… (samo prvih 25 po broju izlazaka)");
         }
-        return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"));
+        return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"), SRC_RELATIONAL);
     }
 
     private AssistantResponse buildPassRokSummaryResponse(Long korisnikId, String question, Long programId) {
@@ -554,8 +609,9 @@ public class AssistantService {
                 .toList();
         if (passed.isEmpty()) {
             return new AssistantResponse(
-                    "Nemaš još položenih predmeta (ocena ≥ 6) u evidenciji — nema podatka o roku položenog ispita.",
-                    List.of("Ocene · PostgreSQL"));
+                    "U evidenciji nema položenih predmeta (ocena ≥ 6) — nema podatka o roku prvog položenog ispita.",
+                    List.of("Ocene · PostgreSQL"),
+                    SRC_RELATIONAL);
         }
         Optional<String> sifraFilter = findPredmetSifraHintInQuestion(question, programId);
         Map<String, List<AcademicQueryService.SubjectGradeDto>> bySifra = passed.stream()
@@ -563,22 +619,22 @@ public class AssistantService {
                 .collect(Collectors.groupingBy(AcademicQueryService.SubjectGradeDto::predmetSifra));
         if (bySifra.isEmpty()) {
             return new AssistantResponse(
-                    "Nisam našao položen ispit za predmet koji liči na tvoje pitanje. "
-                            + "Probaj tačan naziv predmeta ili pogledaj listu svih ocena.",
-                    List.of("Ocene · PostgreSQL"));
+                    "Nema položenog ispita u evidenciji za predmet koji odgovara filtru iz pitanja.",
+                    List.of("Ocene · PostgreSQL"),
+                    SRC_RELATIONAL);
         }
         var sb = new StringBuilder();
-        sb.append("Po evidenciji, položio/la si (prvi put sa ocenom ≥ 6) ovako:\n\n");
+        sb.append("Prvi položeni pokušaj (ocena ≥ 6) po predmetu:\n\n");
         for (var e : bySifra.entrySet()) {
             List<AcademicQueryService.SubjectGradeDto> rows = e.getValue().stream()
                     .sorted(Comparator.comparing(AcademicQueryService.SubjectGradeDto::datumIspita))
                     .toList();
             AcademicQueryService.SubjectGradeDto firstPass = rows.get(0);
-            sb.append("• „")
+            sb.append("- ")
                     .append(firstPass.predmetNaziv())
-                    .append("” (")
+                    .append(" (")
                     .append(firstPass.predmetSifra())
-                    .append(") — prvi položeni pokušaj: ")
+                    .append(") — rok: ")
                     .append(firstPass.ispitniRok())
                     .append(", datum ")
                     .append(shortDate(firstPass.datumIspita()))
@@ -586,12 +642,9 @@ public class AssistantService {
                     .append(firstPass.ocena())
                     .append('\n');
         }
-        return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"));
+        return new AssistantResponse(sb.toString().trim(), List.of("Ocene · PostgreSQL"), SRC_RELATIONAL);
     }
 
-    /**
-     * Ako u pitanju deluje da je naveden naziv predmeta sa programa, vrati njegovu šifru za filtriranje.
-     */
     private Optional<String> findPredmetSifraHintInQuestion(String question, Long programId) {
         String fq = foldSerbian(question);
         if (fq.length() < 4) {
@@ -608,10 +661,6 @@ public class AssistantService {
         return Optional.empty();
     }
 
-    /**
-     * „Predmeti vezani za programiranje“ itd. — pretraga naziva i kratkog opisa u PostgreSQL-u.
-     * Ako nema pogodaka, vraća null pa ide vektorska pretraga.
-     */
     private AssistantResponse tryCurriculumTopicListing(String question, String f, Long programId) {
         if (!asksBroadCurriculumTopicSearch(f)) {
             return null;
@@ -627,11 +676,11 @@ public class AssistantService {
         if (hits.isEmpty()) {
             return null;
         }
-        String intro = curriculumTopicIntroLine(f, terms);
         var sb = new StringBuilder();
-        sb.append(intro).append("\n\n");
+        sb.append("Kontekst pretrage (ključne reči / teme): ").append(String.join(", ", terms)).append("\n\n");
+        sb.append("Pogodci (naziv, šifra, ESPB, kratak opis iz baze):\n\n");
         for (Predmet p : hits) {
-            sb.append("• ")
+            sb.append("- ")
                     .append(p.getNaziv())
                     .append(" (")
                     .append(p.getSifra())
@@ -643,19 +692,14 @@ public class AssistantService {
             }
             sb.append('\n');
         }
-        sb.append("\nZa detaljnije teme pojedinog kursa pitaj konkretno po nazivu predmeta.");
         List<String> sources = hits.stream()
                 .map(p -> String.format(
                         "ID %d · %s (%s) · %d ESPB",
                         p.getId(), p.getNaziv(), p.getSifra(), p.getEspb()))
                 .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString().trim(), sources);
+        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
     }
 
-    /**
-     * Pitanja tipa „da li predmet sadrži X“ / „gde se spominje Y“ — SQL pretraga naziva i kratkog opisa kada široka
-     * lista ({@link #tryCurriculumTopicListing}) ne pokrije oblik pitanja. Vraća null ako nema pogodaka ili nije taj namer.
-     */
     private AssistantResponse trySqlCurriculumKeywordAnswer(String question, String f, Long programId) {
         if (!sqlCurriculumKeywordQuestion(f)) {
             return null;
@@ -677,9 +721,10 @@ public class AssistantService {
             return null;
         }
         var sb = new StringBuilder();
-        sb.append("Po nazivu i kratkom opisu u bazi, ovo na tvom studijskom programu odgovara traženim rečima:\n\n");
+        sb.append("Izvučene reči iz pitanja (za SQL/tekstualno poklapanje): ").append(String.join(", ", terms)).append("\n\n");
+        sb.append("Predmeti na programu koji odgovaraju:\n\n");
         for (Predmet p : hits) {
-            sb.append("• ")
+            sb.append("- ")
                     .append(p.getNaziv())
                     .append(" (")
                     .append(p.getSifra())
@@ -691,13 +736,12 @@ public class AssistantService {
             }
             sb.append('\n');
         }
-        sb.append("\nZa detaljnije teme pitaj konkretno po nazivu predmeta.");
         List<String> sources = hits.stream()
                 .map(p -> String.format(
                         "ID %d · %s (%s) · %d ESPB",
                         p.getId(), p.getNaziv(), p.getSifra(), p.getEspb()))
                 .collect(Collectors.toList());
-        return new AssistantResponse(sb.toString().trim(), sources);
+        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
     }
 
     private static boolean sqlCurriculumKeywordQuestion(String f) {
@@ -731,9 +775,6 @@ public class AssistantService {
                 || f.contains("ucim") || f.contains("algebr"));
     }
 
-    /**
-     * Kompletan prikaz sadržaja jednog predmeta (PostgreSQL + svi relevantni fragmenti iz vektorskog indeksa), bez LLM-a.
-     */
     private AssistantResponse trySubjectSyllabusDetailResponse(
             String question,
             String f,
@@ -751,19 +792,25 @@ public class AssistantService {
             pred = resolvePredmetForSyllabusViaSearch(question, allowed);
         }
         if (pred.isEmpty()) {
-            return new AssistantResponse("Predmet nije pronađen u dostupnom kurikulumu.", List.of());
+            return new AssistantResponse(
+                    "Predmet iz pitanja nije pronađen u kurikulumu studijskog programa studenta.",
+                    List.of(),
+                    SRC_RELATIONAL);
         }
         Predmet p = pred.get();
         if (!p.getStudijskiProgram().getId().equals(programId)) {
-            return new AssistantResponse("Predmet nije pronađen u dostupnom kurikulumu.", List.of());
+            return new AssistantResponse(
+                    "Predmet iz pitanja nije pronađen u kurikulumu studijskog programa studenta.",
+                    List.of(),
+                    SRC_RELATIONAL);
         }
         List<VectorSearchClient.VectorMatch> chunks = vectorSearchClient.search(p.getNaziv(), 32, List.of(p.getId()));
         if (chunks.isEmpty()) {
             chunks = vectorSearchClient.search(question, 32, List.of(p.getId()));
         }
-        String body = formatSubjectSyllabusFromSources(p, chunks);
+        String evidence = formatSubjectSyllabusFromSources(p, chunks);
         List<String> sources = buildSyllabusSourceLines(p, chunks);
-        return new AssistantResponse(body, sources);
+        return new AssistantResponse(evidence, sources, SRC_SYLLABUS);
     }
 
     private Optional<Predmet> resolvePredmetForSyllabusViaSearch(String question, List<Long> allowed) {
@@ -945,29 +992,6 @@ public class AssistantService {
         return out;
     }
 
-    private static String curriculumTopicIntroLine(String f, List<String> terms) {
-        if (f.contains("programiranje") || f.contains("programira") || f.contains("kodiranje")
-                || f.contains("objektno") || f.contains("oop")) {
-            return "Evo predmeta na tvom studijskom programu gde se u nazivu ili kratkom opisu eksplicitno radi o programiranju, jezicima ili objektno orijentisanom kodu:";
-        }
-        if (f.contains("nosql") || f.contains("mongo")) {
-            return "NoSQL (dokument-model, MongoDB ili slično, CAP, izbor baze…) u NAIS je uglavnom opisan uz Baze podataka; evo predmeta gde se to pojavljuje u kratkom opisu:";
-        }
-        if (f.contains("sql") || f.contains("baze") || f.contains("baza")) {
-            return "Predmeti gde se u opisu spominju baze podataka, SQL ili srodne teme (po podacima u NAIS):";
-        }
-        if (f.contains("matematik")) {
-            return "Predmeti sa matematikom u nazivu ili opisu:";
-        }
-        if (f.contains("mrez") || f.contains("mrež")) {
-            return "Predmeti vezani za mreže:";
-        }
-        if (f.contains("bezbednost") || f.contains("bezbednos") || f.contains("sigurnost")) {
-            return "Predmeti vezani za bezbednost / sigurnost:";
-        }
-        return "Predmeti koji odgovaraju tvom upitu (pretraga naziva i kratkog opisa u bazi):";
-    }
-
     private static boolean asksBroadCurriculumTopicSearch(String f) {
         if (f.contains("poloz") || f.contains("polož") || f.contains("nisam")) {
             return false;
@@ -1060,12 +1084,12 @@ public class AssistantService {
         return f.contains("koje nisam") || f.contains("sta nisam");
     }
 
-    /** Profil, ocene, proseka — direktno iz PostgreSQL-a, prirodan ton. */
     private AssistantResponse buildStudentDataResponse(
             Long korisnikId,
             boolean includeProfile,
             boolean includeGrades,
-            boolean includeGpa
+            boolean includeGpa,
+            String question
     ) {
         var sb = new StringBuilder();
         List<String> sources = new ArrayList<>();
@@ -1123,7 +1147,7 @@ public class AssistantService {
             }
             sources.add("Ocene · PostgreSQL");
         }
-        return new AssistantResponse(sb.toString().trim(), sources);
+        return new AssistantResponse(sb.toString().trim(), sources, SRC_RELATIONAL);
     }
 
     private static String shortDate(String iso) {
@@ -1207,9 +1231,6 @@ public class AssistantService {
         if (f.contains("svi predmet") || f.contains("sve predmet") || f.contains("svi kurse") || f.contains("sve kurse")) {
             return true;
         }
-        if (f.contains("studijski program") || f.contains("na programu") || f.contains("mom programu")) {
-            return true;
-        }
         if (wordBound(f, "imam") || wordBound(f, "imate") || wordBound(f, "imamo")) {
             return f.contains("koje") || f.contains("koji") || f.contains("koja") || f.contains("koliko")
                     || f.contains("sta") || wordBound(f, "sve");
@@ -1234,9 +1255,6 @@ public class AssistantService {
         return false;
     }
 
-    /**
-     * Najrelevantniji predmet prvi, zatim ostali (maks. ukupno {@code max}) da model ne gubi fokus u šumu.
-     */
     private static List<VectorSearchClient.VectorMatch> orderMatchesForLlm(
             String question,
             List<VectorSearchClient.VectorMatch> matches,
@@ -1265,6 +1283,59 @@ public class AssistantService {
             List<VectorSearchClient.VectorMatch> matches
     ) {
         return orderMatchesForLlm(question, matches, 6);
+    }
+
+    /** Kratak odgovor iz top Qdrant pogodaka kada LLM nije dostupan. */
+    private static String vectorFallbackAnswerFromMatches(List<VectorSearchClient.VectorMatch> ordered) {
+        if (ordered.isEmpty()) {
+            return "Nema dovoljno podataka za odgovor iz pretrage.";
+        }
+        VectorSearchClient.VectorMatch top = ordered.get(0);
+        var sb = new StringBuilder();
+        sb.append("Prema semantičkoj pretrazi sadržaja kurikuluma, kao najbliži tvom pitanju izdvajam predmet „")
+                .append(top.predmetNaziv())
+                .append("” (šifra ")
+                .append(top.predmetSifra())
+                .append(", ")
+                .append(top.espb())
+                .append(" ESPB)");
+        String snippet = firstCurriculumSnippet(top);
+        if (snippet != null && !snippet.isBlank()) {
+            sb.append(":\n\n").append(snippet);
+        } else {
+            sb.append(".");
+        }
+        if (ordered.size() > 1) {
+            sb.append("\n\nDrugi slični predmeti na programu: ");
+            for (int i = 1; i < Math.min(ordered.size(), 4); i++) {
+                if (i > 1) {
+                    sb.append("; ");
+                }
+                VectorSearchClient.VectorMatch m = ordered.get(i);
+                sb.append("„").append(m.predmetNaziv()).append("” (").append(m.predmetSifra()).append(")");
+            }
+            sb.append(".");
+        }
+        return sb.toString();
+    }
+
+    private static String firstCurriculumSnippet(VectorSearchClient.VectorMatch m) {
+        if (m.cilj() != null && !m.cilj().isBlank()) {
+            return truncate(m.cilj().trim(), 520);
+        }
+        if (m.temeKursa() != null && !m.temeKursa().isBlank()) {
+            return truncate(m.temeKursa().trim(), 520);
+        }
+        if (m.ishodiUcenja() != null && !m.ishodiUcenja().isBlank()) {
+            return truncate(m.ishodiUcenja().trim(), 520);
+        }
+        if (m.metodeNastave() != null && !m.metodeNastave().isBlank()) {
+            return truncate(m.metodeNastave().trim(), 520);
+        }
+        if (m.text() != null && !m.text().isBlank()) {
+            return truncate(m.text().trim(), 520);
+        }
+        return null;
     }
 
     private static String buildStructuredContext(List<VectorSearchClient.VectorMatch> matches) {
@@ -1297,7 +1368,6 @@ public class AssistantService {
         return sb.toString().trim();
     }
 
-    /** Ne dupliraj u kontekstu ako je „text“ uglavnom isto što i strukturisana polja. */
     private static boolean textRedundantWithFields(VectorSearchClient.VectorMatch m) {
         String t = m.text() == null ? "" : m.text().trim();
         if (t.length() < 120) {
@@ -1321,12 +1391,23 @@ public class AssistantService {
         sb.append(label).append(value.trim()).append('\n');
     }
 
-    private String callOpenAi(
-            String question,
-            String context,
-            String apiKey,
-            List<VectorSearchClient.VectorMatch> matchesForFallback
-    ) {
+    /**
+     * Groq prvo (Docker / .env), zatim opcioni OpenAI ključ za lokalni dev, pa konfiguracija.
+     */
+    private String effectiveLlmApiKey() {
+        String groqEnv = System.getenv("GROQ_API_KEY");
+        if (groqEnv != null && !groqEnv.isBlank()) {
+            return groqEnv.trim();
+        }
+        String openaiEnv = System.getenv("OPENAI_API_KEY");
+        if (openaiEnv != null && !openaiEnv.isBlank()) {
+            return openaiEnv.trim();
+        }
+        String fromProps = naisProperties.getLlm().getOpenaiApiKey();
+        return (fromProps != null && !fromProps.isBlank()) ? fromProps.trim() : "";
+    }
+
+    private LlmOrFallback callOpenAi(String question, String context, String apiKey) {
         try {
             String qLine = question == null ? "" : question.replace("\r\n", "\n").trim();
             String userBlock = "PITANJE STUDENTA:\n„"
@@ -1349,8 +1430,15 @@ public class AssistantService {
             body.put("temperature", naisProperties.getLlm().getOpenaiTemperature());
             body.put("max_tokens", naisProperties.getLlm().getOpenaiMaxTokens());
             String jsonBody = MAPPER.writeValueAsString(body);
+            String baseUrl = naisProperties.getLlm().getOpenaiBaseUrl().trim();
+            while (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            if (baseUrl.isEmpty()) {
+                baseUrl = "https://api.openai.com/v1";
+            }
             RestClient client = restClientBuilder
-                    .baseUrl("https://api.openai.com/v1")
+                    .baseUrl(baseUrl)
                     .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .build();
@@ -1360,12 +1448,27 @@ public class AssistantService {
                     .retrieve()
                     .body(String.class);
             JsonNode root = MAPPER.readTree(raw);
-            return root.path("choices").path(0).path("message").path("content").asText(
-                    "Nije moguće generisati odgovor."
-            );
+            String content = root.path("choices").path(0).path("message").path("content").asText("").trim();
+            if (content.isEmpty() || "Nije moguće generisati odgovor.".equals(content)) {
+                log.warn("LLM returned empty assistant content");
+                return new LlmOrFallback(MSG_VECTOR_LLM_EMPTY, false);
+            }
+            return new LlmOrFallback(content, true);
         } catch (Exception e) {
-            return synthesizeNaturalFallbackAnswer(question, matchesForFallback);
+            log.warn("LLM chat completion failed: {}", e.getMessage());
+            return new LlmOrFallback(llmFailureMessageForUser(e), false);
         }
+    }
+
+    private static String llmFailureMessageForUser(Exception e) {
+        String d = e.getMessage();
+        if (d == null || d.isBlank()) {
+            return "Poziv jezičkom modelu nije uspeo. Proveri GROQ_API_KEY, OPENAI_BASE_URL (Groq), OPENAI_MODEL i mrežu iz kontejnera.";
+        }
+        if (d.length() > 220) {
+            d = d.substring(0, 217) + "...";
+        }
+        return "Poziv jezičkom modelu nije uspeo: " + d;
     }
 
     private static String systemPrompt() {
@@ -1402,109 +1505,6 @@ public class AssistantService {
         );
     }
 
-    /**
-     * Prirodan odgovor bez OpenAI: jedan ili dva pasusa iz najboljih pogodaka.
-     * Lista predmeta je u {@code sources} u JSON-u (čet ne duplira bullet liste).
-     */
-    private static String synthesizeNaturalFallbackAnswer(
-            String question,
-            List<VectorSearchClient.VectorMatch> matches
-    ) {
-        if (matches == null || matches.isEmpty()) {
-            return "Iz ovih reči mi nije uspelo da nađem pouzdan pogodak među predmetima na tvom programu. "
-                    + "Probaj drugačiju formulaciju ili konkretan naziv kursa.";
-        }
-        String fq = foldSerbian(question);
-        if (asksIfTopicMentionedSomewhere(fq)) {
-            List<String> stems = extractQuestionStems(question);
-            if (!stems.isEmpty()) {
-                List<VectorSearchClient.VectorMatch> mentionHits = new ArrayList<>();
-                for (VectorSearchClient.VectorMatch m : matches) {
-                    if (keywordFitScore(m, stems) > 0) {
-                        mentionHits.add(m);
-                    }
-                }
-                mentionHits.sort(Comparator.comparingInt((VectorSearchClient.VectorMatch m) -> keywordFitScore(m, stems))
-                        .reversed());
-                mentionHits = dedupeMentionList(mentionHits);
-                if (!mentionHits.isEmpty()) {
-                    return formatMentionFallbackAnswer(mentionHits);
-                }
-            }
-        }
-        VectorSearchClient.VectorMatch vectorTop = matches.get(0);
-        VectorSearchClient.VectorMatch primary = resolvePrimaryForNarrative(question, matches);
-        List<String> stems = extractQuestionStems(question);
-        ContentPick chosen = pickBestCourseContent(matches, primary);
-        VectorSearchClient.VectorMatch pickMatch = matches.stream()
-                .filter(m -> m.predmetId() == chosen.predmetId())
-                .findFirst()
-                .orElse(primary);
-        ContentPick pick = chosen.predmetId() != primary.predmetId()
-                && keywordFitScore(primary, stems) >= keywordFitScore(pickMatch, stems)
-                ? contentPickFrom(primary)
-                : chosen;
-
-        var sb = new StringBuilder();
-        sb.append("Najbliže onome što pitaš deluje predmet ")
-                .append("„")
-                .append(primary.predmetNaziv())
-                .append("” — ")
-                .append(primary.espb())
-                .append(" ESPB, šifra ")
-                .append(primary.predmetSifra());
-        if (!primary.profesor().isBlank()) {
-            sb.append(", predmet vodi ").append(primary.profesor());
-        }
-        sb.append(".\n\n");
-
-        if (primary.predmetId() != vectorTop.predmetId()) {
-            sb.append("Uz to, pretraga je istakla i „")
-                    .append(vectorTop.predmetNaziv())
-                    .append("” jer mu je opis sličan temi — vredi baciti pogled i tamo.\n\n");
-        }
-
-        String body = truncate(pick.temeText(), 560);
-        if (body.isBlank()) {
-            body = truncate(pick.extraText(), 400);
-        }
-        boolean richTeme = !isGenericBoilerplateTeme(pick.temeText());
-        if (!body.isBlank()) {
-            if (richTeme && pick.predmetId() == primary.predmetId()) {
-                sb.append("Po opisu kursa, između ostalog ulazi i ovo: ");
-            } else if (richTeme) {
-                sb.append("Detaljnije je opisano kod „").append(pick.naziv()).append("”: ");
-            } else if (pick.predmetId() == primary.predmetId()) {
-                sb.append(
-                        "U bazi je za sada kratak, prilično opšti tekst; tačan plan obično dobiješ od katedre. "
-                                + "Evo šta piše: ");
-            } else {
-                sb.append("Još jedan srodan opis u bazi: ");
-            }
-            sb.append(body).append("\n\n");
-        } else {
-            sb.append("Za ovaj predmet u bazi još nema dužeg opisa sadržaja.\n\n");
-        }
-
-        VectorSearchClient.VectorMatch other = null;
-        for (VectorSearchClient.VectorMatch m : matches) {
-            if (m.predmetId() != primary.predmetId()) {
-                other = m;
-                break;
-            }
-        }
-        if (other != null) {
-            sb.append("Blizu su ti i teme sa „")
-                    .append(other.predmetNaziv())
-                    .append("” — detalje vidi u izvorima ispod.");
-        }
-
-        if (!questionMatchesAnyCourseTitle(question, matches) && other == null) {
-            sb.append("\n\nAko nije to što tražiš, probaj drugačije reči ili tačan naziv predmeta.");
-        }
-        return sb.toString().trim();
-    }
-
     private static String roughStemSr(String token) {
         if (token.length() <= 4) {
             return token;
@@ -1537,14 +1537,12 @@ public class AssistantService {
         return new ArrayList<>(out);
     }
 
-    /**
-     * Dodatni tokeni za leksičku pretragu kurikuluma (skraćenice, UNIX/Linux, crtice u složenim izrazima).
-     */
     private static List<String> looseCurriculumTokens(String question) {
         String f = foldSerbian(question);
         LinkedHashSet<String> out = new LinkedHashSet<>();
         String[] tech = {
                 "unix", "linux", "nosql", "mongodb", "docker", "kubernetes", "oop", "sql", "git", "agil", "scrum",
+                "devops", "jenkins", "gitlab", "ansible", "terraform", "pipeline", "cicd",
         };
         for (String t : tech) {
             if (f.contains(t)) {
@@ -1562,6 +1560,20 @@ public class AssistantService {
             }
         }
         return new ArrayList<>(out);
+    }
+
+    /** Povezuje „DevOps / CI/CD“ sa naslovima poput „DevOps i neprekidna isporuka“. */
+    private static void addDevopsCiCdLexicalHints(String question, LinkedHashSet<String> stemSet) {
+        String f = foldSerbian(question);
+        boolean cicd = f.contains("ci/cd") || f.contains("cicd") || f.contains("continuous")
+                || (f.contains("ci") && f.contains("cd"));
+        boolean devopsy = f.contains("devops") || f.contains("dev ops") || f.contains("neprekid")
+                || f.contains("isporuc") || f.contains("deployment") || f.contains("pipeline");
+        if (cicd || devopsy) {
+            stemSet.add("devops");
+            stemSet.add("neprekid");
+            stemSet.add("isporuc");
+        }
     }
 
     private static int keywordFitScore(VectorSearchClient.VectorMatch m, List<String> stems) {
@@ -1588,46 +1600,6 @@ public class AssistantService {
         return s;
     }
 
-    private static boolean asksIfTopicMentionedSomewhere(String f) {
-        return f.contains("spominje")
-                || f.contains("pominje")
-                || f.contains("pominju")
-                || (f.contains("negde") && (f.contains("spominje") || f.contains("pominje") || f.contains("naveden")))
-                || (f.contains("da li") && (f.contains("postoji") || f.contains("ima")))
-                || (f.contains("gde") && (f.contains("ucim") || f.contains("radim")));
-    }
-
-    private static List<VectorSearchClient.VectorMatch> dedupeMentionList(List<VectorSearchClient.VectorMatch> in) {
-        Map<Long, VectorSearchClient.VectorMatch> byId = new LinkedHashMap<>();
-        for (VectorSearchClient.VectorMatch m : in) {
-            byId.putIfAbsent(m.predmetId(), m);
-        }
-        return new ArrayList<>(byId.values());
-    }
-
-    private static String formatMentionFallbackAnswer(List<VectorSearchClient.VectorMatch> hits) {
-        var sb = new StringBuilder();
-        sb.append("Da — u opisima predmeta na tvom programu to se odnosi bar na:\n\n");
-        int n = Math.min(hits.size(), 6);
-        for (int i = 0; i < n; i++) {
-            VectorSearchClient.VectorMatch m = hits.get(i);
-            sb.append("• „")
-                    .append(m.predmetNaziv())
-                    .append("” (")
-                    .append(m.predmetSifra())
-                    .append(", ")
-                    .append(m.espb())
-                    .append(" ESPB)\n");
-        }
-        if (hits.size() > n) {
-            sb.append("\nIma još srodnih pogodaka u listi izvora ispod.");
-        }
-        sb.append(
-                "\n\nZa detaljan plan nastave najbolje je proveriti sa katedrom ili službenim nastavnim planom.");
-        return sb.toString().trim();
-    }
-
-    /** Kada korisnik piše „bazama“, „sql“ itd., prednost ima predmet čiji naziv/teme to sadrže, ne slepi vektor-vrh. */
     private static VectorSearchClient.VectorMatch resolvePrimaryForNarrative(
             String question,
             List<VectorSearchClient.VectorMatch> matches
@@ -1655,60 +1627,6 @@ public class AssistantService {
         return vectorTop;
     }
 
-    private static ContentPick contentPickFrom(VectorSearchClient.VectorMatch m) {
-        return new ContentPick(
-                m.predmetId(),
-                m.predmetNaziv(),
-                m.predmetSifra(),
-                m.temeKursa(),
-                m.text()
-        );
-    }
-
-    private static boolean isGenericBoilerplateTeme(String teme) {
-        if (teme == null || teme.length() < 60) {
-            return true;
-        }
-        String f = foldSerbian(teme);
-        return f.contains("osnovne teme iz") && f.contains("pregled literature")
-                && f.contains("ispitne prakse");
-    }
-
-    private record ContentPick(long predmetId, String naziv, String sifra, String temeText, String extraText) {
-    }
-
-    /** Najbolji ne-generički opis teme; polazi od predmeta koji koristimo u narativu. */
-    private static ContentPick pickBestCourseContent(
-            List<VectorSearchClient.VectorMatch> matches,
-            VectorSearchClient.VectorMatch narrativePrimary
-    ) {
-        if (!isGenericBoilerplateTeme(narrativePrimary.temeKursa())) {
-            return contentPickFrom(narrativePrimary);
-        }
-        int n = Math.min(matches.size(), 8);
-        for (int i = 0; i < n; i++) {
-            VectorSearchClient.VectorMatch m = matches.get(i);
-            if (!isGenericBoilerplateTeme(m.temeKursa())) {
-                return contentPickFrom(m);
-            }
-        }
-        return contentPickFrom(narrativePrimary);
-    }
-
-    private static boolean questionMatchesAnyCourseTitle(
-            String question,
-            List<VectorSearchClient.VectorMatch> matches
-    ) {
-        List<String> stems = extractQuestionStems(question);
-        if (stems.isEmpty()) {
-            return false;
-        }
-        return matches.stream().anyMatch(m -> {
-            String t = foldSerbian(m.predmetNaziv());
-            return stems.stream().anyMatch(s -> s.length() >= 3 && t.contains(s));
-        });
-    }
-
     private static String foldSerbian(String s) {
         if (s == null || s.isBlank()) {
             return "";
@@ -1726,7 +1644,6 @@ public class AssistantService {
         return t.length() <= max ? t : t.substring(0, max) + "…";
     }
 
-    /** Jedan red po predmetu — najbolji chunk (Qdrant često vrati više tačaka po kursu). */
     private static List<VectorSearchClient.VectorMatch> dedupeByPredmetKeepBestScore(
             List<VectorSearchClient.VectorMatch> matches
     ) {

@@ -4,11 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Statistika predmeta po studijskom programu, računata isključivo iz redova tabele {@code ocena}
- * za studente na tom programu. Generacije (upis) se agregiraju u jedan uzorak osim ako je zadata
- * konkretna godina upisa.
- */
 public final class ProgramSubjectStatisticsDtos {
 
     private ProgramSubjectStatisticsDtos() {
@@ -17,9 +12,6 @@ public final class ProgramSubjectStatisticsDtos {
     public record ProgramSummary(long id, String sifra, String naziv) {
     }
 
-    /**
-     * Opcije za filtriranje uzorka ispred agregacije.
-     */
     public record StatisticsQueryParams(
             Integer godinaUpisa,
             String skolskaGodina,
@@ -43,13 +35,6 @@ public final class ProgramSubjectStatisticsDtos {
     ) {
     }
 
-    /**
-     * Jedna stavka po predmetu na programu.
-     * <ul>
-     *   <li>{@code passRate} = passed / took * 100 (studenti sa bar jednim izlaskom / distinct studenti)</li>
-     *   <li>Prosečna, medijana, min/max — samo vrednosti ocena &gt;= 6 (stvarni redovi u {@code ocena})</li>
-     * </ul>
-     */
     public record SubjectStatisticsRow(
             long subjectId,
             String subjectCode,
@@ -95,11 +80,6 @@ public final class ProgramSubjectStatisticsDtos {
         }
     }
 
-    /**
-     * Studentski pregled: nepoloženi predmeti iz tekuće i svih prethodnih godina kurikuluma (bez budućih godina)
-     * + stopa prolaznosti na smeru.
-     * Eksplicitna JSON imena da frontend uvek dobije {@code kurikulumGodina} / {@code kurikulumSemestar}.
-     */
     public record UnpassedSubjectPassRateDto(
             @JsonProperty("subjectCode") String subjectCode,
             @JsonProperty("subjectName") String subjectName,

@@ -1,7 +1,3 @@
-/**
- * Sedam ispitnih rokova (ključ R01..R07): Januar, Februar, April, Jun, Jul, Avgust, Oktobar.
- * Odgarađa backend InternalStatisticsService / ColumnarStatsService.
- */
 const ROK_NAZIVI = [
   'Januarski',
   'Februarski',
@@ -12,22 +8,18 @@ const ROK_NAZIVI = [
   'Oktobarski',
 ] as const
 
-/**
- * Ključ iz backenda: `2025-R02` = Februarski 2025.
- * Stari ključevi `YYYY-MM` mapiraju se na odgovarajući rok.
- */
 export function formatPassFailTrendLabel(mesec: string): string {
   const rok = mesec.match(/^(\d{4})-R(\d{2})$/)
   if (rok) {
     const godina = rok[1]
-    const idx = Number(rok[2], 10)
+    const idx = parseInt(rok[2], 10)
     const naziv = ROK_NAZIVI[idx - 1]
     return naziv ? `${naziv} ${godina}` : mesec
   }
   const kal = mesec.match(/^(\d{4})-(\d{2})$/)
   if (kal) {
-    const y = Number(kal[1], 10)
-    const m = Number(kal[2], 10)
+    const y = parseInt(kal[1], 10)
+    const m = parseInt(kal[2], 10)
     const mapirano = mapKalendarskiMesecNaRok(y, m)
     return mapirano ? `${mapirano.naziv} ${mapirano.godina}` : mesec
   }

@@ -13,10 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -28,6 +30,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        if ("/api/auth/login".equals(request.getServletPath())) {
+            log.info("Auth login request: method={}, servletPath={}", request.getMethod(), request.getServletPath());
+        }
         if (!HttpMethod.POST.matches(request.getMethod())) {
             return false;
         }
@@ -41,11 +46,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header != null) {
+            header = header.trim();
+        }
+        if (header == null || header.length() < 8 || !header.regionMatches(true, 0, "Bearer ", 0, 7)) {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = header.substring(7);
+        String token = header.substring(7).trim();
         try {
             var claims = jwtService.parseClaims(token);
             String sub = claims.getSubject();

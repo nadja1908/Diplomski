@@ -43,9 +43,6 @@ public class StudentController {
         return academicQueryService.curriculumProgress(korisnikId);
     }
 
-    /**
-     * Predmeti koje student još nije položio, sa stopom prolaznosti na celom studijskom programu (SQL agregat).
-     */
     @GetMapping("/unpassed-subject-pass-rates")
     public List<UnpassedSubjectPassRateDto> unpassedSubjectPassRates(
             @AuthenticationPrincipal Long korisnikId) {

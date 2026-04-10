@@ -41,9 +41,6 @@ public class AcademicQueryService {
     private final PredmetRepository predmetRepository;
     private final LinearAcademicTimeline linearAcademicTimeline;
 
-    /**
-     * Autorizacija po bazi (ne {@code @PreAuthorize} na kontroleru), da radi pouzdano sa JWT principalom tipa {@link Long}.
-     */
     private void assertSefKatedre(Long korisnikId) {
         if (korisnikId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Niste prijavljeni");
@@ -131,11 +128,6 @@ public class AcademicQueryService {
                 ukupnoPredmetaNaProgramu);
     }
 
-    /**
-     * Kurikulum studijskog programa studenta sa statusom po predmetu (najbolji pokušaj).
-     * Godina i semestar predmeta dolaze iz kolona {@code kurikulum_godina} i {@code kurikulum_semestar} u bazi (nastavni plan).
-     * Procenjena godina studenta: akademska godina počinje oktobrom (1–6).
-     */
     @Transactional(readOnly = true)
     public CurriculumProgressDto curriculumProgress(Long korisnikId) {
         Student s = studentRepository.findByKorisnikId(korisnikId)
@@ -234,9 +226,6 @@ public class AcademicQueryService {
         );
     }
 
-    /**
-     * Godina studija 1–6; školska godina počinje oktobrom (npr. upis 2025 → 1. godina do septembra 2026).
-     */
     static int procenjenaGodinaStudijaAkademska(int godinaUpisa, LocalDate d) {
         int cy = d.getYear();
         int cm = d.getMonthValue();
@@ -245,9 +234,6 @@ public class AcademicQueryService {
         return Math.max(1, Math.min(6, g));
     }
 
-    /**
-     * Završeni semestri u tekućoj godini studija: okt–jan = 0, feb–jun = 1 (posle zimskog), jul–sep = 2.
-     */
     static int zavrseniSemestriUTekucojGodiniStudija(Month month) {
         int m = month.getValue();
         if (m >= 10 || m == 1) {
@@ -265,16 +251,10 @@ public class AcademicQueryService {
         return 2 * (gs - 1) + uGodini;
     }
 
-    /**
-     * Za statistiku polaganja: predmeti II semestra u okviru godine kurikuluma smisleni su tek posle letnjeg dela
-     * godine (jul–sep), kad je u modelu završen i drugi semestar tekuće školske godine. Okt–jun nema relevantnih
-     * položenih za II sem. u tom smislu.
-     */
     static boolean statistikaPolaganjaZaDrugiSemestarKurikulumaAktivna(LocalDate d) {
         return zavrseniSemestriUTekucojGodiniStudija(d.getMonth()) == 2;
     }
 
-    /** Za {@code filterGodinaUpisa == 2021}: generacija „2021 i ranije“ ({@code godinaUpisa <= 2021}); inače tačan sklad sa godinom. */
     static boolean studentUpadaUStatistikuGeneracije(int godinaUpisa, Integer filterGodinaUpisa) {
         if (filterGodinaUpisa == null) {
             return true;
@@ -285,10 +265,6 @@ public class AcademicQueryService {
         return godinaUpisa == filterGodinaUpisa;
     }
 
-    /**
-     * Broj indeksa u API odgovoru: vodeća slova zamenjuju se šifrom studijskog programa (RI, SI, …).
-     * Tako se u pregledu smera uvek vidi ispravan prefiks i kad je u bazi ostao generički „RA“.
-     */
     static String brojIndeksaSaSifromPrograma(String brojIndeksa, String programSifra) {
         if (brojIndeksa == null || programSifra == null) {
             return brojIndeksa;
@@ -345,17 +321,6 @@ public class AcademicQueryService {
                 .toList();
     }
 
-    /**
-     * Pregled jednog studijskog programa katedre: studenti (procenjena godina po akademskoj godini od oktobra),
-     * predmeti sa semestrom u okviru godine kurikuluma, statistika polaganja samo za studente koji su po datumu
-     * završili dovoljno semestara da bi mogli da polažu taj predmet (godina + semestar u kurikulumu).
-     *
-     * @param statistikaGodinaUpisa ako nije {@code null}, u statistiku ulaze samo studenti te kalendarske godine upisa
-     *                              (jedna generacija); inače svi studenti programa. Ignoriše se kad je {@code statistikaCeoProgram}.
-     * @param statistikaCeoProgram ako je {@code true}: za svaki predmet na programu brojači koriste <strong>sve</strong> studente
-     *                           na tom programu (bez filtra generacije i bez „dovoljno semestara“ / II sem. kalendara);
-     *                           {@code elegibilnih} = broj studenata na programu, ostalo na osnovu najboljih ocena iz evidencije.
-     */
     @Transactional(readOnly = true)
     public HeadProgramPregledDto programPregledForHead(
             Long korisnikId,
@@ -540,7 +505,6 @@ public class AcademicQueryService {
             Double prosekNaEspb,
             Double prosekAritmetickiPolozenihPredmeta,
             int zbirEspbPolozenih,
-            /** Ukupan broj evidentiranih izlazaka (učitavanja na ispit), posle pravila napredovanja. */
             int ukupnoIspita,
             int brojPolozenihPredmeta,
             int ukupnoPredmetaNaProgramu

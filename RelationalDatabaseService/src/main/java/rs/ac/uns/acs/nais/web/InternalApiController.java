@@ -56,9 +56,6 @@ public class InternalApiController {
                 .toList();
     }
 
-    /**
-     * Svi predmeti studijskog programa studenta (isti kurikulum), za Cassandrinu statistiku položeno/palo na nivou predmeta.
-     */
     @GetMapping("/student/korisnik/{korisnikId}/program-predmeti")
     public List<StudentProgramPredmetMin> programPredmetiZaStudenta(
             @PathVariable Long korisnikId,

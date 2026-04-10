@@ -4,6 +4,7 @@ import java.util.List;
 
 public record AssistantResponse(
         String answer,
-        List<String> sources
+        List<String> sources,
+        String answerSource
 ) {
 }

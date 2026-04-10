@@ -4,7 +4,6 @@ export type HeadProgramSummary = {
   naziv: string
 }
 
-/** Odgovor na GET /api/head/students (bez query parametra). */
 export type HeadStudentsBundle = {
   programi: HeadProgramSummary[]
   studenti: HeadStudentListRow[]
@@ -28,7 +27,6 @@ export type HeadStudentRow = {
   prezime: string
   email: string
   procenjenaGodina: number
-  /** Godina upisa (kalendarska); sufiks indeksa /YY = poslednja dva cifre (ako backend ne pošalje, parsira se iz indeksa). */
   godinaUpisa?: number
 }
 
@@ -38,7 +36,6 @@ export type HeadPredmetRow = {
   naziv: string
   espb: number
   godinaStudija: number
-  /** 1 ili 2 — podela godine kurikuluma po šifri (backend). */
   semestar?: number
 }
 

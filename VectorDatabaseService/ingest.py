@@ -1,10 +1,3 @@
-"""
-Load chunks from /data/chunks.jsonl into Qdrant.
-Each line: JSON with text, predmet_id, predmet_sifra, predmet_naziv, tip
-
-Embedding: default Embedić (srpski), fine-tuned sa multilingual-e5 — vidi NAIS_EMBEDDING_MODEL.
-Posle promene modela / dimenzije obavezno ponovo pokreni ingest (kolekcija se briše i puni iznova).
-"""
 import json
 import logging
 import os
@@ -22,8 +15,8 @@ QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
 COLLECTION = os.getenv("QDRANT_COLLECTION", "predmeti")
 DATA_PATH = os.getenv("INGEST_PATH", "/data/chunks.jsonl")
-EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-large")
-EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "1024"))
+EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-small")
+EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "384"))
 BATCH = 32
 
 

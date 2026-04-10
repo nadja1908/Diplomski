@@ -36,11 +36,9 @@ public class Predmet {
     @Column(name = "kratak_opis", columnDefinition = "TEXT")
     private String kratakOpis;
 
-    /** Godina studija u kurikulumu (1–4), iz nastavnog plana. */
     @Column(name = "kurikulum_godina", nullable = false)
     private int kurikulumGodina;
 
-    /** Semestar unutar godine kurikuluma (1 ili 2). */
     @Column(name = "kurikulum_semestar", nullable = false)
     private int kurikulumSemestar;
 }

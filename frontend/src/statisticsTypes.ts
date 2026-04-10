@@ -1,5 +1,3 @@
-/** Odgovor REST API-ja /api/statistics (Spring record → JSON camelCase). */
-
 export type ProgramSummary = {
   id: number
   sifra: string
@@ -60,7 +58,6 @@ export type StatisticsFilterOptions = {
   }[]
 }
 
-/** GET /api/student/me/unpassed-subject-pass-rates */
 export type UnpassedSubjectPassRate = {
   subjectCode: string
   subjectName: string
@@ -78,7 +75,6 @@ function num(v: unknown, fallback: number): number {
   return fallback
 }
 
-/** Normalizacija odgovora (camelCase ili snake_case, stariji backend bez polja). */
 export function parseUnpassedSubjectPassRate(raw: unknown): UnpassedSubjectPassRate {
   if (raw == null || typeof raw !== 'object') {
     return {

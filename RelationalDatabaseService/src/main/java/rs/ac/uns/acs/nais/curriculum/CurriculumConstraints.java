@@ -1,8 +1,5 @@
 package rs.ac.uns.acs.nais.curriculum;
 
-/**
- * Hard caps za nastavni plan u demo/operativnom modelu (usklađeno sa seed skriptama).
- */
 public final class CurriculumConstraints {
 
     public static final int MAX_SUBJECTS_PER_PROGRAM = 45;

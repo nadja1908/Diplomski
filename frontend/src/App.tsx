@@ -11,18 +11,16 @@ type StaffSection = HeadPortalView | 'stats'
 
 type ChatMessage =
   | { id: string; role: 'user'; text: string }
-  | { id: string; role: 'assistant'; text: string; sources: string[] }
+  | { id: string; role: 'assistant'; text: string }
 
 const WELCOME_TEXT =
-  'Zdravo! Pitaj me o predmetima, ocenama, proseku ili sadržaju kurseva — odgovaram iz tvog studijskog programa.'
+  'Zdravo! Pitaj šta god ti treba o predmetima, ocenama i kurikulumu — odgovori su vezani za tvoj studijski program.'
 
 const CHAT_STARTERS = [
   'Šta znaš o meni?',
   'Koje predmete još nisam položio/la?',
-  'Koji predmet pokriva NoSQL?',
-  'Gde na programu ima programiranja?',
   'Moj prosek i ocene',
-  'Spisak svih predmeta na mom programu',
+  'Navedi sve predmete na mom smeru',
 ]
 
 function newId() {
@@ -36,7 +34,6 @@ function ChatBotAvatar({
 }: {
   size?: number
   className?: string
-  /** Za plutajuće dugme: krug i senka umesto sirove slike. */
   fabStyle?: boolean
 }) {
   const [broken, setBroken] = useState(false)
@@ -93,13 +90,6 @@ function FabBotIcon() {
   )
 }
 
-function sourceKindLabel(line: string): 'sql' | 'vector' | 'other' {
-  const u = line.toLowerCase()
-  if (u.includes('postgresql') || u.includes('postgres')) return 'sql'
-  if (u.includes('qdrant')) return 'vector'
-  return 'other'
-}
-
 function FormattedBubbleText({ text, className }: { text: string; className?: string }) {
   const blocks = text.split(/\n\n+/).filter((b) => b.trim().length > 0)
   return (
@@ -124,31 +114,6 @@ function FormattedBubbleText({ text, className }: { text: string; className?: st
         )
       })}
     </div>
-  )
-}
-
-function ChatSources({ sources }: { sources: string[] }) {
-  if (sources.length === 0) return null
-  return (
-    <details className="chat-sources-details">
-      <summary className="chat-sources-summary">
-        <span className="chat-sources-summary-title">Izvori</span>
-        <span className="chat-sources-count">{sources.length}</span>
-      </summary>
-      <ul className="chat-sources-list">
-        {sources.map((s) => {
-          const kind = sourceKindLabel(s)
-          return (
-            <li key={s.slice(0, 120)}>
-              <span className={`chat-source-pill chat-source-pill--${kind}`} aria-hidden>
-                {kind === 'sql' ? 'SQL' : kind === 'vector' ? 'Vektor' : '·'}
-              </span>
-              <span className="chat-source-line">{s}</span>
-            </li>
-          )
-        })}
-      </ul>
-    </details>
   )
 }
 
@@ -208,7 +173,7 @@ export default function App() {
   const [chatPending, setChatPending] = useState(false)
   const [chatError, setChatError] = useState('')
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { id: 'welcome', role: 'assistant', text: WELCOME_TEXT, sources: [] },
+    { id: 'welcome', role: 'assistant', text: WELCOME_TEXT },
   ])
   const [chatInput, setChatInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -220,9 +185,7 @@ export default function App() {
     setName('')
     setStaffSection('analytics')
     setChatOpen(false)
-    setChatMessages([
-      { id: newId(), role: 'assistant', text: WELCOME_TEXT, sources: [] },
-    ])
+    setChatMessages([{ id: newId(), role: 'assistant', text: WELCOME_TEXT }])
     setChatInput('')
     setChatError('')
   }
@@ -268,29 +231,36 @@ export default function App() {
           id: newId(),
           role: 'assistant',
           text: r.answer,
-          sources: r.sources ?? [],
         },
       ])
-    } catch {
-      setChatError('Nije moguće dohvatiti odgovor. Proveri mrežu ili da li si ulogovan kao student.')
-      setChatMessages((m) => [
-        ...m,
-        {
-          id: newId(),
-          role: 'assistant',
-          text: 'Servis trenutno nije dostupan. Pokušaj ponovo za trenutak.',
-          sources: [],
-        },
-      ])
+    } catch (e) {
+      const raw = e instanceof Error ? e.message : ''
+      const httpBody =
+        /^HTTP \d+:\s*(.*)$/s.exec(raw)?.[1]?.trim() ?? ''
+      if (httpBody) {
+        setChatError(httpBody)
+        setChatMessages((m) => [
+          ...m,
+          { id: newId(), role: 'assistant', text: httpBody },
+        ])
+      } else {
+        setChatError('Nije moguće dohvatiti odgovor. Proveri mrežu ili da li si ulogovan kao student.')
+        setChatMessages((m) => [
+          ...m,
+          {
+            id: newId(),
+            role: 'assistant',
+            text: 'Servis trenutno nije dostupan. Pokušaj ponovo za trenutak.',
+          },
+        ])
+      }
     } finally {
       setChatPending(false)
     }
   }
 
   const resetChat = () => {
-    setChatMessages([
-      { id: newId(), role: 'assistant', text: WELCOME_TEXT, sources: [] },
-    ])
+    setChatMessages([{ id: newId(), role: 'assistant', text: WELCOME_TEXT }])
     setChatInput('')
     setChatError('')
   }
@@ -374,7 +344,6 @@ export default function App() {
                     <FormattedBubbleText text={msg.text} className="chat-formatted chat-formatted--user" />
                   )}
                 </div>
-                {msg.role === 'assistant' ? <ChatSources sources={msg.sources} /> : null}
               </div>
             </div>
           ))}
@@ -437,8 +406,7 @@ export default function App() {
           </button>
         </div>
         <div className="chat-hint-bar">
-          <kbd>Enter</kbd> šalje · <kbd>Shift</kbd>+<kbd>Enter</kbd> novi red · bez LLM ključa
-          odgovor je iz baze i vektorske pretrage
+          <kbd>Enter</kbd> šalje · <kbd>Shift</kbd>+<kbd>Enter</kbd> novi red
         </div>
       </div>
     </div>

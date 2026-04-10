@@ -17,10 +17,6 @@ public class InternalStatisticsService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    /**
-     * Agregacija za Cassandru: za <strong>svaki predmet u katalogu</strong>, životni zbirovi (
-     * <strong>sve godine, svi ispitni termini</strong> u bazi) — bez ograničenja po akademskoj godini.
-     */
     public StatisticsAggregatesResponse computeAggregates() {
         List<Map<String, Object>> overallRows = jdbcTemplate.queryForList("""
                 SELECT p.id AS predmet_id,

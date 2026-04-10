@@ -25,19 +25,10 @@ type LoadErr = Partial<Record<'profile' | 'grades' | 'gpa' | 'curriculum' | 'unp
 
 type SpPage = 'overview' | 'curriculum' | 'grades' | 'analytics'
 
-const PAGE_COPY: Record<SpPage, { title: string; sub?: string }> = {
-  overview: {
-    title: 'Pregled',
-    sub: 'Sažetak profila, proseka i predmeta na koje treba obratiti pažnju.',
-  },
-  grades: {
-    title: 'Izlasci',
-    sub: 'Svi izlasci na ispit iz evidencije — svaki red je jedan termin. Koristi pretragu da suziš listu.',
-  },
-  analytics: {
-    title: 'Statistika',
-    sub: 'Za predmete koje još niješ položio/la — samo stopa prolaznosti na celom studijskom programu (iz baze).',
-  },
+const PAGE_COPY: Record<SpPage, { title: string }> = {
+  overview: { title: 'Pregled' },
+  grades: { title: 'Izlasci' },
+  analytics: { title: 'Statistika' },
   curriculum: { title: 'Studijski program po godinama' },
 }
 
@@ -53,7 +44,6 @@ function formatDate(iso: string) {
   return iso.slice(0, 10)
 }
 
-/** Na FTN-u položen ispit ima ocenu 6–10; 5 nije položeno. */
 const PASSING_GRADE = 6
 
 function bestGradePerSubject(grades: SubjectGrade[]): SubjectGrade[] {
@@ -258,10 +248,6 @@ export function StudentPortal({ displayName, onLogout }: Props) {
 
         <article className="dj-card">
           <h3 className="dj-card-title">Obratiti pažnju</h3>
-          <p className="dj-card-hint">
-            Predmeti na koje ste izašli na ispit, a nije postignuta položena ocena — najbolji pokušaj je ispod 6 (npr.
-            ocena 5).
-          </p>
           {!grades || loading ? (
             <div className="sp-skeleton-block" />
           ) : notPassedBest.length ? (
@@ -309,9 +295,6 @@ export function StudentPortal({ displayName, onLogout }: Props) {
     <>
       <div className="sp-section-head sp-section-head--compact">
         <h2 className="sp-section-title">Svi izlasci</h2>
-        <p className="sp-section-desc">
-          Svaki red je jedan izlazak na ispit. Redovi sa ocenom ispod 6 su vizuelno označeni (nije položeno).
-        </p>
       </div>
       <div className="sp-table-wrap">
         {loading && !grades ? (
@@ -606,7 +589,6 @@ export function StudentPortal({ displayName, onLogout }: Props) {
           <header className="dj-page-head">
             <div>
               <h1 className="dj-page-title">{PAGE_COPY[page].title}</h1>
-              {PAGE_COPY[page].sub ? <p className="dj-page-sub">{PAGE_COPY[page].sub}</p> : null}
             </div>
             {page === 'grades' ? (
               <label className="sp-search dj-search">

@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Odbija podatke koji krše pragove kurikuluma (po programu, godini i semestru).
- */
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 @RequiredArgsConstructor
@@ -71,9 +68,6 @@ public class CurriculumIntegrityService implements ApplicationRunner {
         }
     }
 
-    /**
-     * Za REST / buduće mutacije kurikuluma: provera jednog programa.
-     */
     public void validateProgramStateOrThrow(long studijskiProgramId, List<Predmet> subjectsOnProgram) {
         Objects.requireNonNull(subjectsOnProgram, "subjectsOnProgram");
         if (subjectsOnProgram.size() > CurriculumConstraints.MAX_SUBJECTS_PER_PROGRAM) {

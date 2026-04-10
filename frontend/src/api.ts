@@ -49,28 +49,23 @@ export const naisApi = {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
-  /** Šta baza kaže za tvoj JWT (id, email, uloga) — za dijagnostiku. */
   authMe: () =>
     api<{ id: number; email: string; ime: string; prezime: string; uloga: string }>('/api/auth/me'),
   studentProfile: () => api<StudentProfile>('/api/student/me/profile'),
   studentGrades: () => api<SubjectGrade[]>('/api/student/me/subjects-grades'),
   studentGpa: () => api<Gpa>('/api/student/me/gpa'),
   studentCurriculum: () => api<CurriculumProgress>('/api/student/me/curriculum-progress'),
-  /** Predmeti koje student još nije položio + programska stopa prolaznosti (sort backend). */
   studentUnpassedSubjectPassRates: async () => {
     const rows = await api<unknown[]>('/api/student/me/unpassed-subject-pass-rates')
     return Array.isArray(rows) ? rows.map(parseUnpassedSubjectPassRate) : []
   },
-  /** Isti URL kao bundle; vraća { programi, studenti } ili treba koristiti headStudentsBundle. */
   headStudents: () => api<unknown>('/api/head/students'),
   headStudentsBundle: () => api<HeadStudentsBundle>('/api/head/students'),
   headPrograms: () => api<HeadProgramSummary[]>('/api/head/programs'),
-  /** Koristi /api/head/students?programPregledId= da radi bez rute /api/head/program/** na gatewayju. */
   headProgramPregled: (
     programId: number,
     opts?: {
       statistikaGodinaUpisa?: number | null
-      /** true = svi studenti smera × svi predmeti, bez uzorka po semestru/generaciji */
       statistikaCeoProgram?: boolean
     },
   ) => {
@@ -80,24 +75,43 @@ export const naisApi = {
     if (opts?.statistikaCeoProgram === true) q.set('statistikaCeoProgram', 'true')
     return api<HeadProgramPregled>(`/api/head/students?${q}`)
   },
-  /** Cassandra — predmeti katedre (samo šef). */
   headAnalytics: () => api<ColumnarSubjectStat[]>('/api/head/subjects/analytics'),
-  /** Cassandra — trend položeno / palo po ispitnim rokovima za jednu kalendarsku godinu roka. */
   headTrends: (godina?: number) => {
     const q = godina != null ? `?godina=${encodeURIComponent(String(godina))}` : ''
     return api<PassFailTrend>(`/api/head/trends/pass-fail${q}`)
   },
-  /** Cassandra — zbirni KPI + najlakši / najteži predmet katedre (samo šef). */
   headPerf: () => api<PerformanceOverview>('/api/head/performance-overview'),
-  /** Cassandra — globalni rang svih predmeta (sinhronizovano iz PostgreSQL-a). */
   rankings: () => api<ColumnarSubjectStat[]>('/api/stats/rankings'),
-  assistant: (question: string) =>
-    api<{ answer: string; sources: string[] }>('/api/assistant/query', {
+  assistant: async (question: string) => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    const t = getToken()
+    if (t) headers['Authorization'] = `Bearer ${t}`
+    const res = await fetch(`${base}/api/assistant/query`, {
       method: 'POST',
+      headers,
       body: JSON.stringify({ question }),
-    }),
+    })
+    if (!res.ok) {
+      const txt = await res.text()
+      let msg = txt
+      try {
+        const j = JSON.parse(txt) as { message?: string }
+        if (j?.message && typeof j.message === 'string') {
+          msg = j.message
+        }
+      } catch {
+        /* use raw txt */
+      }
+      const snippet = msg.length > 600 ? `${msg.slice(0, 600)}…` : msg
+      throw new Error(
+        snippet ? `HTTP ${res.status}: ${snippet}` : `HTTP ${res.status} ${res.statusText}`,
+      )
+    }
+    return res.json() as Promise<{ answer: string; sources: string[]; answerSource?: string }>
+  },
 
-  /** Statistika predmeta iz PostgreSQL-a — samo šef katedre (studyProgramId obavezan). */
   programStatistics: (opts: {
     studyProgramId: number
     godinaUpisa?: number

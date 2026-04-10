@@ -20,7 +20,6 @@ public class StatisticsSyncService {
     private final SubjectStatisticsRepository subjectStatisticsRepository;
     private final SubjectMonthlyTrendRepository subjectMonthlyTrendRepository;
 
-    /** Pun osvežaj Cassandru iz PostgreSQL-a: svi predmeti u katalogu + životne agregate (sve godine u bazi). */
     public void rebuildFromRelationalService() {
         StatisticsAggregatesResponse data = relationalInternalClient.fetchAggregates();
         if (data == null || data.overall() == null) {

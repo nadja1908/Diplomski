@@ -17,21 +17,17 @@ log = logging.getLogger(__name__)
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
 COLLECTION = os.getenv("QDRANT_COLLECTION", "predmeti")
-EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-large")
-EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "1024"))
+EMBEDDING_MODEL = os.getenv("NAIS_EMBEDDING_MODEL", "djovak/embedic-small")
+EMBED_DIM = int(os.getenv("NAIS_EMBED_DIM", "384"))
 _preserve_raw = os.getenv("NAIS_EMBED_PRESERVE_DIACRITICS")
 if _preserve_raw is not None:
     USE_EMBED_PRESERVE_DIACRITICS = _preserve_raw.lower() in ("1", "true", "yes")
 else:
     USE_EMBED_PRESERVE_DIACRITICS = "embedic" in EMBEDDING_MODEL.lower()
 
-# Qdrant vraća kosinusnu sličnost (veće = bliže). Rezovo slabe pogotke daleko od najboljeg
-# da generički tekst (Matematika, paralelno programiranje…) ne „lepi“ uz specifična pitanja.
 MIN_VECTOR_SIM = float(os.getenv("NAIS_VECTOR_MIN_SIM", "0.22"))
 SIM_GAP_FROM_BEST = float(os.getenv("NAIS_VECTOR_SIM_GAP", "0.18"))
-# false = ceo upit ide u embedding (bolje za slobodna pitanja); true = samo ključne reči (rizično za SR).
 USE_QUERY_FOCUS = os.getenv("NAIS_QUERY_FOCUS", "false").lower() in ("1", "true", "yes")
-# Rerang: prvo više pogodaka ključnih reči u payload-u, zatim vektorski skor.
 USE_KEYWORD_RERANK = os.getenv("NAIS_KEYWORD_RERANK", "true").lower() in ("1", "true", "yes")
 
 _STOPWORDS = frozenset(
@@ -65,7 +61,6 @@ def _fold_sr(s: str) -> str:
 
 
 def _extract_query_keywords(q: str) -> list[str]:
-    """Značajne reči iz celog upita (za rerang), bez šumnih funkcijskih reči."""
     folded = _fold_sr(q)
     tokens = re.split(r"[^a-z0-9]+", folded)
     seen: dict[str, None] = {}
@@ -79,7 +74,6 @@ def _extract_query_keywords(q: str) -> list[str]:
 
 
 def _extract_query_keywords_embed(q: str) -> list[str]:
-    """Ključne reči za embedding bez ASCII-foldinga (Embedić: ošišana latinica ruši kvalitet)."""
     t = q.strip().lower()
     tokens = re.findall(r"\w+", t, flags=re.UNICODE)
     seen: dict[str, None] = {}
@@ -93,7 +87,6 @@ def _extract_query_keywords_embed(q: str) -> list[str]:
 
 
 def _expand_keyword_stems(kws: list[str]) -> list[str]:
-    """Kratki morfološki pomoćnik (matematiku → matematik) za bolji embedding i rerang."""
     out: list[str] = []
     for w in kws:
         out.append(w)
@@ -264,7 +257,6 @@ def _normalize_vector(v: Any) -> list[float] | None:
 
 
 def _prune_by_similarity(hits: list, limit: int) -> list:
-    """Zadrži samo pogotke sa skorom blizu najboljeg (i iznad minimalnog praga)."""
     if not hits:
         return []
     ordered = sorted(hits, key=lambda h: -h.score)
@@ -307,7 +299,7 @@ def _cosine_sim(qv: list[float], pv: list[float]) -> float:
 
 
 def _run_search_scroll_program(q: str, limit: int, ids: list[int]) -> list[dict[str, Any]]:
-    """Brute-force over all points: reliable when Qdrant search() behaves oddly."""
+
     model = get_model()
     q_vec = _query_for_embedding(q)
     enc = model.encode(q_vec)
@@ -373,7 +365,6 @@ def _run_vector_search(q: str, limit: int, ids: list[int] | None):
     client = get_client()
     prefetch = limit
     if ids:
-        # Širi prefetch: inače filter po programu može da isprazni top-N globalnih pogodaka.
         prefetch = min(512, max(limit * 15, len(ids) * 8, 96))
     hits = client.search(
         collection_name=COLLECTION,
@@ -432,7 +423,6 @@ def search_get(
 
 @app.post("/api/v1/search")
 def search_post(body: SearchRequest):
-    """Preferred for long predmet_id lists (JSON body, no URL encoding issues)."""
     results = _run_vector_search(body.q, body.limit, body.predmet_ids)
     return {"query": body.q, "results": results}
 

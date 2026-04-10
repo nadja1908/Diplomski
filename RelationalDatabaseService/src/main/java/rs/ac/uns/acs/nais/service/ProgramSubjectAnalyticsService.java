@@ -33,24 +33,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Analitika predmeta po studijskom programu iz relacione baze.
- *
- * <p><strong>Studenti koji su polagali</strong> ({@code totalStudentsWhoTook}): broj različitih studenata
- * koji imaju bar jedan zapis u {@code ocena} za dati predmet (posle filtara na generaciju / školsku godinu).</p>
- *
- * <p><strong>Studenti koji su položili</strong> ({@code totalStudentsWhoPassed}): među tim studentima, oni čija je
- * <em>najbolja</em> ocena na tom predmetu &gt;= 6. Jedan student se broji jednom.</p>
- *
- * <p><strong>Stopa prolaznosti</strong>: {@code passed / took * 100}. „Najteži“ predmet = najniža stopa među
- * predmetima gde je {@code took &gt; 0}.</p>
- *
- * <p><strong>Prosečna ocena</strong>: aritmetička sredina svih <em>redova</em> {@code ocena} gde je
- * {@code vrednost_ocene &gt;= 6} (ne proseka generacija). Blagi studenti sa više položenih pokušaja ulaze više puta
- * u prosek — što odgovara zahtevu „iz stvarnih zapisa“, alternativa bi bila jedna ocena po studentu (npr. najbolja).</p>
- *
- * <p><strong>Medijana</strong>: {@code percentile_cont(0.5)} nad istim skupom položenih ocena (redovi sa ocenom &gt;= 6).</p>
- */
 @Service
 @RequiredArgsConstructor
 public class ProgramSubjectAnalyticsService {
@@ -63,11 +45,6 @@ public class ProgramSubjectAnalyticsService {
     private final StudentRepository studentRepository;
     private final LinearAcademicTimeline linearAcademicTimeline;
 
-    /**
-     * Nepoloženi predmeti iz tekuće i svih prethodnih godina kurikuluma (prema procenjenoj godini studija),
-     * bez predmeta iz budućih godina kurikuluma; sa programskom stopom prolaznosti.
-     * Redosled: godina kurikuluma, semestar, naziv predmeta.
-     */
     @Transactional(readOnly = true)
     public List<UnpassedSubjectPassRateDto> unpassedSubjectsPassRatesSorted(long korisnikId) {
         var student = studentRepository.findByKorisnikId(korisnikId)
@@ -107,7 +84,6 @@ public class ProgramSubjectAnalyticsService {
                 .collect(Collectors.toMap(Predmet::getId, Function.identity()));
         for (Predmet p : programPredmeti) {
             int kg = p.getKurikulumGodina();
-            // Svi semestri u okviru dozvoljenih godina kurikuluma (npr. 1. godina → i 1. i 2. semestar).
             if (kg < 1 || kg > maxKurikulumGodina) {
                 continue;
             }
@@ -360,10 +336,6 @@ public class ProgramSubjectAnalyticsService {
                 .toList();
     }
 
-    /**
-     * CTE {@code filtered_ocene}: svi relevantni izlasci sa metapodacima studenta i roka.
-     * Predmeti su uvek ograničeni na {@code studijski_program_id = :programId}.
-     */
     private Map<Long, LinearAcademicTimeline.PredmetKurikulumSlot> curriculumSlotsByPredmetId(List<Predmet> predmetiOrdered) {
         Map<Long, LinearAcademicTimeline.PredmetKurikulumSlot> m = new LinkedHashMap<>();
         for (Predmet p : predmetiOrdered) {
@@ -558,9 +530,6 @@ public class ProgramSubjectAnalyticsService {
         return Math.round(v * 100.0) / 100.0;
     }
 
-    /**
-     * Jedan predmet po ID-u (isti izračun kao lista, uz validaciju pripadnosti programu).
-     */
     @Transactional(readOnly = true)
     public SubjectStatisticsRow subjectDetail(long programId, long subjectId, StatisticsQueryParams params) {
         StatisticsQueryParams withPredmet = new StatisticsQueryParams(

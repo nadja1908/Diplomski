@@ -23,25 +23,29 @@ spring:
       routes:
         # Eksplicitno (radi i sa starijim slikama gde duža lista Path predikata zna da zakaže).
         - id: relational-student-curriculum
-          uri: lb://relational-database-service
+          uri: http://relational-database-service:9030
           predicates:
             - Path=/api/student/me/curriculum-progress
         # Student: samo liste nepoloženih predmeta sa programskom stopom prolaznosti.
         - id: relational-student-unpassed-stats
-          uri: lb://relational-database-service
+          uri: http://relational-database-service:9030
           predicates:
             - Path=/api/student/me/unpassed-subject-pass-rates
+        - id: relational-assistant
+          uri: http://relational-database-service:9030
+          predicates:
+            - Path=/api/assistant/**
         # Šef / REST statistika — posebna ruta umesto duge liste predikata.
         - id: relational-program-statistics
-          uri: lb://relational-database-service
+          uri: http://relational-database-service:9030
           predicates:
             - Path=/api/statistics/**
         - id: relational-auth-student-head-assistant
-          uri: lb://relational-database-service
+          uri: http://relational-database-service:9030
           predicates:
-            - Path=/api/auth/**,/api/student/me/profile,/api/student/me/subjects-grades,/api/student/me/gpa,/api/head/students,/api/head/programs,/api/head/program/**,/api/assistant/**
+            - Path=/api/auth/**,/api/student/me/profile,/api/student/me/subjects-grades,/api/student/me/gpa,/api/head/students,/api/head/programs,/api/head/program/**
         - id: columnar-statistics
-          uri: lb://columnar-database-service
+          uri: http://columnar-database-service:9050
           predicates:
             - Path=/api/student/me/statistics,/api/head/subjects/analytics,/api/head/trends/pass-fail,/api/head/performance-overview,/api/stats/**
 

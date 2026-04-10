@@ -16,10 +16,6 @@ public class HeadController {
 
     private final AcademicQueryService academicQueryService;
 
-    /**
-     * Bez parametra: lista studijskih programa katedre + studenti (radi i kroz stariji gateway koji nema /api/head/programs).
-     * Sa programPregledId: pun pregled jednog programa (isti odgovor kao /api/head/program/{id}/pregled).
-     */
     @GetMapping("/students")
     public Object students(
             @AuthenticationPrincipal Long korisnikId,

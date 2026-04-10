@@ -30,7 +30,6 @@ public class AuthController {
         }
     }
 
-    /** Ko si po JWT + bazi (za dijagnostiku kad head API vrati 403). */
     @GetMapping("/me")
     public AuthMeResponse me(@AuthenticationPrincipal Long korisnikId) {
         if (korisnikId == null) {

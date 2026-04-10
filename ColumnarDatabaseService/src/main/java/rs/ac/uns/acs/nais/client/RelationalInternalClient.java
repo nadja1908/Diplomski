@@ -42,7 +42,6 @@ public class RelationalInternalClient {
                 });
     }
 
-    /** Predmeti na studijskom programu studenta (puna lista za statistiku na nivou predmeta). */
     public List<StudentProgramPredmetMin> studentProgramPredmeti(Long korisnikId) {
         return client().get()
                 .uri("/internal/student/korisnik/{id}/program-predmeti", korisnikId)

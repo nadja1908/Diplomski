@@ -1,8 +1,11 @@
 package rs.ac.uns.acs.nais.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -24,9 +29,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final ObjectMapper objectMapper;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, ObjectMapper objectMapper) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -42,12 +49,41 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // Permit login even if method matching behaves differently behind proxies.
+                        .requestMatchers("/api/auth/login").permitAll()
+                        // Let Spring return 400/404 bodies without turning into 401 via /error.
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/internal/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/head/**").authenticated()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                            objectMapper.writeValue(
+                                    response.getOutputStream(),
+                                    Map.of(
+                                            "error", "Unauthorized",
+                                            "message",
+                                            "Nedostaje ili je nevažeći JWT. Odjavi se i ponovo se prijavi."));
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                            objectMapper.writeValue(
+                                    response.getOutputStream(),
+                                    Map.of(
+                                            "error", "Forbidden",
+                                            "message",
+                                            "Nemaš pravo pristupa ovom resursu. "
+                                                    + "Čet asistent (/api/assistant) zahteva ulogu STUDENT. "
+                                                    + "Ako si na nastavničkom nalogu, uloguj se studentskim nalogom. "
+                                                    + "Ako si student a i dalje vidiš ovo, proveri da li korisnik ima red u tabeli student u bazi."));
+                        }))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

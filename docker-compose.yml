@@ -76,8 +76,8 @@ services:
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       INGEST_PATH: /data/chunks.jsonl
-      NAIS_EMBEDDING_MODEL: djovak/embedic-large
-      NAIS_EMBED_DIM: "1024"
+      NAIS_EMBEDDING_MODEL: djovak/embedic-small
+      NAIS_EMBED_DIM: "384"
       NAIS_QUERY_FOCUS: "false"
       NAIS_VECTOR_MIN_SIM: "0.22"
       NAIS_VECTOR_SIM_GAP: "0.18"
@@ -88,8 +88,12 @@ services:
     depends_on:
       - qdrant
 
+  # LLM: Groq — u .env (pored ovog fajla) obavezno: GROQ_API_KEY=gsk_... (bez razmaka oko =).
+  # env_file: lista stringova (ne "path/required") radi na svim verzijama Compose-a.
   relational-database-service:
     build: ./RelationalDatabaseService
+    env_file:
+      - .env
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
       DB_HOST: postgres
@@ -100,6 +104,10 @@ services:
       VECTOR_SERVICE_URL: http://vector-database-service:8000
       JWT_SECRET: nais-demo-secret-change-me-for-demo-32b
       INTERNAL_API_SECRET: nais-internal-shared-secret
+      # Vrednost ključa NE pišeš ovde — samo u fajlu .env (GROQ_API_KEY=gsk_...). Ovo je samo prosleđivanje.
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.groq.com/openai/v1}
+      OPENAI_MODEL: ${OPENAI_MODEL:-llama-3.3-70b-versatile}
     ports:
       - "9030:9030"
     depends_on:

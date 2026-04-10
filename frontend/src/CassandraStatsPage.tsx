@@ -9,7 +9,6 @@ function fmtAvg(v: number | null | undefined): string {
 }
 
 type Props = {
-  /** Dodatni endpoint-i za šefa katedre (katedra, trend, KPI). */
   isHeadOfDepartment: boolean
 }
 
@@ -148,10 +147,6 @@ export function CassandraStatsPage({ isHeadOfDepartment }: Props) {
             <h3 id="cass-trend-title" className="cass-stats-h3">
               Trend položeno / palo po ispitnim rokovima (katedra)
             </h3>
-            <p className="dj-card-hint">
-              Prikaz za poslednju kalendarsku godinu roka sa podacima: Januar, Februar, April, Jun, Jul, Avgust, Oktobar.
-              Datum ispita mapiran je na odgovarajući rok; jun i jul su odvojeni.
-            </p>
             <div className="cass-trend-list">
               {trend.meseci.map((p) => {
                 const total = p.polozeno + p.pali

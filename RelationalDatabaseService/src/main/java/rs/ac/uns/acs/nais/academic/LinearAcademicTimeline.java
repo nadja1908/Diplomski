@@ -9,18 +9,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Striktan linearni model studija: nema ponavljanja godine, nema produženog studiranja.
- * Godina upisa {@code U} i referentna kalendarska godina upisa novog kruga {@code R} određuju
- * tekuću godinu studija {@code Y = R - U + 1} (ograničeno na [1, 4]).
- *
- * <p>Dostupnost predmeta: sve iz završenih godina kurikuluma ({@code ks &lt; Y}, oba semestra)
- * i samo I semestar tekuće godine ({@code ks == Y} i {@code sem == 1}).</p>
- */
 @Component
 public class LinearAcademicTimeline {
 
-    /** Kalendarska godina u kojoj je generacija {@code R} u prvoj godini studija (npr. 2025 → “prvaci” = 1. godina). */
     private final int referenceIntakeYear;
 
     public LinearAcademicTimeline(
@@ -38,9 +29,6 @@ public class LinearAcademicTimeline {
         return Math.max(1, Math.min(4, y));
     }
 
-    /**
-     * Da li je predmet na mestu ({@code kurikulumGodina}, {@code semestar}) u rasporedu za studenta sa godinom upisa {@code godinaUpisa}.
-     */
     public boolean predmetJeURasporedu(int godinaUpisaStudenta, int kurikulumGodina, int semestar) {
         int sy = studyYearFromGodinaUpisa(godinaUpisaStudenta);
         if (kurikulumGodina < sy) {
@@ -52,15 +40,10 @@ public class LinearAcademicTimeline {
         return semestar == 1;
     }
 
-    /** Jedina „tekuća“ godina kurikuluma za filtriranje po generaciji (bez višestrukog izbora). */
     public int ocekivanaGodinaKurikulumaZaGeneraciju(int godinaUpisa) {
         return studyYearFromGodinaUpisa(godinaUpisa);
     }
 
-    /**
-     * Školske godine ispitnog roka koje smeju da se pojave uz datu generaciju upisa
-     * (od godine upisa do referentne godine, uključivo).
-     */
     public List<String> dozvoljeneSkolskeGodineZaGeneraciju(int godinaUpisa) {
         List<String> out = new ArrayList<>();
         int end = Math.min(referenceIntakeYear, godinaUpisa + 3);
@@ -99,15 +82,10 @@ public class LinearAcademicTimeline {
         }
     }
 
-    /** Legacy uzorak „2021 i ranije“ — bez stroge linearne validacije kršenja godina. */
     public boolean koristiStrogiLinearniModel(Integer godinaUpisa) {
         return godinaUpisa != null && godinaUpisa > 2021;
     }
 
-    /**
-     * Za generaciju upisa {@code > 2021}: fiksira tekuću godinu kurikuluma i I semestar; uklanja filter
-     * „školska godina ispitnog roka” (agregacija po svim rokovima u okviru linearnog uzorka predmeta).
-     */
     public StatisticsQueryParams normalizeStatisticsParams(StatisticsQueryParams params) {
         Integer gu = params.godinaUpisa();
         if (!koristiStrogiLinearniModel(gu)) {
@@ -123,10 +101,6 @@ public class LinearAcademicTimeline {
                 params.includeGenerationBreakdown());
     }
 
-    /**
-     * Predmeti čiji se ispiti smeju brojati za uzorak generacije {@code godinaUpisa} u linearnom modelu
-     * (završene godine — oba semestra; tekuća godina — samo I semestar).
-     */
     public java.util.Set<Long> predmetIdsDostupniZaGeneraciju(
             int godinaUpisa,
             java.util.Map<Long, PredmetKurikulumSlot> kurikulumPoPredmetId

@@ -13,3 +13,7 @@ node_modules/
 dist/
 __pycache__/
 *.pyc
+
+# Lokalni cloudflared quick tunnel logovi (ne commitovati)
+tunnel-out.log
+tunnel-err.log

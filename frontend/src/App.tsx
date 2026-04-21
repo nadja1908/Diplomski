@@ -128,33 +128,21 @@ function ChatQuickStarters({
   disabled: boolean
   onPick: (q: string) => void
 }) {
-  const detailsRef = useRef<HTMLDetailsElement>(null)
-
-  const pick = (q: string) => {
-    onPick(q)
-    if (detailsRef.current) detailsRef.current.open = false
-  }
-
   return (
-    <details ref={detailsRef} className="chat-starters-details">
-      <summary className="chat-starters-summary">Brzi predlozi (opciono)</summary>
-      <div className="chat-starters-details-body" role="group" aria-label="Brzi predlozi pitanja">
-        <div className="chat-starters-scroll">
-          {CHAT_STARTERS.map((q) => (
-            <button
-              key={q}
-              type="button"
-              className="chat-starter-chip"
-              disabled={disabled}
-              title={q}
-              onClick={() => pick(q)}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-      </div>
-    </details>
+    <div className="chat-starters-bar" role="toolbar" aria-label="Brzi predlozi">
+      {CHAT_STARTERS.map((q) => (
+        <button
+          key={q}
+          type="button"
+          className="chat-chip-mini"
+          disabled={disabled}
+          title={q}
+          onClick={() => onPick(q)}
+        >
+          {q}
+        </button>
+      ))}
+    </div>
   )
 }
 
@@ -341,6 +329,7 @@ export default function App() {
         {chatError ? <div className="chat-banner-err">{chatError}</div> : null}
 
         <div ref={chatThreadRef} className="chat-thread" role="log" aria-live="polite">
+          <div className="chat-thread-fill" aria-hidden />
           {chatMessages.map((msg) => (
             <div
               key={msg.id}

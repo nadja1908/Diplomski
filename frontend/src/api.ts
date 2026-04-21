@@ -7,7 +7,8 @@ import {
   type StatisticsFilterOptions,
 } from './statisticsTypes'
 
-const base = ''
+const configuredBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim() ?? ''
+const base = configuredBase.replace(/\/+$/, '')
 
 export function getToken(): string | null {
   return localStorage.getItem('nais_token')

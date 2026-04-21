@@ -15,6 +15,7 @@ type ChatMessage =
 
 const WELCOME_TEXT =
   'Zdravo! Pitaj šta god ti treba o predmetima, ocenama i kurikulumu — odgovori su vezani za tvoj studijski program.'
+const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}brand-logo.svg`
 
 const CHAT_STARTERS = [
   'Šta znaš o meni?',
@@ -53,7 +54,7 @@ function ChatBotAvatar({
   }
   return (
     <img
-      src="/chatBot.png"
+      src={`${import.meta.env.BASE_URL}chatBot.png`}
       alt=""
       width={size}
       height={size}
@@ -163,7 +164,7 @@ export default function App() {
   )
   const [password, setPassword] = useState('student123')
   const [rememberMe, setRememberMe] = useState(true)
-  const [loginLogoSrc, setLoginLogoSrc] = useState('/logoFINAL.png')
+  const [loginLogoSrc, setLoginLogoSrc] = useState(BRAND_LOGO_SRC)
   const [role, setRole] = useState<Role>(null)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
@@ -425,7 +426,7 @@ export default function App() {
                 height={72}
                 alt=""
                 decoding="async"
-                onError={() => setLoginLogoSrc('/brand-logo.svg')}
+                onError={() => setLoginLogoSrc(BRAND_LOGO_SRC)}
               />
               <div className="login-brand-titles-dj">
                 <span className="login-brand-name-dj">DjordUNI</span>
@@ -494,7 +495,7 @@ export default function App() {
                     height={64}
                     alt=""
                     decoding="async"
-                    onError={() => setLoginLogoSrc('/brand-logo.svg')}
+                    onError={() => setLoginLogoSrc(BRAND_LOGO_SRC)}
                   />
                   <div className="dj-brand-text">
                     <span className="dj-brand-name">DjordUNI</span>

@@ -42,6 +42,7 @@ const STATUS_COPY: Record<CurriculumSubject['status'], { label: string }> = {
 }
 
 const PASSING_GRADE = 6
+const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}brand-logo.svg`
 
 function bestGradePerSubject(grades: SubjectGrade[]): SubjectGrade[] {
   const m = new Map<string, SubjectGrade>()
@@ -62,7 +63,7 @@ type Props = {
 }
 
 export function StudentPortal({ displayName, onLogout }: Props) {
-  const [logoSrc, setLogoSrc] = useState('/logoFINAL.png')
+  const [logoSrc, setLogoSrc] = useState(BRAND_LOGO_SRC)
   const [page, setPage] = useState<SpPage>('overview')
   const [profile, setProfile] = useState<StudentProfile | null>(null)
   const [grades, setGrades] = useState<SubjectGrade[] | null>(null)
@@ -558,7 +559,7 @@ export function StudentPortal({ displayName, onLogout }: Props) {
             width={56}
             height={64}
             alt=""
-            onError={() => setLogoSrc('/brand-logo.svg')}
+            onError={() => setLogoSrc(BRAND_LOGO_SRC)}
           />
           <div className="dj-brand-text">
             <span className="dj-brand-name">DjordUNI</span>

@@ -93,8 +93,7 @@ services:
   relational-database-service:
     build: ./RelationalDatabaseService
     restart: unless-stopped
-    env_file:
-      - .env
+    # GROQ_API_KEY: iz .env u root-u (lokalno) ili iz cloud varijabli pri deployu — bez env_file da compose radi i bez fajla u repou.
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
       DB_HOST: postgres

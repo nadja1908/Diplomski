@@ -13,6 +13,8 @@ spring:
               - 'http://localhost:*'
               - 'http://127.0.0.1:*'
               - 'https://nadja1908.github.io'
+              - 'https://*.up.railway.app'
+              - 'https://*.railway.app'
             allowedMethods:
               - GET
               - POST

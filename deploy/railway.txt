@@ -1,0 +1,38 @@
+NAIS — javni backend na Railway (jedan URL za GitHub Pages + asistentkinju)
+================================================================================
+
+Šta dobijaš
+----------
+- Backend (ceo docker-compose) radi na internetu.
+- U GitHub Actions varijabli VITE_API_BASE_URL staviš HTTPS adresu gateway-a (port 9000).
+- Asistentkinja otvara samo GitHub Pages link; ne mora Docker kod sebe.
+
+Preduslov
+----------
+- Nalog na https://railway.app
+- GitHub repo povezan sa Railway (Deploy from GitHub repo).
+- Groq ključ: u Railway → Variables dodaj GROQ_API_KEY (vrednost kao u lokalnom .env).
+
+Koraci (Railway)
+----------------
+1. Railway → New Project → "Deploy from GitHub repo" → izaberi repo (npr. Diplomski).
+2. Railway detektuje docker-compose.yml u root-u (folder NAIS-projekat ako je monorepo: u Project Settings postavi Root Directory na NAIS-projekat).
+3. Variables (projekat ili po servisu, najčešće Shared Variables):
+   - GROQ_API_KEY = tvoj gsk_... ključ
+   (Ostalo već ima podrazumevane vrednosti u compose-u.)
+4. Sačekaj da svi servisi budu "Active". Prvi start može potrajati (Cassandra seed itd.).
+5. Servis "gateway-api" → Settings → Networking → Generate Domain (javni HTTPS).
+   Kopiraj URL, npr. https://nais-gateway-production-xxxx.up.railway.app
+6. Na GitHubu: Settings → Secrets and variables → Actions → Variables:
+   - VITE_API_BASE_URL = taj URL (bez / na kraju)
+7. Actions → "Deploy frontend to GitHub Pages" → Run workflow.
+
+Napomene
+--------
+- Projekat je RAM-težak (Postgres, Cassandra, više JVM-ova). Na besplatnom kreditu može da bude tijesno; ako padaju servisi, Railway Hobby ili smanji compose (napredno).
+- Ako Railway promeni domen, ažuriraj VITE_API_BASE_URL i ponovo pokreni Pages deploy.
+- Gateway CORS već uključuje https://nadja1908.github.io i *.up.railway.app.
+
+Lokalno posle uklanjanja env_file iz compose-a
+----------------------------------------------
+- I dalje stavi GROQ_API_KEY u fajl .env pored docker-compose.yml; Docker Compose automatski koristi .env za ${GROQ_API_KEY} u compose fajlu.

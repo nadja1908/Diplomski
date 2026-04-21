@@ -17,6 +17,9 @@ const WELCOME_TEXT =
   'Zdravo! Pitaj šta god ti treba o predmetima, ocenama i kurikulumu — odgovori su vezani za tvoj studijski program.'
 const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}brand-logo.svg`
 
+const PAGES_BEZ_BACKEND_URL =
+  import.meta.env.PROD && !(import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim()
+
 const CHAT_STARTERS = [
   'Šta znaš o meni?',
   'Koje predmete još nisam položio/la?',
@@ -435,6 +438,14 @@ export default function App() {
             </div>
             <h1 className="login-heading-dj">Prijava</h1>
             <p className="login-lead-dj">Unesi podatke za nastavak</p>
+            {PAGES_BEZ_BACKEND_URL ? (
+              <p className="err login-err-dj" role="alert">
+                Ovaj build nema podešen backend URL (obično HTTP 405 na prijavi). U GitHub repou: Settings → Secrets and
+                variables → Actions → Variables → dodaj <code>VITE_API_BASE_URL</code> (npr. tvoj{' '}
+                <code>https://….trycloudflare.com</code> dok radi tunnel), pa ponovo pokreni workflow „Deploy frontend to
+                GitHub Pages“.
+              </p>
+            ) : null}
             <form onSubmit={login} className="login-form-dj">
               <label className="login-label-dj">
                 Email

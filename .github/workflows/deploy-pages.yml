@@ -34,6 +34,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Provera VITE_API_BASE_URL
+        shell: bash
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          if [[ -z "${VITE_API_BASE_URL// }" ]]; then
+            echo "::error::Dodaj repository variable VITE_API_BASE_URL (Settings → Secrets and variables → Actions → Variables). Vrednost: javni URL gateway-ja, npr. https://tvoj-tunnel.trycloudflare.com — bez / na kraju. Zatim Run workflow."
+            exit 1
+          fi
+
       - name: Build frontend
         env:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}

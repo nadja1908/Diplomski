@@ -128,23 +128,33 @@ function ChatQuickStarters({
   disabled: boolean
   onPick: (q: string) => void
 }) {
+  const detailsRef = useRef<HTMLDetailsElement>(null)
+
+  const pick = (q: string) => {
+    onPick(q)
+    if (detailsRef.current) detailsRef.current.open = false
+  }
+
   return (
-    <div className="chat-starters" role="group" aria-label="Brzi predlozi pitanja">
-      <span className="chat-starters-label">Brzo pitaj</span>
-      <div className="chat-starters-scroll">
-        {CHAT_STARTERS.map((q) => (
-          <button
-            key={q}
-            type="button"
-            className="chat-starter-chip"
-            disabled={disabled}
-            onClick={() => onPick(q)}
-          >
-            {q}
-          </button>
-        ))}
+    <details ref={detailsRef} className="chat-starters-details">
+      <summary className="chat-starters-summary">Brzi predlozi (opciono)</summary>
+      <div className="chat-starters-details-body" role="group" aria-label="Brzi predlozi pitanja">
+        <div className="chat-starters-scroll">
+          {CHAT_STARTERS.map((q) => (
+            <button
+              key={q}
+              type="button"
+              className="chat-starter-chip"
+              disabled={disabled}
+              title={q}
+              onClick={() => pick(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </details>
   )
 }
 
@@ -181,6 +191,7 @@ export default function App() {
   ])
   const [chatInput, setChatInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatThreadRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   const logout = () => {
@@ -270,9 +281,13 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (chatOpen) {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
+    if (!chatOpen) return
+    const thread = chatThreadRef.current
+    if (!thread) return
+    const id = requestAnimationFrame(() => {
+      thread.scrollTo({ top: thread.scrollHeight, behavior: 'smooth' })
+    })
+    return () => cancelAnimationFrame(id)
   }, [chatMessages, chatPending, chatOpen])
 
   useEffect(() => {
@@ -325,7 +340,7 @@ export default function App() {
 
         {chatError ? <div className="chat-banner-err">{chatError}</div> : null}
 
-        <div className="chat-thread" role="log" aria-live="polite">
+        <div ref={chatThreadRef} className="chat-thread" role="log" aria-live="polite">
           {chatMessages.map((msg) => (
             <div
               key={msg.id}

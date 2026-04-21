@@ -146,17 +146,7 @@ export function ProgramStatisticsDashboard({ studyProgramId }: Props) {
               ))}
             </select>
           </label>
-          {strictLinear && godinaUpisa !== '' ? (
-            <div className="stats-fl" style={{ gridColumn: '1 / -1' }}>
-              <p className="dj-card-hint" style={{ margin: 0 }}>
-                <strong>Kontekst:</strong>{' '}
-                {naslovGodineKurikulumaZaStudenta(
-                  ocekivanaGodinaKurikulumaZaGeneraciju(Number(godinaUpisa)),
-                )}{' '}
-                · <strong>I semestar</strong>
-              </p>
-            </div>
-          ) : null}
+          {/* Removed contextual hint: "Kontekst: ... I semestar" per request */}
         </div>
         <div className="stats-dash-actions">
           <button type="button" className="dj-btn-refresh" disabled={loading} onClick={() => void load()}>

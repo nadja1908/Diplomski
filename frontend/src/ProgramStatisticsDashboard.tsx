@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { naisApi } from './api'
 import {
-  naslovGodineKurikulumaZaStudenta,
-  ocekivanaGodinaKurikulumaZaGeneraciju,
-  strogiLinearniModelZaGeneraciju,
   REFERENCE_INTAKE_YEAR,
   SHEF_DOPUSTENE_GENERACIJE_UPISA,
 } from './studijskeGodineLabele'
@@ -93,9 +90,6 @@ export function ProgramStatisticsDashboard({ studyProgramId }: Props) {
       setGodinaUpisa(String(opcije[0]))
     }
   }, [filters?.generacijeUpisa, godinaUpisa])
-
-  const strictLinear =
-    godinaUpisa !== '' && strogiLinearniModelZaGeneraciju(Number(godinaUpisa))
 
   const generacijaOpcije = useMemo(
     () => pickGeneracijaOpcije(filters?.generacijeUpisa),

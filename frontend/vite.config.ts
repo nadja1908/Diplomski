@@ -5,6 +5,8 @@ const gateway = process.env.VITE_GATEWAY_URL ?? 'http://localhost:9000'
 const columnar = process.env.VITE_COLUMNAR_URL ?? 'http://localhost:9050'
 
 export default defineConfig({
+  // Relative base makes the build work on GitHub Pages project URLs.
+  base: './',
   plugins: [react()],
   server: {
     port: 5173,

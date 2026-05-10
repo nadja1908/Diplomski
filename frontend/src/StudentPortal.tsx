@@ -42,7 +42,7 @@ const STATUS_COPY: Record<CurriculumSubject['status'], { label: string }> = {
 }
 
 const PASSING_GRADE = 6
-const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}brand-logo.svg`
+const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}logoFINAL.png`
 
 function bestGradePerSubject(grades: SubjectGrade[]): SubjectGrade[] {
   const m = new Map<string, SubjectGrade>()

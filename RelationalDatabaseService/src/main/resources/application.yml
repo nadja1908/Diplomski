@@ -43,6 +43,9 @@ nais:
     expiration-ms: 86400000
   vector-service:
     base-url: ${VECTOR_SERVICE_URL:http://vector-database-service:8000}
+  assistant:
+    # false = asistent ne zove Qdrant; kurikulum i kontekst za LLM iz PostgreSQL-a (naziv, kratak opis, sadržaj predmeta).
+    qdrant-enabled: ${NAIS_ASSISTANT_QDRANT_ENABLED:true}
   llm:
     # Produkcija: Groq (GROQ_API_KEY). URL/model su OpenAI-kompatibilni endpointi Groq-a.
     # Ključ uvek čita AssistantService iz GROQ_API_KEY (i opciono OPENAI_API_KEY samo za lokalni dev).

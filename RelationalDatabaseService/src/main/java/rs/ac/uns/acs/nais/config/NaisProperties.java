@@ -11,6 +11,7 @@ public class NaisProperties {
     private final Jwt jwt = new Jwt();
     private final VectorService vectorService = new VectorService();
     private final Llm llm = new Llm();
+    private final Assistant assistant = new Assistant();
 
     @Data
     public static class Jwt {
@@ -30,5 +31,15 @@ public class NaisProperties {
         private String openaiModel = "llama-3.3-70b-versatile";
         private double openaiTemperature = 0.4;
         private int openaiMaxTokens = 900;
+    }
+
+    @Data
+    public static class Assistant {
+        /**
+         * Kada je {@code false}, čet uopšte ne poziva vektorski servis (Qdrant) — samo PostgreSQL i ostale rute.
+         * Kada je {@code true} (podrazumevano), Qdrant se i dalje koristi samo kad lokalni pogodak nije dovoljno jak
+         * ili kad treba dopuna generičkog sadržaja predmeta.
+         */
+        private boolean qdrantEnabled = true;
     }
 }

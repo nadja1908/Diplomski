@@ -15,7 +15,7 @@ type ChatMessage =
 
 const WELCOME_TEXT =
   'Zdravo! Pitaj šta god ti treba o predmetima, ocenama i kurikulumu — odgovori su vezani za tvoj studijski program.'
-const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}brand-logo.svg`
+const BRAND_LOGO_SRC = `${import.meta.env.BASE_URL}logoFINAL.png`
 
 const PAGES_BEZ_BACKEND_URL =
   import.meta.env.PROD && !(import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim()

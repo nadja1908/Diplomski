@@ -368,11 +368,6 @@ export function StudentPortal({ displayName, onLogout }: Props) {
         <div className="sp-banner sp-banner--warn">
           <p className="sp-banner-title">Kurikulum</p>
           <p className="sp-banner-detail">{errors.curriculum}</p>
-          <p className="sp-banner-hint">
-            Proveri da li API Gateway radi na <code className="sp-code">localhost:9000</code> i da li je
-            ponovo izgrađen posle dodavanja rute <code className="sp-code">curriculum-progress</code>{' '}
-            (<code className="sp-code">docker compose build gateway-api</code>).
-          </p>
         </div>
       ) : null}
       {loading && !curriculum ? (

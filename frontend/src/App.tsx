@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import './App.css'
+import { ApiRequestError } from './apiError'
 import { naisApi, setToken } from './api'
 import { CassandraStatsPage } from './CassandraStatsPage'
 import { HeadPortal, type HeadPortalView } from './HeadPortal'
@@ -8,6 +9,8 @@ import { StudentPortal } from './StudentPortal'
 type Role = string | null
 
 type StaffSection = HeadPortalView | 'stats'
+
+type HeadNavTab = Exclude<StaffSection, 'stats'>
 
 type ChatMessage =
   | { id: string; role: 'user'; text: string }
@@ -209,8 +212,8 @@ export default function App() {
       } else {
         localStorage.removeItem('nais_remember_email')
       }
-    } catch {
-      setError('Prijava nije uspela.')
+    } catch (err) {
+      setError(err instanceof ApiRequestError ? err.message : 'Prijava nije uspela.')
     } finally {
       setAuthLoading(false)
     }
@@ -237,24 +240,20 @@ export default function App() {
         },
       ])
     } catch (e) {
-      const raw = e instanceof Error ? e.message : ''
-      const httpBody =
-        /^HTTP \d+:\s*(.*)$/s.exec(raw)?.[1]?.trim() ?? ''
-      if (httpBody) {
-        setChatError(httpBody)
-        setChatMessages((m) => [
-          ...m,
-          { id: newId(), role: 'assistant', text: httpBody },
-        ])
+      const msg =
+        e instanceof ApiRequestError
+          ? e.message
+          : e instanceof Error
+            ? e.message
+            : ''
+      if (msg) {
+        setChatError(msg)
+        setChatMessages((m) => [...m, { id: newId(), role: 'assistant', text: msg }])
       } else {
-        setChatError('Nije moguće dohvatiti odgovor. Proveri mrežu ili da li si ulogovan kao student.')
+        setChatError('Nije moguće dohvatiti odgovor.')
         setChatMessages((m) => [
           ...m,
-          {
-            id: newId(),
-            role: 'assistant',
-            text: 'Servis trenutno nije dostupan. Pokušaj ponovo za trenutak.',
-          },
+          { id: newId(), role: 'assistant', text: 'Servis trenutno nije dostupan. Pokušaj ponovo za trenutak.' },
         ])
       }
     } finally {
@@ -444,10 +443,7 @@ export default function App() {
             <p className="login-lead-dj">Unesi podatke za nastavak</p>
             {PAGES_BEZ_BACKEND_URL ? (
               <p className="err login-err-dj" role="alert">
-                Ovaj build nema podešen backend URL (obično HTTP 405 na prijavi). U GitHub repou: Settings → Secrets and
-                variables → Actions → Variables → dodaj <code>VITE_API_BASE_URL</code> (npr. tvoj{' '}
-                <code>https://….trycloudflare.com</code> dok radi tunnel), pa ponovo pokreni workflow „Deploy frontend to
-                GitHub Pages“.
+                U ovom okruženju nije podešena adresa backend servisa.
               </p>
             ) : null}
             <form onSubmit={login} className="login-form-dj">
@@ -536,6 +532,13 @@ export default function App() {
                       >
                         Studenti
                       </button>
+                      <button
+                        type="button"
+                        className={`dj-nav-item${staffSection === 'subjects' ? ' dj-nav-item--active' : ''}`}
+                        onClick={() => setStaffSection('subjects')}
+                      >
+                        Predmeti
+                      </button>
                     </>
                   ) : null}
                   <button
@@ -556,7 +559,7 @@ export default function App() {
 
               <div className="sp-main dj-main head-portal-main">
                 {role === 'SEF_KATEDRE' && staffSection !== 'stats' ? (
-                  <HeadPortal view={staffSection} />
+                  <HeadPortal view={staffSection as HeadNavTab} />
                 ) : null}
 
                 {(role !== 'SEF_KATEDRE' || staffSection === 'stats') ? (

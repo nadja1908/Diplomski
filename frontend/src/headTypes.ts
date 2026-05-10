@@ -59,3 +59,35 @@ export type HeadProgramPregled = {
   statistikaPolaganja: HeadPredmetStat[]
   napomenaOUzorku: string
 }
+
+/** Predmet sa sadržajem — šef katedre (CRUD liste) */
+export type HeadPredmetDetail = {
+  id: number
+  sifra: string
+  naziv: string
+  espb: number
+  studijskiProgramId: number
+  studijskiProgramSifra: string
+  studijskiProgramNaziv: string
+  kratakOpis: string
+  kurikulumGodina: number
+  kurikulumSemestar: number
+  cilj: string
+  ishodiUcenja: string
+  metodeNastave: string
+  temeKursa: string
+}
+
+export type HeadPredmetUpsertPayload = {
+  sifra: string
+  naziv: string
+  espb: number
+  studijskiProgramId: number
+  kurikulumGodina: number
+  kurikulumSemestar: number
+  kratakOpis?: string | null
+  cilj?: string | null
+  ishodiUcenja?: string | null
+  metodeNastave?: string | null
+  temeKursa?: string | null
+}

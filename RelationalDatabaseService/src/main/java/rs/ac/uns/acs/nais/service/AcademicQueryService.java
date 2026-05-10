@@ -53,6 +53,18 @@ public class AcademicQueryService {
         }
     }
 
+    /**
+     * Za upis operacije šefa katedre: validira ulogu i red u {@code sef_katedre}, vraća id katedre.
+     */
+    @Transactional(readOnly = true)
+    public long katedraIdForHeadOrThrow(Long korisnikId) {
+        assertSefKatedre(korisnikId);
+        return sefKatedreRepository.findByKorisnikIdWithKatedra(korisnikId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Niste dodeljeni kao šef katedre"))
+                .getKatedra()
+                .getId();
+    }
+
     @Transactional(readOnly = true)
     public StudentProfileDto studentProfile(Long korisnikId) {
         Objects.requireNonNull(korisnikId, "korisnikId");

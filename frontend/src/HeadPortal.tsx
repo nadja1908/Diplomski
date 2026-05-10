@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { naisApi } from './api'
 import { ProgramStatisticsDashboard } from './ProgramStatisticsDashboard'
 import { HeadStudentsSection } from './HeadStudentsSection'
+import { HeadSubjectsSection } from './HeadSubjectsSection'
 
-export type HeadPortalView = 'analytics' | 'students'
+export type HeadPortalView = 'analytics' | 'students' | 'subjects'
 
 type Props = {
   view: HeadPortalView
@@ -29,9 +30,10 @@ export function HeadPortal({ view }: Props) {
         const bundle = await naisApi.headStudentsBundle()
         if (cancelled) return
         if (!bundle?.programi || !Array.isArray(bundle.programi)) {
-          throw new Error(
-            'Backend mora biti ažuriran: GET /api/head/students sada vraća objekat { programi, studenti }.',
-          )
+          setPrograms([])
+          setProgramId(null)
+          setProgramsErr('Podaci katedre nisu učitani.')
+          return
         }
         const list = bundle.programi
         setPrograms(list)
@@ -47,20 +49,10 @@ export function HeadPortal({ view }: Props) {
               ? e.message
               : 'Ne mogu da učitam podatke katedre (nepoznata greška).'
           if (/403|Forbidden/i.test(msg)) {
-            msg +=
-              ' Ako ste šef katedre: odjavite se, ponovo se prijavite. Ako koristite Docker + pokrećete servis i iz IDE-a, proverite da je JWT_SECRET isti i da u Eureci nije registrovano više relational instanci sa različitim tajnama.'
+            msg += ' Prijavi se ponovo kao korisnik sa odgovarajućim pravima.'
           }
           if (/401|Unauthorized/i.test(msg)) {
-            msg +=
-              ' Token nije prihvaćen — odjava, ponovna prijava, ili uskladite JWT_SECRET između svih instanci relacionog servisa i docker-compose.'
-          }
-          try {
-            const me = await naisApi.authMe()
-            if (!cancelled) {
-              msg += ` — GET /api/auth/me: uloga u bazi = ${me.uloga}, email = ${me.email}`
-            }
-          } catch {
-            /* ignore */
+            msg += ' Sesija nije važeća — prijavi se ponovo.'
           }
           setProgramsErr(msg)
         }
@@ -100,46 +92,52 @@ export function HeadPortal({ view }: Props) {
     }
   }, [programId, view])
 
-  const titleForView = view === 'analytics' ? 'Analitika programa' : 'Studenti'
+  const titleForView =
+    view === 'analytics' ? 'Analitika programa' : view === 'students' ? 'Studenti' : 'Predmeti'
+
+  const showProgramPicker = view !== 'subjects'
 
   return (
     <>
       <article className="dj-card head-work-card head-pregled-card">
         <h2 className="dj-card-title">{titleForView}</h2>
-        {view !== 'analytics' ? (
+        {view === 'students' ? (
           <p className="dj-card-hint">Lista studenata po generaciji upisa.</p>
         ) : null}
-
         {programsErr ? <p className="err head-portal-err">{programsErr}</p> : null}
 
-        <div className="head-program-picker">
-          <label className="head-program-picker-label" htmlFor="head-program-select">
-            Studijski program
-          </label>
-          <select
-            id="head-program-select"
-            className="head-program-select"
-            value={programId ?? ''}
-            onChange={(e) => {
-              const v = e.target.value
-              setProgramId(v ? Number(v) : null)
-            }}
-            disabled={programs.length === 0 || loadingPrograms}
-          >
-            {programs.length === 0 ? <option value="">Nema programa</option> : null}
-            {programs.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.sifra} — {p.naziv}
-              </option>
-            ))}
-          </select>
-        </div>
+        {showProgramPicker ? (
+          <div className="head-program-picker">
+            <label className="head-program-picker-label" htmlFor="head-program-select">
+              Studijski program
+            </label>
+            <select
+              id="head-program-select"
+              className="head-program-select"
+              value={programId ?? ''}
+              onChange={(e) => {
+                const v = e.target.value
+                setProgramId(v ? Number(v) : null)
+              }}
+              disabled={programs.length === 0 || loadingPrograms}
+            >
+              {programs.length === 0 ? <option value="">Nema programa</option> : null}
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.sifra} — {p.naziv}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
 
         {view === 'analytics' && programId != null ? (
           <div className="head-analytics-embed">
             <ProgramStatisticsDashboard studyProgramId={programId} />
           </div>
         ) : null}
+
+        {view === 'subjects' ? <HeadSubjectsSection /> : null}
 
         {view === 'students' ? (
           <>

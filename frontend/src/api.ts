@@ -1,4 +1,11 @@
-import type { HeadProgramPregled, HeadProgramSummary, HeadStudentsBundle } from './headTypes'
+import { ApiRequestError, parseHttpErrorBody } from './apiError'
+import type {
+  HeadPredmetDetail,
+  HeadPredmetUpsertPayload,
+  HeadProgramPregled,
+  HeadProgramSummary,
+  HeadStudentsBundle,
+} from './headTypes'
 import type { CurriculumProgress, Gpa, StudentProfile, SubjectGrade } from './studentTypes'
 import type { ColumnarSubjectStat, PassFailTrend, PerformanceOverview } from './columnarTypes'
 import {
@@ -29,10 +36,7 @@ async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${base}${path}`, { ...init, headers })
   if (!res.ok) {
     const txt = await res.text()
-    const snippet = txt.length > 280 ? `${txt.slice(0, 280)}…` : txt
-    throw new Error(
-      snippet ? `HTTP ${res.status}: ${snippet}` : `HTTP ${res.status} ${res.statusText}`,
-    )
+    throw new ApiRequestError(res.status, parseHttpErrorBody(res.status, txt))
   }
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
@@ -76,6 +80,14 @@ export const naisApi = {
     if (opts?.statistikaCeoProgram === true) q.set('statistikaCeoProgram', 'true')
     return api<HeadProgramPregled>(`/api/head/students?${q}`)
   },
+  headSubjectsList: () => api<HeadPredmetDetail[]>('/api/head/subjects'),
+  headSubjectCreate: (body: HeadPredmetUpsertPayload) =>
+    api<HeadPredmetDetail>('/api/head/subjects', { method: 'POST', body: JSON.stringify(body) }),
+  headSubjectUpdate: (id: number, body: HeadPredmetUpsertPayload) =>
+    api<HeadPredmetDetail>(`/api/head/subjects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
   headAnalytics: () => api<ColumnarSubjectStat[]>('/api/head/subjects/analytics'),
   headTrends: (godina?: number) => {
     const q = godina != null ? `?godina=${encodeURIComponent(String(godina))}` : ''
@@ -96,19 +108,7 @@ export const naisApi = {
     })
     if (!res.ok) {
       const txt = await res.text()
-      let msg = txt
-      try {
-        const j = JSON.parse(txt) as { message?: string }
-        if (j?.message && typeof j.message === 'string') {
-          msg = j.message
-        }
-      } catch {
-        /* use raw txt */
-      }
-      const snippet = msg.length > 600 ? `${msg.slice(0, 600)}…` : msg
-      throw new Error(
-        snippet ? `HTTP ${res.status}: ${snippet}` : `HTTP ${res.status} ${res.statusText}`,
-      )
+      throw new ApiRequestError(res.status, parseHttpErrorBody(res.status, txt))
     }
     return res.json() as Promise<{ answer: string; sources: string[]; answerSource?: string }>
   },

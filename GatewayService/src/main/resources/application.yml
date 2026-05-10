@@ -44,6 +44,15 @@ spring:
           uri: ${RELATIONAL_SERVICE_URI:http://localhost:9030}
           predicates:
             - Path=/api/statistics/**
+        # Posebna ruta: /api/head/subjects/** ide na relacioni (CRUD), osim /analytics koji ostaje kolonarni.
+        - id: columnar-head-subjects-analytics-first
+          uri: ${COLUMNAR_SERVICE_URI:http://localhost:9050}
+          predicates:
+            - Path=/api/head/subjects/analytics
+        - id: relational-head-subjects-crud
+          uri: ${RELATIONAL_SERVICE_URI:http://localhost:9030}
+          predicates:
+            - Path=/api/head/subjects,/api/head/subjects/**
         - id: relational-auth-student-head-assistant
           uri: ${RELATIONAL_SERVICE_URI:http://localhost:9030}
           predicates:
@@ -51,7 +60,7 @@ spring:
         - id: columnar-statistics
           uri: ${COLUMNAR_SERVICE_URI:http://localhost:9050}
           predicates:
-            - Path=/api/student/me/statistics,/api/head/subjects/analytics,/api/head/trends/pass-fail,/api/head/performance-overview,/api/stats/**
+            - Path=/api/student/me/statistics,/api/head/trends/pass-fail,/api/head/performance-overview,/api/stats/**
 
 server:
   port: 9000
